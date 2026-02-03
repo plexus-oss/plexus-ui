@@ -116,7 +116,6 @@ export function TelemetryDashboard() {
           </div>
         </section>
 
-        {/* Resources */}
         <section>
           <h2 className="text-2xl font-semibold mb-4">Resources</h2>
           <ul className="space-y-2">

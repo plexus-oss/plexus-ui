@@ -638,7 +638,6 @@ export function TelemetryDemo() {
         )}
       </ChartCard>
 
-      {/* 3D Visualizations */}
       <div className="grid gap-3 md:grid-cols-1">
         <ChartCard
           title="LiDAR Terrain Scan"

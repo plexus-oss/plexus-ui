@@ -276,7 +276,6 @@ const channelData = Array.from({ length: 8 }, () =>
 </div>`}
       preview={
         <div className="w-full space-y-4">
-          {/* Patient/Session Info */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
