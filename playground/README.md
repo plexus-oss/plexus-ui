@@ -120,9 +120,9 @@ Components are copied into your project (not NPM dependencies).
 
 ## Learn More
 
-- **Main docs**: [plexusui.dev](https://plexusui.dev)
+- **Main docs**: [ui.plexus.company](https://ui.plexus.company)
 - **Component library**: `/packages/components`
-- **GitHub**: [github.com/annschulte/plexus-ui](https://github.com/annschulte/plexus-ui)
+- **GitHub**: [github.com/plexus-oss/ui](https://github.com/plexus-oss/ui)
 
 ---
 
