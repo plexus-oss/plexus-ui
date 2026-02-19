@@ -62,4 +62,4 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 **Made with Care**
 
-Questions? Reach out to [@annschulte](https://github.com/annschulte)
+Questions? Reach out to [@plexus](https://github.com/plexus-oss)
