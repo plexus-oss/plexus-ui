@@ -31,7 +31,7 @@ Open http://localhost:3000 to see demos.
 - ✅ Dark mode support
 - ✅ TypeScript + React
 
-**[→ Full Documentation](./packages/components/lib/connectors/README.md)**
+**[→ Playground & Demos](./playground)**
 
 ## Contributing
 
