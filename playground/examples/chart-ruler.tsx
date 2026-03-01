@@ -1,18 +1,11 @@
 "use client";
 
+import { ChartRuler, LineChart, type Measurement } from "@plexusui/components/charts";
 import * as React from "react";
 import { useState } from "react";
-import {
-  LineChart,
-  ChartRuler,
-  type Measurement,
-} from "@plexusui/components/charts";
-import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { useColorScheme } from "@/components/color-scheme-provider";
+import { ComponentPreview } from "@/components/component-preview";
 
 /**
  * Generate sample telemetry data
@@ -72,9 +65,7 @@ const [enabled, setEnabled] = useState(true);
                 type="button"
                 onClick={() => setRulerEnabled(!rulerEnabled)}
                 className={`px-3 py-1 text-xs rounded ${
-                  rulerEnabled
-                    ? `bg-[${color}] text-white`
-                    : `bg-zinc-800 text-zinc-400`
+                  rulerEnabled ? `bg-[${color}] text-white` : `bg-zinc-800 text-zinc-400`
                 }`}
               >
                 {rulerEnabled ? "Disable Ruler" : "Enable Ruler"}
@@ -113,17 +104,13 @@ const [enabled, setEnabled] = useState(true);
 
           {measurements.length > 0 && (
             <div className="bg-zinc-900 p-4 rounded-lg">
-              <div className="text-xs font-semibold mb-2 text-zinc-300">
-                Recent Measurements:
-              </div>
+              <div className="text-xs font-semibold mb-2 text-zinc-300">Recent Measurements:</div>
               <div className="space-y-1 text-xs font-mono text-zinc-400">
                 {measurements.slice(-3).map((m, i) => (
                   <div key={i}>
                     {`#${measurements.length - 2 + i}: ΔX=${m.deltaX.toFixed(
                       2
-                    )}, ΔY=${m.deltaY.toFixed(
-                      2
-                    )}, Distance=${m.distance.toFixed(2)}`}
+                    )}, ΔY=${m.deltaY.toFixed(2)}, Distance=${m.distance.toFixed(2)}`}
                   </div>
                 ))}
               </div>
@@ -137,9 +124,7 @@ const [enabled, setEnabled] = useState(true);
 
 function RateOfChangeExample() {
   const data = React.useMemo(() => generateTelemetryData(100), []);
-  const [lastMeasurement, setLastMeasurement] = useState<Measurement | null>(
-    null
-  );
+  const [lastMeasurement, setLastMeasurement] = useState<Measurement | null>(null);
 
   return (
     <ComponentPreview
@@ -183,36 +168,25 @@ const [measurement, setMeasurement] = useState<Measurement | null>(null);
 
           {lastMeasurement && (
             <div className="bg-zinc-900 p-4 rounded-lg">
-              <div className="text-xs font-semibold mb-2 text-zinc-300">
-                Calculated Metrics:
-              </div>
+              <div className="text-xs font-semibold mb-2 text-zinc-300">Calculated Metrics:</div>
               <div className="grid grid-cols-2 gap-4 text-xs font-mono">
                 <div>
                   <div className="text-zinc-500">Time Difference (ΔX)</div>
-                  <div className="text-zinc-200">
-                    {lastMeasurement.deltaX.toFixed(2)} s
-                  </div>
+                  <div className="text-zinc-200">{lastMeasurement.deltaX.toFixed(2)} s</div>
                 </div>
                 <div>
                   <div className="text-zinc-500">Position Change (ΔY)</div>
-                  <div className="text-zinc-200">
-                    {lastMeasurement.deltaY.toFixed(2)} units
-                  </div>
+                  <div className="text-zinc-200">{lastMeasurement.deltaY.toFixed(2)} units</div>
                 </div>
                 <div>
                   <div className="text-zinc-500">Rate of Change</div>
                   <div className="text-zinc-200">
-                    {(lastMeasurement.deltaY / lastMeasurement.deltaX).toFixed(
-                      2
-                    )}{" "}
-                    units/s
+                    {(lastMeasurement.deltaY / lastMeasurement.deltaX).toFixed(2)} units/s
                   </div>
                 </div>
                 <div>
                   <div className="text-zinc-500">Euclidean Distance</div>
-                  <div className="text-zinc-200">
-                    {lastMeasurement.distance.toFixed(2)}
-                  </div>
+                  <div className="text-zinc-200">{lastMeasurement.distance.toFixed(2)}</div>
                 </div>
               </div>
             </div>
@@ -260,9 +234,7 @@ const exportData = () => {
                 onClick={() => {
                   const csv =
                     "deltaX,deltaY,distance\n" +
-                    measurements
-                      .map((m) => `${m.deltaX},${m.deltaY},${m.distance}`)
-                      .join("\n");
+                    measurements.map((m) => `${m.deltaX},${m.deltaY},${m.distance}`).join("\n");
                   console.log("CSV Export:", csv);
                   alert("Exported to console");
                 }}
@@ -370,9 +342,8 @@ export function ChartRulerExamples() {
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Chart Ruler</h1>
         <p className="text-zinc-600 dark:text-zinc-400 text-lg">
-          Interactive measurement tool for calculating distances and deltas
-          between points. Perfect for analyzing rates of change and time
-          differences.
+          Interactive measurement tool for calculating distances and deltas between points. Perfect
+          for analyzing rates of change and time differences.
         </p>
       </div>
 
@@ -386,8 +357,8 @@ export function ChartRulerExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            Interactive component for measuring distances. Click and drag to
-            measure, release to capture.
+            Interactive component for measuring distances. Click and drag to measure, release to
+            capture.
           </p>
         </div>
 
@@ -408,9 +379,7 @@ export function ChartRulerExamples() {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-zinc-900 p-4 rounded-lg">
               <div className="font-semibold mb-2">Time Differences</div>
-              <div className="text-sm text-zinc-400">
-                Calculate time between events or phases
-              </div>
+              <div className="text-sm text-zinc-400">Calculate time between events or phases</div>
             </div>
             <div className="bg-zinc-900 p-4 rounded-lg">
               <div className="font-semibold mb-2">Amplitude Changes</div>

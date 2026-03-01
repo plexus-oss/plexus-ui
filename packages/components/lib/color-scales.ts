@@ -53,9 +53,7 @@ function interpolateColor(
  * scale(1)    // "rgb(255, 0, 0)"
  * ```
  */
-export function createColorScale(
-  stops: ColorStop[]
-): (value: number) => string {
+export function createColorScale(stops: ColorStop[]): (value: number) => string {
   if (stops.length === 0) {
     throw new Error("Color scale must have at least one stop");
   }
@@ -78,8 +76,7 @@ export function createColorScale(
 
       if (clamped <= stop2.position) {
         // Interpolate between stop1 and stop2
-        const t =
-          (clamped - stop1.position) / (stop2.position - stop1.position);
+        const t = (clamped - stop1.position) / (stop2.position - stop1.position);
         const [r, g, b] = interpolateColor(stop1.color, stop2.color, t);
         return `rgb(${r}, ${g}, ${b})`;
       }

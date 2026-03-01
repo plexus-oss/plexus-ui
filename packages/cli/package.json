@@ -1,6 +1,6 @@
 {
   "name": "@plexusui/cli",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "CLI for adding GPU-accelerated Plexus UI components to your project - built for robotics, medical devices, aerospace, and industrial IoT",
   "type": "module",
   "bin": {

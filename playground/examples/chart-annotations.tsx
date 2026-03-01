@@ -1,18 +1,11 @@
 "use client";
 
+import { type Annotation, ChartAnnotations, LineChart } from "@plexusui/components/charts";
 import * as React from "react";
 import { useState } from "react";
-import {
-  LineChart,
-  ChartAnnotations,
-  type Annotation,
-} from "@plexusui/components/charts";
-import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { useColorScheme } from "@/components/color-scheme-provider";
+import { ComponentPreview } from "@/components/component-preview";
 
 /**
  * Generate sample telemetry data
@@ -68,9 +61,7 @@ const [annotations, setAnnotations] = useState<Annotation[]>([]);
                 type="button"
                 onClick={() => setEnabled(!enabled)}
                 className={`px-3 py-1 text-xs rounded ${
-                  enabled
-                    ? `bg-[${color}] text-white`
-                    : "bg-zinc-800 text-zinc-400"
+                  enabled ? `bg-[${color}] text-white` : "bg-zinc-800 text-zinc-400"
                 }`}
               >
                 {enabled ? "Disable" : "Enable"}
@@ -164,9 +155,7 @@ useEffect(() => {
                 type="button"
                 onClick={() => setIsStreaming(!isStreaming)}
                 className={`cursor-pointer px-3 py-1 text-xs rounded ${
-                  isStreaming
-                    ? `bg-[${color}] text-white`
-                    : `bg-zinc-800 text-zinc-400`
+                  isStreaming ? `bg-[${color}] text-white` : `bg-zinc-800 text-zinc-400`
                 }`}
               >
                 {isStreaming ? "Pause" : "Start Stream"}
@@ -201,8 +190,8 @@ useEffect(() => {
           </LineChart.Root>
 
           <div className="bg-zinc-900 p-3 rounded text-xs text-zinc-400">
-            💡 Pause the stream, add annotations, then resume - annotations stay
-            locked to their data points
+            💡 Pause the stream, add annotations, then resume - annotations stay locked to their
+            data points
           </div>
         </div>
       }
@@ -222,8 +211,7 @@ const annotationProps: ApiProp[] = [
     name: "onChange",
     type: "(annotations: Annotation[]) => void",
     default: "required",
-    description:
-      "Callback when annotations are added, edited, deleted, or repositioned",
+    description: "Callback when annotations are added, edited, deleted, or repositioned",
   },
   {
     name: "enabled",
@@ -245,8 +233,7 @@ export function ChartAnnotationsExamples() {
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Chart Annotations</h1>
         <p className="text-zinc-600 dark:text-zinc-400 text-lg">
-          Minimal text annotation system for labeling data. Clean, fast, stays
-          out of the way.
+          Minimal text annotation system for labeling data. Clean, fast, stays out of the way.
         </p>
       </div>
 
@@ -259,8 +246,7 @@ export function ChartAnnotationsExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            Single component for all annotation needs. Click to add, inline
-            editing, minimal UI.
+            Single component for all annotation needs. Click to add, inline editing, minimal UI.
           </p>
         </div>
 

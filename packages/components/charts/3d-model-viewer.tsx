@@ -1,19 +1,19 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
 import { Grid, OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
 import {
   createContext,
+  type ReactNode,
+  Suspense,
   useContext,
+  useMemo,
   useRef,
   useState,
-  useMemo,
-  Suspense,
-  type ReactNode,
 } from "react";
 import * as THREE from "three";
-import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import { viridis } from "../lib/color-scales";
 
 // ============================================================================
@@ -64,9 +64,7 @@ const ModelViewerContext = createContext<ModelViewerContextType | null>(null);
 function useModelViewerData() {
   const ctx = useContext(ModelViewerContext);
   if (!ctx) {
-    throw new Error(
-      "ModelViewer components must be used within ModelViewer.Root"
-    );
+    throw new Error("ModelViewer components must be used within ModelViewer.Root");
   }
   return ctx;
 }
@@ -104,9 +102,9 @@ function Model3D() {
         const loader = new OBJLoader();
         const text = new TextDecoder().decode(modelData as ArrayBuffer);
         const object = loader.parse(text);
-        const firstMesh = object.children.find(
-          (child) => child instanceof THREE.Mesh
-        ) as THREE.Mesh | undefined;
+        const firstMesh = object.children.find((child) => child instanceof THREE.Mesh) as
+          | THREE.Mesh
+          | undefined;
         if (firstMesh) {
           setGeometry(firstMesh.geometry);
         }
@@ -121,9 +119,9 @@ function Model3D() {
       } else if (modelType === "obj") {
         const loader = new OBJLoader();
         loader.load(modelUrl, (object) => {
-          const firstMesh = object.children.find(
-            (child) => child instanceof THREE.Mesh
-          ) as THREE.Mesh | undefined;
+          const firstMesh = object.children.find((child) => child instanceof THREE.Mesh) as
+            | THREE.Mesh
+            | undefined;
           if (firstMesh) {
             setGeometry(firstMesh.geometry);
           }
@@ -214,9 +212,7 @@ function Scene() {
       <group ref={meshRef}>
         <Model3D />
       </group>
-      {showGrid && (
-        <Grid args={[10, 10]} cellColor="#6B7280" sectionColor="#374151" />
-      )}
+      {showGrid && <Grid args={[10, 10]} cellColor="#6B7280" sectionColor="#374151" />}
       {showAxes && <axesHelper args={[3]} />}
     </>
   );

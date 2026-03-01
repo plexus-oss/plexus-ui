@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: chart SVG elements are decorative and labeled via axes */
 "use client";
 
 import * as React from "react";
@@ -40,9 +40,7 @@ function GPUErrorFallback({
         </div>
 
         <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-          {isGPUError
-            ? "GPU Acceleration Unavailable"
-            : "Chart Rendering Error"}
+          {isGPUError ? "GPU Acceleration Unavailable" : "Chart Rendering Error"}
         </h3>
 
         <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
@@ -58,20 +56,14 @@ function GPUErrorFallback({
             </h4>
             <ul className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
               <li className="flex items-start gap-2">
-                <span className="text-zinc-400 dark:text-zinc-600 mt-0.5">
-                  1.
-                </span>
+                <span className="text-zinc-400 dark:text-zinc-600 mt-0.5">1.</span>
                 <span>
-                  <strong className="text-zinc-900 dark:text-zinc-100">
-                    Update your browser:
-                  </strong>{" "}
+                  <strong className="text-zinc-900 dark:text-zinc-100">Update your browser:</strong>{" "}
                   Chrome 113+, Edge 113+, or Safari 18+
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-zinc-400 dark:text-zinc-600 mt-0.5">
-                  2.
-                </span>
+                <span className="text-zinc-400 dark:text-zinc-600 mt-0.5">2.</span>
                 <span>
                   <strong className="text-zinc-900 dark:text-zinc-100">
                     Enable hardware acceleration:
@@ -80,13 +72,9 @@ function GPUErrorFallback({
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-zinc-400 dark:text-zinc-600 mt-0.5">
-                  3.
-                </span>
+                <span className="text-zinc-400 dark:text-zinc-600 mt-0.5">3.</span>
                 <span>
-                  <strong className="text-zinc-900 dark:text-zinc-100">
-                    Update GPU drivers:
-                  </strong>{" "}
+                  <strong className="text-zinc-900 dark:text-zinc-100">Update GPU drivers:</strong>{" "}
                   Visit your graphics card manufacturer's website
                 </span>
               </li>
@@ -191,9 +179,7 @@ export interface BaseChartContext {
   tooltipData: TooltipData | null;
   setTooltipData: (data: TooltipData | null) => void;
   timeSeriesState: TimeSeriesState | null;
-  setTimeSeriesState: React.Dispatch<
-    React.SetStateAction<TimeSeriesState | null>
-  >;
+  setTimeSeriesState: React.Dispatch<React.SetStateAction<TimeSeriesState | null>>;
   /** Whether the chart is visible (in viewport and tab active). Use to pause expensive rendering. */
   isVisible: boolean;
 }
@@ -267,9 +253,9 @@ export function hexToRgb(color: string): [number, number, number] {
   const rgbMatch = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/i.exec(color);
   if (rgbMatch) {
     return [
-      parseInt(rgbMatch[1]) / 255,
-      parseInt(rgbMatch[2]) / 255,
-      parseInt(rgbMatch[3]) / 255,
+      parseInt(rgbMatch[1], 10) / 255,
+      parseInt(rgbMatch[2], 10) / 255,
+      parseInt(rgbMatch[3], 10) / 255,
     ];
   }
 
@@ -302,31 +288,22 @@ export interface WebGLRenderer<TProps extends RendererProps = RendererProps> {
   getProgram: () => WebGLProgram | null;
 }
 
-export interface WebGLRendererConfig<
-  TProps extends RendererProps = RendererProps
-> {
+export interface WebGLRendererConfig<TProps extends RendererProps = RendererProps> {
   canvas: HTMLCanvasElement;
   createShaders: (gl: WebGL2RenderingContext) => {
     vertexSource: string;
     fragmentSource: string;
   };
-  onRender: (
-    gl: WebGL2RenderingContext,
-    program: WebGLProgram,
-    props: TProps
-  ) => void;
-  onDestroy?: (
-    gl: WebGL2RenderingContext,
-    program: WebGLProgram | null
-  ) => void;
+  onRender: (gl: WebGL2RenderingContext, program: WebGLProgram, props: TProps) => void;
+  onDestroy?: (gl: WebGL2RenderingContext, program: WebGLProgram | null) => void;
 }
 
 /**
  * Create a WebGL2 renderer with custom shaders and render logic
  */
-export function createWebGLRenderer<
-  TProps extends RendererProps = RendererProps
->(config: WebGLRendererConfig<TProps>): WebGLRenderer<TProps> {
+export function createWebGLRenderer<TProps extends RendererProps = RendererProps>(
+  config: WebGLRendererConfig<TProps>
+): WebGLRenderer<TProps> {
   const gl = config.canvas.getContext("webgl2", {
     alpha: true,
     antialias: true,
@@ -353,10 +330,7 @@ export function createWebGLRenderer<
     return shader;
   };
 
-  const createProgram = (
-    vertexSource: string,
-    fragmentSource: string
-  ): WebGLProgram => {
+  const createProgram = (vertexSource: string, fragmentSource: string): WebGLProgram => {
     const vertexShader = createShader(gl.VERTEX_SHADER, vertexSource);
     const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentSource);
 
@@ -421,16 +395,11 @@ export interface WebGPURenderer<TProps extends RendererProps = RendererProps> {
   getPipeline: () => GPURenderPipeline | null;
 }
 
-export interface WebGPURendererConfig<
-  TProps extends RendererProps = RendererProps
-> {
+export interface WebGPURendererConfig<TProps extends RendererProps = RendererProps> {
   canvas: HTMLCanvasElement;
   device: GPUDevice;
   format?: GPUTextureFormat;
-  createPipeline: (
-    device: GPUDevice,
-    format: GPUTextureFormat
-  ) => GPURenderPipeline;
+  createPipeline: (device: GPUDevice, format: GPUTextureFormat) => GPURenderPipeline;
   onRender: (
     device: GPUDevice,
     context: GPUCanvasContext,
@@ -443,9 +412,9 @@ export interface WebGPURendererConfig<
 /**
  * Create a WebGPU renderer with custom pipeline and render logic
  */
-export function createWebGPURenderer<
-  TProps extends RendererProps = RendererProps
->(config: WebGPURendererConfig<TProps>): WebGPURenderer<TProps> {
+export function createWebGPURenderer<TProps extends RendererProps = RendererProps>(
+  config: WebGPURendererConfig<TProps>
+): WebGPURenderer<TProps> {
   const device = config.device;
   const format = config.format ?? "bgra8unorm";
 
@@ -555,14 +524,9 @@ export function ChartRoot({
     return { width: w, height: h };
   });
 
-  const [hoveredPoint, setHoveredPoint] =
-    React.useState<HoveredPoint<unknown> | null>(null);
-  const [tooltipData, setTooltipData] = React.useState<TooltipData | null>(
-    null
-  );
-  const [renderMode, setRenderMode] = React.useState<"webgpu" | "webgl" | null>(
-    null
-  );
+  const [hoveredPoint, setHoveredPoint] = React.useState<HoveredPoint<unknown> | null>(null);
+  const [tooltipData, setTooltipData] = React.useState<TooltipData | null>(null);
+  const [renderMode, setRenderMode] = React.useState<"webgpu" | "webgl" | null>(null);
 
   const [gpuDevice, setGpuDevice] = React.useState<GPUDevice | null>(null);
 
@@ -609,17 +573,16 @@ export function ChartRoot({
     };
   }, [preferWebGPU]);
 
-  const [timeSeriesState, setTimeSeriesState] =
-    React.useState<TimeSeriesState | null>(() => {
-      if (!enableTimeSeries || !timeRange) return null;
-      return {
-        isPlaying: false,
-        currentTime: timeRange[0],
-        startTime: timeRange[0],
-        endTime: timeRange[1],
-        playbackSpeed: 1,
-      };
-    });
+  const [timeSeriesState, setTimeSeriesState] = React.useState<TimeSeriesState | null>(() => {
+    if (!enableTimeSeries || !timeRange) return null;
+    return {
+      isPlaying: false,
+      currentTime: timeRange[0],
+      startTime: timeRange[0],
+      endTime: timeRange[1],
+      playbackSpeed: 1,
+    };
+  });
 
   React.useEffect(() => {
     const container = containerRef.current;
@@ -629,8 +592,7 @@ export function ChartRoot({
       const entry = entries[0];
       if (!entry) return;
 
-      const { width: observedWidth, height: observedHeight } =
-        entry.contentRect;
+      const { width: observedWidth, height: observedHeight } = entry.contentRect;
 
       let newWidth = observedWidth;
       let newHeight = observedHeight;
@@ -672,46 +634,27 @@ export function ChartRoot({
     return () => {
       observer.disconnect();
     };
-  }, [
-    widthProp,
-    heightProp,
-    minWidth,
-    minHeight,
-    maxWidth,
-    maxHeight,
-    aspectRatio,
-  ]);
+  }, [widthProp, heightProp, minWidth, minHeight, maxWidth, maxHeight, aspectRatio]);
 
   const { width, height } = dimensions;
 
-  const xDomain: [number, number] =
-    xDomainProp === "auto" || !xDomainProp ? [0, 100] : xDomainProp;
-  const yDomain: [number, number] =
-    yDomainProp === "auto" || !yDomainProp ? [0, 100] : yDomainProp;
+  const xDomain: [number, number] = xDomainProp === "auto" || !xDomainProp ? [0, 100] : xDomainProp;
+  const yDomain: [number, number] = yDomainProp === "auto" || !yDomainProp ? [0, 100] : yDomainProp;
 
-  const xTicks = React.useMemo(
-    () => xTicksProp || getTicks(xDomain, 6),
-    [xTicksProp, xDomain]
-  );
-  const yTicks = React.useMemo(
-    () => yTicksProp || getTicks(yDomain, 6),
-    [yTicksProp, yDomain]
-  );
+  const xTicks = React.useMemo(() => xTicksProp || getTicks(xDomain, 6), [xTicksProp, xDomain]);
+  const yTicks = React.useMemo(() => yTicksProp || getTicks(yDomain, 6), [yTicksProp, yDomain]);
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
   const xScale = React.useCallback(
-    (x: number) =>
-      margin.left + ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth,
+    (x: number) => margin.left + ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth,
     [xDomain, margin.left, innerWidth]
   );
 
   const yScale = React.useCallback(
     (y: number) =>
-      margin.top +
-      innerHeight -
-      ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight,
+      margin.top + innerHeight - ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight,
     [yDomain, margin.top, innerHeight]
   );
 
@@ -758,14 +701,14 @@ export function ChartRoot({
       typeof widthProp === "string"
         ? widthProp
         : typeof widthProp === "number"
-        ? `${widthProp}px`
-        : "100%",
+          ? `${widthProp}px`
+          : "100%",
     height:
       typeof heightProp === "string"
         ? heightProp
         : typeof heightProp === "number"
-        ? `${heightProp}px`
-        : "100%",
+          ? `${heightProp}px`
+          : "100%",
     minWidth: minWidth,
     minHeight: minHeight,
     maxWidth: typeof widthProp === "number" ? widthProp : maxWidth,
@@ -795,10 +738,7 @@ export function ChartRoot({
         errorFallback
           ? () => <>{errorFallback}</>
           : ({ error, resetErrorBoundary }) => (
-              <GPUErrorFallback
-                error={error}
-                resetErrorBoundary={resetErrorBoundary}
-              />
+              <GPUErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} />
             )
       }
       onError={onError}
@@ -839,10 +779,7 @@ export function ChartAxes() {
 
     context.beginPath();
     context.moveTo(ctx.margin.left, ctx.height - ctx.margin.bottom);
-    context.lineTo(
-      ctx.width - ctx.margin.right,
-      ctx.height - ctx.margin.bottom
-    );
+    context.lineTo(ctx.width - ctx.margin.right, ctx.height - ctx.margin.bottom);
     context.stroke();
 
     const getFilteredXTicks = () => {
@@ -878,9 +815,7 @@ export function ChartAxes() {
     visibleXTicks.forEach((tick) => {
       const x = ctx.xScale(tick);
       context.textAlign = "center";
-      const label = ctx.xAxis.formatter
-        ? ctx.xAxis.formatter(tick)
-        : formatValue(tick);
+      const label = ctx.xAxis.formatter ? ctx.xAxis.formatter(tick) : formatValue(tick);
       context.fillText(label, x, ctx.height - ctx.margin.bottom + 20);
     });
 
@@ -905,9 +840,7 @@ export function ChartAxes() {
 
       context.textAlign = "right";
       context.textBaseline = "middle";
-      const label = ctx.yAxis.formatter
-        ? ctx.yAxis.formatter(tick)
-        : formatValue(tick);
+      const label = ctx.yAxis.formatter ? ctx.yAxis.formatter(tick) : formatValue(tick);
       context.fillText(label, ctx.margin.left - 10, y);
     });
 
@@ -1030,10 +963,7 @@ export function ChartTooltip({
             className="text-zinc-700 dark:text-zinc-200 text-xs flex items-center gap-2"
           >
             {item.color && (
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: item.color }}
-              />
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
             )}
             <span className="dark:text-zinc-200">
               {item.label}: <span className="font-mono">{item.value}</span>

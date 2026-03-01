@@ -1,8 +1,9 @@
-/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: <explanation> */
-import { execSync } from "child_process";
+/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: forEach callbacks used for side effects, not iteration returns */
+
+import { execSync } from "node:child_process";
+import * as path from "node:path";
 import chalk from "chalk";
 import fs from "fs-extra";
-import * as path from "path";
 
 /**
  * Check which dependencies are already installed in the current project

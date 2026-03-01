@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Open_Sans, Space_Grotesk } from "next/font/google";
 import { Providers } from "@/app/providers";
-import { TopNav } from "@/components/top-nav";
 import { LayoutWrapper } from "@/components/layout-wrapper";
+import { TopNav } from "@/components/top-nav";
 
 export const metadata: Metadata = {
   title: "Plexus UI - Playground",

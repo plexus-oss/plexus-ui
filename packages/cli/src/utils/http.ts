@@ -1,4 +1,4 @@
-import https from "https";
+import https from "node:https";
 
 /**
  * Download file from URL with redirect support
@@ -15,7 +15,7 @@ export async function downloadFile(url: string): Promise<string> {
               return;
             }
             let data = "";
-            // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
+            // biome-ignore lint/suspicious/noAssignInExpressions: intentional concatenation in stream data handler
             res2.on("data", (chunk) => (data += chunk));
             res2.on("end", () => resolve(data));
             res2.on("error", reject);
@@ -25,7 +25,7 @@ export async function downloadFile(url: string): Promise<string> {
           return;
         } else {
           let data = "";
-          // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
+          // biome-ignore lint/suspicious/noAssignInExpressions: intentional concatenation in stream data handler
           res.on("data", (chunk) => (data += chunk));
           res.on("end", () => resolve(data));
           res.on("error", reject);

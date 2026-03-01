@@ -10,11 +10,7 @@
     },
     "style": {
       "type": "string",
-      "enum": [
-        "default",
-        "minimal",
-        "space"
-      ],
+      "enum": ["default", "minimal", "space"],
       "default": "default",
       "description": "Visual style variant for components"
     },
@@ -26,10 +22,7 @@
     "aliases": {
       "type": "object",
       "description": "Import path aliases",
-      "required": [
-        "components",
-        "utils"
-      ],
+      "required": ["components", "utils"],
       "properties": {
         "components": {
           "type": "string",
@@ -63,7 +56,5 @@
       }
     }
   },
-  "required": [
-    "aliases"
-  ]
+  "required": ["aliases"]
 }

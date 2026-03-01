@@ -1,18 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { AttitudeIndicator } from "@plexusui/components/charts/attitude-indicator";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
+import { useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
+import { ComponentPreview } from "@/components/component-preview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { ComponentPreview } from "@/components/component-preview";
 
 // ============================================================================
 // Basic Interactive Example
@@ -45,12 +41,7 @@ function AttitudeDemo() {
       preview={
         <div className="w-full space-y-6">
           <div className="flex justify-center">
-            <AttitudeIndicator
-              pitch={pitch}
-              roll={roll}
-              width={400}
-              height={400}
-            />
+            <AttitudeIndicator pitch={pitch} roll={roll} width={400} height={400} />
           </div>
 
           <Card>
@@ -183,12 +174,7 @@ function CustomIndicator() {
       preview={
         <div className="w-full space-y-6">
           <div className="flex justify-center">
-            <AttitudeIndicator.Root
-              pitch={pitch}
-              roll={roll}
-              width={400}
-              height={400}
-            >
+            <AttitudeIndicator.Root pitch={pitch} roll={roll} width={400} height={400}>
               <AttitudeIndicator.Canvas />
             </AttitudeIndicator.Root>
           </div>
@@ -256,15 +242,13 @@ const attitudeIndicatorProps: ApiProp[] = [
     name: "roll",
     type: "number",
     default: "0",
-    description:
-      "Roll angle in degrees (-180 to 180). Positive is right wing down",
+    description: "Roll angle in degrees (-180 to 180). Positive is right wing down",
   },
   {
     name: "yaw",
     type: "number",
     default: "undefined",
-    description:
-      "Yaw/heading angle in degrees (0-360). Shows heading indicator if provided",
+    description: "Yaw/heading angle in degrees (0-360). Shows heading indicator if provided",
   },
   {
     name: "size",
@@ -312,8 +296,7 @@ const attitudeIndicatorProps: ApiProp[] = [
     name: "preferWebGPU",
     type: "boolean",
     default: "true",
-    description:
-      "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
+    description: "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
   },
   {
     name: "className",
@@ -376,8 +359,7 @@ const attitudeIndicatorRootProps: ApiProp[] = [
     name: "children",
     type: "ReactNode",
     default: "undefined",
-    description:
-      "Primitive components (Horizon, Aircraft, RollScale, HeadingIndicator)",
+    description: "Primitive components (Horizon, Aircraft, RollScale, HeadingIndicator)",
   },
 ];
 
@@ -386,8 +368,7 @@ const attitudeIndicatorPrimitiveProps: ApiProp[] = [
     name: "AttitudeIndicator.Horizon",
     type: "component",
     default: "-",
-    description:
-      "Renders the horizon line with pitch markers. Props: showDegreeMarkers?: boolean",
+    description: "Renders the horizon line with pitch markers. Props: showDegreeMarkers?: boolean",
   },
   {
     name: "AttitudeIndicator.Aircraft",
@@ -426,22 +407,18 @@ export function AttitudeIndicatorExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            AttitudeIndicator component for displaying aircraft/vehicle
-            orientation (pitch, roll, yaw)
+            AttitudeIndicator component for displaying aircraft/vehicle orientation (pitch, roll,
+            yaw)
           </p>
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">
-            AttitudeIndicator (All-in-One)
-          </h3>
+          <h3 className="text-lg font-semibold">AttitudeIndicator (All-in-One)</h3>
           <ApiReferenceTable props={attitudeIndicatorProps} />
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">
-            AttitudeIndicator.Root (Composable)
-          </h3>
+          <h3 className="text-lg font-semibold">AttitudeIndicator.Root (Composable)</h3>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Root component for building custom layouts with primitives
           </p>
@@ -451,8 +428,7 @@ export function AttitudeIndicatorExamples() {
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Primitive Components</h3>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Use with AttitudeIndicator.Root for complete control over
-            composition
+            Use with AttitudeIndicator.Root for complete control over composition
           </p>
           <ApiReferenceTable props={attitudeIndicatorPrimitiveProps} />
         </div>

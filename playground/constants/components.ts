@@ -21,24 +21,20 @@ export interface ComponentMetadata {
 /**
  * Get all components from registry regardless of category
  */
-export function getAllComponentsFromRegistry(
-  registry: any
-): ComponentMetadata[] {
-  return Object.entries(registry.components).map(
-    ([id, component]: [string, any]) => ({
-      id,
-      name: component.name,
-      displayName: component.displayName || component.name,
-      category: component.category,
-      description: component.description,
-      files: component.files || [],
-      dependencies: component.dependencies,
-      devDependencies: component.devDependencies,
-      registryDependencies: component.registryDependencies,
-      tier: component.tier || "free",
-      textures: component.textures || [],
-    })
-  );
+export function getAllComponentsFromRegistry(registry: any): ComponentMetadata[] {
+  return Object.entries(registry.components).map(([id, component]: [string, any]) => ({
+    id,
+    name: component.name,
+    displayName: component.displayName || component.name,
+    category: component.category,
+    description: component.description,
+    files: component.files || [],
+    dependencies: component.dependencies,
+    devDependencies: component.devDependencies,
+    registryDependencies: component.registryDependencies,
+    tier: component.tier || "free",
+    textures: component.textures || [],
+  }));
 }
 
 export type ComponentTier = "free" | "pro";
@@ -61,8 +57,7 @@ function transformToPlaygroundFormat(
   return metadata.map((component: ComponentMetadata) => ({
     id: component.id,
     name: component.displayName || component.name,
-    category:
-      component.category.charAt(0).toUpperCase() + component.category.slice(1),
+    category: component.category.charAt(0).toUpperCase() + component.category.slice(1),
     description: component.description,
     textures: component.textures || [],
     tier: component.tier || "free",

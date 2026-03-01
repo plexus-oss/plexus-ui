@@ -1,11 +1,11 @@
-/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: chart SVG elements are decorative and labeled via axes */
 "use client";
 
 import { useMemo } from "react";
-import type { Series } from "./bar-chart";
-import { BarChart } from "./bar-chart";
 import type { BinMethod, DataPoint, HistogramBin } from "../lib/data-utils";
 import { calculateNormalCurve, createHistogramBins } from "../lib/data-utils";
+import type { Series } from "./bar-chart";
+import { BarChart } from "./bar-chart";
 
 // ============================================================================
 // Histogram Types
@@ -92,7 +92,7 @@ export interface HistogramChartProps {
   binEdge?: "left" | "right";
 }
 
-export { type HistogramBin };
+export type { HistogramBin };
 
 // ============================================================================
 // Histogram Component
@@ -135,7 +135,6 @@ export function HistogramChart({
           case "frequency":
             yValue = bin.count / data.length;
             break;
-          case "count":
           default:
             yValue = bin.count;
             break;
@@ -192,7 +191,6 @@ export function HistogramChart({
         case "frequency":
           yValue = bin.count / data.length;
           break;
-        case "count":
         default:
           yValue = bin.count;
           break;
@@ -213,7 +211,6 @@ export function HistogramChart({
         return "Density";
       case "frequency":
         return "Frequency";
-      case "count":
       default:
         return "Count";
     }
@@ -221,7 +218,7 @@ export function HistogramChart({
 
   // Render using BarChart with calculated bar width
   // We use orientation="vertical" and set barWidth to match bin width
-  const chartWidth = typeof width === "string" ? parseInt(width) : width - 80; // Account for margins
+  const chartWidth = typeof width === "string" ? parseInt(width, 10) : width - 80; // Account for margins
   const xRange = autoDomain[1] - autoDomain[0];
   const pixelsPerUnit = chartWidth / xRange;
   const calculatedBarWidth = binWidth * pixelsPerUnit * 0.95; // 95% to add tiny gap
@@ -233,10 +230,7 @@ export function HistogramChart({
         xAxis={{
           ...xAxis,
           label: xAxis.label || "Value",
-          domain:
-            xAxis.domain === "auto" || !xAxis.domain
-              ? autoDomain
-              : xAxis.domain,
+          domain: xAxis.domain === "auto" || !xAxis.domain ? autoDomain : xAxis.domain,
         }}
         yAxis={{
           ...yAxis,
@@ -265,14 +259,10 @@ export function HistogramChart({
         >
           <NormalCurveOverlay
             data={normalCurvePoints}
-            xDomain={
-              xAxis.domain === "auto" || !xAxis.domain
-                ? autoDomain
-                : xAxis.domain
-            }
+            xDomain={xAxis.domain === "auto" || !xAxis.domain ? autoDomain : xAxis.domain}
             yDomain={yDomain}
-            width={typeof width === "string" ? parseInt(width) : width}
-            height={typeof height === "string" ? parseInt(height) : height}
+            width={typeof width === "string" ? parseInt(width, 10) : width}
+            height={typeof height === "string" ? parseInt(height, 10) : height}
             color={normalCurveColor}
           />
         </svg>
@@ -307,9 +297,7 @@ function NormalCurveOverlay({
   const xScale = (x: number) =>
     margin.left + ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
   const yScale = (y: number) =>
-    height -
-    margin.bottom -
-    ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
+    height - margin.bottom - ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
 
   const pathData = data
     .map((point, i) => {

@@ -24,9 +24,7 @@ import type { PointCloudData } from "../charts/point-cloud-viewer";
  * 2.0 3.0 4.0 0.9 255 128 64
  * ```
  */
-export async function loadXYZ(
-  fileOrUrl: File | string
-): Promise<PointCloudData> {
+export async function loadXYZ(fileOrUrl: File | string): Promise<PointCloudData> {
   const text =
     typeof fileOrUrl === "string"
       ? await fetch(fileOrUrl).then((r) => r.text())
@@ -172,9 +170,7 @@ function parsePCDHeader(text: string): {
  * 0.93773 0.33763 0 4.2108e+06
  * ```
  */
-export async function loadPCD(
-  fileOrUrl: File | string
-): Promise<PointCloudData> {
+export async function loadPCD(fileOrUrl: File | string): Promise<PointCloudData> {
   const text =
     typeof fileOrUrl === "string"
       ? await fetch(fileOrUrl).then((r) => r.text())
@@ -183,9 +179,7 @@ export async function loadPCD(
   const { header, dataStart } = parsePCDHeader(text);
 
   if (header.data === "binary" || header.data === "binary_compressed") {
-    throw new Error(
-      "Binary PCD format not yet supported. Use ASCII format or convert file."
-    );
+    throw new Error("Binary PCD format not yet supported. Use ASCII format or convert file.");
   }
 
   // Parse ASCII data
@@ -368,18 +362,11 @@ export async function loadLAS(
   const classifications: number[] = [];
   const colors: number[] = [];
 
-  const pointsToLoad = Math.min(
-    maxPoints,
-    Math.floor(header.numberOfPointRecords / stride)
-  );
+  const pointsToLoad = Math.min(maxPoints, Math.floor(header.numberOfPointRecords / stride));
 
   let offset = header.offsetToPointData;
 
-  for (
-    let i = 0;
-    i < header.numberOfPointRecords && positions.length / 3 < pointsToLoad;
-    i++
-  ) {
+  for (let i = 0; i < header.numberOfPointRecords && positions.length / 3 < pointsToLoad; i++) {
     // Skip points based on stride
     if (i % stride !== 0) {
       offset += header.pointDataRecordLength;
@@ -449,9 +436,7 @@ export async function loadLAS(
 /**
  * Detect point cloud file format from filename or file
  */
-export function detectFormat(
-  fileOrUrl: File | string
-): "xyz" | "pcd" | "las" | "laz" | "unknown" {
+export function detectFormat(fileOrUrl: File | string): "xyz" | "pcd" | "las" | "laz" | "unknown" {
   const filename = typeof fileOrUrl === "string" ? fileOrUrl : fileOrUrl.name;
   const ext = filename.split(".").pop()?.toLowerCase();
 
@@ -500,10 +485,7 @@ export async function loadPointCloud(
 /**
  * Subsample point cloud (simple uniform subsampling)
  */
-export function subsamplePointCloud(
-  data: PointCloudData,
-  targetPoints: number
-): PointCloudData {
+export function subsamplePointCloud(data: PointCloudData, targetPoints: number): PointCloudData {
   const numPoints = data.positions.length / 3;
   if (numPoints <= targetPoints) return data;
 
@@ -514,11 +496,7 @@ export function subsamplePointCloud(
   const colors: number[] = [];
 
   for (let i = 0; i < numPoints; i += stride) {
-    positions.push(
-      data.positions[i * 3],
-      data.positions[i * 3 + 1],
-      data.positions[i * 3 + 2]
-    );
+    positions.push(data.positions[i * 3], data.positions[i * 3 + 1], data.positions[i * 3 + 2]);
 
     if (data.intensities) {
       intensities.push(data.intensities[i]);
@@ -529,11 +507,7 @@ export function subsamplePointCloud(
     }
 
     if (data.colors) {
-      colors.push(
-        data.colors[i * 3],
-        data.colors[i * 3 + 1],
-        data.colors[i * 3 + 2]
-      );
+      colors.push(data.colors[i * 3], data.colors[i * 3 + 1], data.colors[i * 3 + 2]);
     }
   }
 

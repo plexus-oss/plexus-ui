@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { ChartBrushSelector } from "./interactions";
 import { downsampleLTTB, downsampleMinMax } from "../lib/data-utils";
 import type { Point } from "./base-chart";
+import { ChartBrushSelector } from "./interactions";
 
 // ============================================================================
 // Types
@@ -280,9 +280,7 @@ export function ChartMinimap<T = Point>({
         preferWebGPU={true}
         {...chartProps}
       >
-        {CanvasComponent && (
-          <CanvasComponent showGrid={false} {...canvasProps} />
-        )}
+        {CanvasComponent && <CanvasComponent showGrid={false} {...canvasProps} />}
         {showAxes && AxesComponent && <AxesComponent />}
         <ChartBrushSelector
           start={visibleRange.start}

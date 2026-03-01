@@ -1,19 +1,19 @@
 "use client";
 
+import { createContext, useContext, useEffect, useMemo, useRef } from "react";
+import { viridis as defaultColorScale } from "../lib/color-scales";
 import {
-  createWebGLRenderer,
-  createWebGPURenderer,
   ChartAxes,
   ChartRoot,
   ChartTooltip,
+  createWebGLRenderer,
+  createWebGPURenderer,
   hexToRgb,
   type RendererProps,
+  useBaseChart,
   type WebGLRenderer,
   type WebGPURenderer,
-  useBaseChart,
 } from "./base-chart";
-import { createContext, useContext, useEffect, useMemo, useRef } from "react";
-import { viridis as defaultColorScale } from "../lib/color-scales";
 
 // ============================================================================
 // Heatmap Chart Types
@@ -75,9 +75,7 @@ const HeatmapChartContext = createContext<HeatmapChartContextType | null>(null);
 function useHeatmapChartData() {
   const ctx = useContext(HeatmapChartContext);
   if (!ctx) {
-    throw new Error(
-      "HeatmapChart components must be used within HeatmapChart.Root"
-    );
+    throw new Error("HeatmapChart components must be used within HeatmapChart.Root");
   }
   return ctx;
 }
@@ -262,10 +260,8 @@ function createWebGLHeatmapRenderer(
       const matrixLoc = gl.getUniformLocation(program, "u_matrix");
       gl.uniformMatrix3fv(matrixLoc, false, matrix);
 
-      const xScale = (x: number) =>
-        ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
-      const yScale = (y: number) =>
-        ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
+      const xScale = (x: number) => ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
+      const yScale = (y: number) => ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
       const yScaleFlipped = (y: number) => innerHeight - yScale(y);
 
       const cellWidth = innerWidth / xCategoryMap.size;
@@ -291,21 +287,13 @@ function createWebGLHeatmapRenderer(
       if (!buffers.color) buffers.color = gl.createBuffer();
 
       gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(geometry.positions),
-        gl.STATIC_DRAW
-      );
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry.positions), gl.STATIC_DRAW);
       const positionLoc = gl.getAttribLocation(program, "a_position");
       gl.enableVertexAttribArray(positionLoc);
       gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(geometry.colors),
-        gl.STATIC_DRAW
-      );
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry.colors), gl.STATIC_DRAW);
       const colorLoc = gl.getAttribLocation(program, "a_color");
       gl.enableVertexAttribArray(colorLoc);
       gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
@@ -368,15 +356,11 @@ function createWebGPUHeatmapRenderer(
           buffers: [
             {
               arrayStride: 8,
-              attributes: [
-                { shaderLocation: 0, offset: 0, format: "float32x2" },
-              ],
+              attributes: [{ shaderLocation: 0, offset: 0, format: "float32x2" }],
             },
             {
               arrayStride: 16,
-              attributes: [
-                { shaderLocation: 1, offset: 0, format: "float32x4" },
-              ],
+              attributes: [{ shaderLocation: 1, offset: 0, format: "float32x4" }],
             },
           ],
         },
@@ -443,10 +427,8 @@ function createWebGPUHeatmapRenderer(
       ]);
       device.queue.writeBuffer(uniformBuffer, 0, uniformData);
 
-      const xScale = (x: number) =>
-        ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
-      const yScale = (y: number) =>
-        ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
+      const xScale = (x: number) => ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
+      const yScale = (y: number) => ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
       const yScaleFlipped = (y: number) => innerHeight - yScale(y);
 
       const cellWidth = innerWidth / xCategoryMap.size;
@@ -501,10 +483,7 @@ function createWebGPUHeatmapRenderer(
       }
 
       // Create or resize color buffer with 1.5x growth factor
-      if (
-        !heatmapBuffers.color ||
-        heatmapBuffers.color.size < colorData.byteLength * 1.5
-      ) {
+      if (!heatmapBuffers.color || heatmapBuffers.color.size < colorData.byteLength * 1.5) {
         heatmapBuffers.color?.destroy();
         heatmapBuffers.color = device.createBuffer({
           size: Math.ceil(colorData.byteLength * 1.5),
@@ -673,9 +652,7 @@ function Root({
       xAxis.formatter ||
       ((value: number) => {
         const idx = Math.round(value);
-        return idx >= 0 && idx < xCategories.length
-          ? String(xCategories[idx])
-          : "";
+        return idx >= 0 && idx < xCategories.length ? String(xCategories[idx]) : "";
       })
     );
   }, [xCategories, xAxis.formatter]);
@@ -685,9 +662,7 @@ function Root({
       yAxis.formatter ||
       ((value: number) => {
         const idx = Math.round(value);
-        return idx >= 0 && idx < yCategories.length
-          ? String(yCategories[idx])
-          : "";
+        return idx >= 0 && idx < yCategories.length ? String(yCategories[idx]) : "";
       })
     );
   }, [yCategories, yAxis.formatter]);
@@ -733,9 +708,7 @@ function Root({
 function Canvas() {
   const ctx = useHeatmapChart();
   const rendererRef = useRef<
-    | WebGLRenderer<HeatmapRendererProps>
-    | WebGPURenderer<HeatmapRendererProps>
-    | null
+    WebGLRenderer<HeatmapRendererProps> | WebGPURenderer<HeatmapRendererProps> | null
   >(null);
   const mountedRef = useRef(true);
 
@@ -801,7 +774,14 @@ function Canvas() {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only initialize once
+  }, [
+    ctx.canvasRef.current,
+    ctx.devicePixelRatio,
+    ctx.height,
+    ctx.preferWebGPU,
+    ctx.setRenderMode,
+    ctx.width,
+  ]); // Only initialize once
 
   // Update render when data changes
   useEffect(() => {
@@ -884,9 +864,7 @@ function Grid() {
 
     // Get theme-aware colors
     const isDark = document.documentElement.classList.contains("dark");
-    const gridColor = isDark
-      ? "rgba(255, 255, 255, 0.05)"
-      : "rgba(0, 0, 0, 0.05)";
+    const gridColor = isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)";
 
     context.save();
     context.scale(dpr, dpr);
@@ -958,12 +936,7 @@ function Tooltip() {
     const xIdx = Math.floor(relX / cellWidth);
     const yIdx = Math.floor((innerHeight - relY) / cellHeight);
 
-    if (
-      xIdx < 0 ||
-      xIdx >= ctx.xCategories.length ||
-      yIdx < 0 ||
-      yIdx >= ctx.yCategories.length
-    ) {
+    if (xIdx < 0 || xIdx >= ctx.xCategories.length || yIdx < 0 || yIdx >= ctx.yCategories.length) {
       ctx.setHoveredPoint(null);
       ctx.setTooltipData(null);
       return;
@@ -986,9 +959,7 @@ function Tooltip() {
       if (cellChanged) {
         const screenX = ctx.margin.left + xIdx * cellWidth + cellWidth / 2;
         const screenY =
-          ctx.margin.top +
-          (ctx.yCategories.length - yIdx - 1) * cellHeight +
-          cellHeight / 2;
+          ctx.margin.top + (ctx.yCategories.length - yIdx - 1) * cellHeight + cellHeight / 2;
 
         ctx.setHoveredPoint({
           seriesIdx: 0,

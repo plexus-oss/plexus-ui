@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export const Footer = () => {
   return (
     <footer className="border-t border-zinc-200 dark:border-zinc-800 pt-8 mt-12 pb-8">

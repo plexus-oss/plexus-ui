@@ -1,25 +1,25 @@
-/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: <explanation> */
-import prompts from "prompts";
+/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: forEach callbacks used for side effects, not iteration returns */
+
 import chalk from "chalk";
-import ora from "ora";
 import fs from "fs-extra";
-import * as path from "path";
+import ora from "ora";
+import prompts from "prompts";
 import {
-  registry,
   getComponent,
-  getLib,
-  isMonorepo,
-  getLocalFilePath,
   getFileUrl,
+  getLib,
+  getLocalFilePath,
+  isMonorepo,
+  registry,
 } from "../registry/index.js";
 import {
-  loadConfig,
   detectProjectStructure,
   downloadFile,
   getComponentDestinationPath,
   getComponentSubdirectory,
   getInstalledDependencies,
   installDependencies,
+  loadConfig,
   transformImports,
 } from "../utils/index.js";
 
@@ -70,9 +70,7 @@ export async function add(components: string[]) {
   );
 
   if (invalidComponents.length > 0) {
-    console.log(
-      chalk.red(`\n❌ Invalid components: ${invalidComponents.join(", ")}`)
-    );
+    console.log(chalk.red(`\n❌ Invalid components: ${invalidComponents.join(", ")}`));
     console.log(chalk.dim(`Available: ${availableComponents.join(", ")}`));
     return;
   }
@@ -144,8 +142,7 @@ export async function add(components: string[]) {
         }
         installedComponents.push(component);
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Unknown error";
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
         failedComponents.push({ name: component, error: errorMessage });
       }
     }
@@ -178,11 +175,7 @@ export async function add(components: string[]) {
     console.log(chalk.dim("📦 Installed components:"));
     installedComponents.forEach((c) => {
       const config = getComponent(c);
-      console.log(
-        chalk.cyan(
-          `   • ${c}${config?.description ? ` - ${config.description}` : ""}`
-        )
-      );
+      console.log(chalk.cyan(`   • ${c}${config?.description ? ` - ${config.description}` : ""}`));
     });
 
     if (skippedComponents.length > 0) {
@@ -206,12 +199,8 @@ export async function add(components: string[]) {
 
     // Check what's already installed
     const installedDeps = await getInstalledDependencies();
-    const missingDeps = Array.from(allDeps).filter(
-      (dep) => !installedDeps.has(dep)
-    );
-    const missingDevDeps = Array.from(allDevDeps).filter(
-      (dep) => !installedDeps.has(dep)
-    );
+    const missingDeps = Array.from(allDeps).filter((dep) => !installedDeps.has(dep));
+    const missingDevDeps = Array.from(allDevDeps).filter((dep) => !installedDeps.has(dep));
 
     // Install missing dependencies
     if (missingDeps.length > 0 || missingDevDeps.length > 0) {
@@ -237,10 +226,7 @@ export async function add(components: string[]) {
           console.log(chalk.green("\n✅ Dependencies installed successfully!"));
         } catch (error) {
           console.log(
-            chalk.yellow(
-              "\n⚠️  " +
-                (error instanceof Error ? error.message : "Unknown error")
-            )
+            chalk.yellow(`\n⚠️  ${error instanceof Error ? error.message : "Unknown error"}`)
           );
         }
       } else {
@@ -249,9 +235,7 @@ export async function add(components: string[]) {
           console.log(chalk.cyan(`   npm install ${missingDeps.join(" ")}`));
         }
         if (missingDevDeps.length > 0) {
-          console.log(
-            chalk.cyan(`   npm install -D ${missingDevDeps.join(" ")}`)
-          );
+          console.log(chalk.cyan(`   npm install -D ${missingDevDeps.join(" ")}`));
         }
       }
     } else {
@@ -259,24 +243,19 @@ export async function add(components: string[]) {
     }
 
     console.log(chalk.dim("\n🎨 Import and use:"));
-    const importAlias =
-      plexusConfig?.aliases?.plexusui || "@/components/plexusui";
+    const importAlias = plexusConfig?.aliases?.plexusui || "@/components/plexusui";
 
     components.forEach((c) => {
       const componentName = c
         .split("-")
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join("");
-      console.log(
-        chalk.cyan(`   import { ${componentName} } from '${importAlias}/${c}'`)
-      );
+      console.log(chalk.cyan(`   import { ${componentName} } from '${importAlias}/${c}'`));
     });
   } catch (error) {
     spinner.fail("Failed to add components");
     console.error(chalk.red("\n❌ Error:"));
-    console.error(
-      chalk.dim(error instanceof Error ? error.message : "Unknown error")
-    );
+    console.error(chalk.dim(error instanceof Error ? error.message : "Unknown error"));
     if (error instanceof Error && error.stack) {
       console.error(chalk.dim("\nStack trace:"));
       console.error(chalk.dim(error.stack));

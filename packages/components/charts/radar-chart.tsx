@@ -30,17 +30,17 @@
  */
 "use client";
 
-import { createContext, useContext, useRef, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import {
-  createWebGLRenderer,
-  createWebGPURenderer,
   ChartRoot,
   ChartTooltip,
+  createWebGLRenderer,
+  createWebGPURenderer,
   hexToRgb,
   type RendererProps,
+  useBaseChart,
   type WebGLRenderer,
   type WebGPURenderer,
-  useBaseChart,
 } from "./base-chart";
 
 // ============================================================================
@@ -368,9 +368,7 @@ function createSweepGeometry(
   return { positions, colors };
 }
 
-function createWebGLRadarRenderer(
-  canvas: HTMLCanvasElement
-): WebGLRenderer<RadarRendererProps> {
+function createWebGLRadarRenderer(canvas: HTMLCanvasElement): WebGLRenderer<RadarRendererProps> {
   const lineBuffers = {
     position: null as WebGLBuffer | null,
     color: null as WebGLBuffer | null,
@@ -392,8 +390,7 @@ function createWebGLRadarRenderer(
       fragmentSource: FRAGMENT_SHADER,
     }),
     onRender: (gl, program, props) => {
-      const { series, rings, sectors, showSweep, sweepAngle, width, height } =
-        props;
+      const { series, rings, sectors, showSweep, sweepAngle, width, height } = props;
 
       if (!lineProgram) {
         lineProgram = program;
@@ -476,21 +473,13 @@ function createWebGLRadarRenderer(
       }
 
       gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffers.position);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(linePositions),
-        gl.DYNAMIC_DRAW
-      );
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(linePositions), gl.DYNAMIC_DRAW);
       const positionLoc = gl.getAttribLocation(lineProgram, "a_position");
       gl.enableVertexAttribArray(positionLoc);
       gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffers.color);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(lineColors),
-        gl.DYNAMIC_DRAW
-      );
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lineColors), gl.DYNAMIC_DRAW);
       const colorLoc = gl.getAttribLocation(lineProgram, "a_color");
       gl.enableVertexAttribArray(colorLoc);
       gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
@@ -499,10 +488,7 @@ function createWebGLRadarRenderer(
 
       // === DRAW POINTS ===
       gl.useProgram(pointProgram);
-      const pointResolutionLoc = gl.getUniformLocation(
-        pointProgram,
-        "u_resolution"
-      );
+      const pointResolutionLoc = gl.getUniformLocation(pointProgram, "u_resolution");
       gl.uniform2f(pointResolutionLoc, width, height);
 
       const pointPositions: number[] = [];
@@ -537,31 +523,19 @@ function createWebGLRadarRenderer(
       }
 
       gl.bindBuffer(gl.ARRAY_BUFFER, pointBuffers.position);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(pointPositions),
-        gl.DYNAMIC_DRAW
-      );
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pointPositions), gl.DYNAMIC_DRAW);
       const pointPositionLoc = gl.getAttribLocation(pointProgram, "a_position");
       gl.enableVertexAttribArray(pointPositionLoc);
       gl.vertexAttribPointer(pointPositionLoc, 2, gl.FLOAT, false, 0, 0);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, pointBuffers.color);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(pointColors),
-        gl.DYNAMIC_DRAW
-      );
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pointColors), gl.DYNAMIC_DRAW);
       const pointColorLoc = gl.getAttribLocation(pointProgram, "a_color");
       gl.enableVertexAttribArray(pointColorLoc);
       gl.vertexAttribPointer(pointColorLoc, 4, gl.FLOAT, false, 0, 0);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, pointBuffers.size);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(pointSizes),
-        gl.DYNAMIC_DRAW
-      );
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pointSizes), gl.DYNAMIC_DRAW);
       const pointSizeLoc = gl.getAttribLocation(pointProgram, "a_size");
       gl.enableVertexAttribArray(pointSizeLoc);
       gl.vertexAttribPointer(pointSizeLoc, 1, gl.FLOAT, false, 0, 0);
@@ -652,8 +626,7 @@ async function createWebGPURadarRenderer(
       return pipeline;
     },
     onRender: async (device, context, pipeline, props) => {
-      const { series, rings, sectors, showSweep, sweepAngle, width, height } =
-        props;
+      const { series, rings, sectors, showSweep, sweepAngle, width, height } = props;
 
       const centerX = width / 2;
       const centerY = height / 2;
@@ -737,10 +710,7 @@ async function createWebGPURadarRenderer(
       const positionData = new Float32Array(linePositions);
       const colorData = new Float32Array(lineColors);
 
-      if (
-        !buffers.position ||
-        buffers.position.size < positionData.byteLength * 1.5
-      ) {
+      if (!buffers.position || buffers.position.size < positionData.byteLength * 1.5) {
         buffers.position?.destroy();
         buffers.position = device.createBuffer({
           size: Math.ceil(positionData.byteLength * 1.5),
@@ -901,9 +871,7 @@ function Root({
 function Canvas() {
   const ctx = useRadarChart();
   const rendererRef = useRef<
-    | WebGLRenderer<RadarRendererProps>
-    | WebGPURenderer<RadarRendererProps>
-    | null
+    WebGLRenderer<RadarRendererProps> | WebGPURenderer<RadarRendererProps> | null
   >(null);
   const frameRef = useRef<number>(0);
 
@@ -925,10 +893,7 @@ function Canvas() {
 
       try {
         if (ctx.renderMode === "webgpu" && ctx.gpuDevice) {
-          const renderer = await createWebGPURadarRenderer(
-            canvas,
-            ctx.gpuDevice
-          );
+          const renderer = await createWebGPURadarRenderer(canvas, ctx.gpuDevice);
 
           if (!mounted) {
             renderer.destroy();
@@ -965,14 +930,7 @@ function Canvas() {
         rendererRef.current = null;
       }
     };
-  }, [
-    ctx.renderMode,
-    ctx.gpuDevice,
-    ctx.width,
-    ctx.height,
-    ctx.devicePixelRatio,
-    ctx.canvasRef,
-  ]);
+  }, [ctx.renderMode, ctx.gpuDevice, ctx.width, ctx.height, ctx.devicePixelRatio, ctx.canvasRef]);
 
   // Render when data changes (skip if not visible)
   useEffect(() => {
@@ -1134,9 +1092,7 @@ function Tooltip() {
         const screenX = centerX + dist * Math.cos(angleRad);
         const screenY = centerY + dist * Math.sin(angleRad);
 
-        const distanceToMouse = Math.sqrt(
-          Math.pow(mouseX - screenX, 2) + Math.pow(mouseY - screenY, 2)
-        );
+        const distanceToMouse = Math.sqrt((mouseX - screenX) ** 2 + (mouseY - screenY) ** 2);
 
         if (distanceToMouse < 15) {
           // Within 15px threshold
@@ -1164,8 +1120,7 @@ function Tooltip() {
 
       const series = ctx.series[closestPoint.seriesIdx];
       ctx.setTooltipData({
-        title:
-          closestPoint.point?.label || `Target ${closestPoint.pointIdx + 1}`,
+        title: closestPoint.point?.label || `Target ${closestPoint.pointIdx + 1}`,
         items: [
           { label: "Category", value: series.name },
           { label: "Angle", value: `${closestPoint.point.angle.toFixed(1)}°` },
@@ -1203,8 +1158,7 @@ function Tooltip() {
           <div
             className="w-4 h-4 rounded-full border-2 border-white dark:border-zinc-900"
             style={{
-              backgroundColor:
-                ctx.series[ctx.hoveredPoint.seriesIdx].color || "#3b82f6",
+              backgroundColor: ctx.series[ctx.hoveredPoint.seriesIdx].color || "#3b82f6",
             }}
           />
         </div>

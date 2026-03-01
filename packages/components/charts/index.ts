@@ -73,85 +73,76 @@
  * ```
  */
 
-// Chart components
-export { LineChart } from "./line-chart";
 export type {
-  DataPoint as LineDataPoint,
-  Series as LineSeries,
-  LineChartProps,
-  LineChartRootProps,
-  LineChartCanvasProps,
-} from "./line-chart";
-
-export { ScatterChart } from "./scatter-chart";
-export type {
-  DataPoint as ScatterDataPoint,
-  Series as ScatterSeries,
-  ScatterChartProps,
-  ScatterChartRootProps,
-  ScatterChartCanvasProps,
-} from "./scatter-chart";
-
-export { BarChart } from "./bar-chart";
-export type {
-  DataPoint as BarDataPoint,
-  Series as BarSeries,
-  BarChartProps,
-  BarChartRootProps,
-  BarChartCanvasProps,
-} from "./bar-chart";
-
-export { AreaChart } from "./area-chart";
-export type {
-  DataPoint as AreaDataPoint,
-  Series as AreaSeries,
+  AreaChartCanvasProps,
   AreaChartProps,
   AreaChartRootProps,
-  AreaChartCanvasProps,
+  DataPoint as AreaDataPoint,
+  Series as AreaSeries,
 } from "./area-chart";
-
-export { HeatmapChart } from "./heatmap-chart";
+export { AreaChart } from "./area-chart";
+export type { AttitudeIndicatorProps } from "./attitude-indicator";
+export { AttitudeIndicator } from "./attitude-indicator";
+export type {
+  BarChartCanvasProps,
+  BarChartProps,
+  BarChartRootProps,
+  DataPoint as BarDataPoint,
+  Series as BarSeries,
+} from "./bar-chart";
+export { BarChart } from "./bar-chart";
+export type {
+  Column,
+  ColumnAlignment,
+  ColumnType,
+  DataGridProps,
+} from "./data-grid";
+export { DataGrid } from "./data-grid";
+export type {
+  GanttChartContainerProps,
+  GanttChartControlsProps,
+  GanttChartCurrentTimeProps,
+  GanttChartGridProps,
+  GanttChartHeaderProps,
+  GanttChartLeftPanelProps,
+  GanttChartRootProps,
+  GanttChartTasksProps,
+  GanttChartViewportProps,
+  Task,
+  TaskStatus,
+} from "./gantt";
+export { GanttChart } from "./gantt";
 export type {
   DataPoint as HeatmapDataPoint,
   HeatmapChartProps,
   HeatmapChartRootProps,
 } from "./heatmap-chart";
-
-export { HistogramChart } from "./histogram-chart";
+export { HeatmapChart } from "./heatmap-chart";
 export type { HistogramChartProps } from "./histogram-chart";
-
-export { RadarChart } from "./radar-chart";
+export { HistogramChart } from "./histogram-chart";
 export type {
+  DataPoint as LineDataPoint,
+  LineChartCanvasProps,
+  LineChartProps,
+  LineChartRootProps,
+  Series as LineSeries,
+} from "./line-chart";
+// Chart components
+export { LineChart } from "./line-chart";
+export type {
+  RadarChartProps,
   RadarDataPoint,
   RadarSeries,
-  RadarChartProps,
 } from "./radar-chart";
-
-export { DataGrid } from "./data-grid";
+export { RadarChart } from "./radar-chart";
 export type {
-  ColumnAlignment,
-  ColumnType,
-  Column,
-  DataGridProps,
-} from "./data-grid";
-
-export { AttitudeIndicator } from "./attitude-indicator";
-export type { AttitudeIndicatorProps } from "./attitude-indicator";
-
-export { GanttChart } from "./gantt";
-export type {
-  Task,
-  TaskStatus,
-  GanttChartRootProps,
-  GanttChartContainerProps,
-  GanttChartViewportProps,
-  GanttChartGridProps,
-  GanttChartHeaderProps,
-  GanttChartTasksProps,
-  GanttChartCurrentTimeProps,
-  GanttChartLeftPanelProps,
-  GanttChartControlsProps,
-} from "./gantt";
+  DataPoint as ScatterDataPoint,
+  ScatterChartCanvasProps,
+  ScatterChartProps,
+  ScatterChartRootProps,
+  Series as ScatterSeries,
+} from "./scatter-chart";
+export { ScatterChart } from "./scatter-chart";
 
 // ============================================================================
 // 3D Components (Three.js)
@@ -166,81 +157,15 @@ export type {
 // only using 2D charts.
 // ============================================================================
 
-// Base chart infrastructure (reusable for all chart types)
-export {
-  ChartRoot,
-  ChartAxes,
-  ChartTooltip,
-  useBaseChart,
-  getDomain,
-  getTicks,
-  formatValue,
-  hexToRgb,
-} from "./base-chart";
-
-export type {
-  Point,
-  Axis,
-  Margin,
-  HoveredPoint,
-  TooltipData,
-  TimeSeriesState,
-  BaseChartContext,
-  BaseChartRootProps,
-  RendererProps,
-  WebGLRenderer,
-  WebGPURenderer,
-} from "./base-chart";
-
-// Chart interactions
-export {
-  ChartInteractions,
-  ChartClick,
-  ChartBrush,
-  ChartBrushSelector,
-  ChartCrosshair,
-} from "./interactions";
-
-export type {
-  ClickEvent,
-  BrushSelection,
-  CrosshairPosition,
-  ChartInteractionsProps,
-  ChartClickProps,
-  ChartBrushProps,
-  ChartBrushSelectorProps,
-  ChartCrosshairProps,
-} from "./interactions";
-
-// Chart annotations and helpers
-export {
-  ChartAnnotations,
-  ChartReferenceLine,
-  ChartRegion,
-  ChartRuler,
-} from "./annotations";
-
-export type {
-  Annotation,
-  ChartAnnotationsProps,
-  ChartReferenceLineProps,
-  ChartRegionProps,
-  ChartRulerProps,
-  Measurement,
-} from "./annotations";
-
-// Chart minimap
-export { ChartMinimap, MinimapContainer } from "./chart-minimap";
-export type {
-  ChartMinimapProps,
-  MinimapContainerProps,
-  MinimapSeries,
-} from "./chart-minimap";
-
 // Data utilities
 export {
+  type BinMethod,
+  type Complex,
+  calculateBinCount,
   calculateBounds,
   calculateNiceBounds,
+  calculateNormalCurve,
+  createHistogramBins,
   createOrResizeVertexBuffer,
   data3DToVertexArray,
   dataToVertexArray,
@@ -249,12 +174,72 @@ export {
   generateCategoricalData,
   generateSineWave,
   generateTelemetryData,
-  normalizeData,
-  createHistogramBins,
-  calculateBinCount,
-  calculateNormalCurve,
-  type BinMethod,
   type HistogramBin,
-  type Complex,
+  normalizeData,
   type SpectrogramPoint as DataSpectrogramPoint,
 } from "../lib/data-utils";
+export type {
+  Annotation,
+  ChartAnnotationsProps,
+  ChartReferenceLineProps,
+  ChartRegionProps,
+  ChartRulerProps,
+  Measurement,
+} from "./annotations";
+// Chart annotations and helpers
+export {
+  ChartAnnotations,
+  ChartReferenceLine,
+  ChartRegion,
+  ChartRuler,
+} from "./annotations";
+export type {
+  Axis,
+  BaseChartContext,
+  BaseChartRootProps,
+  HoveredPoint,
+  Margin,
+  Point,
+  RendererProps,
+  TimeSeriesState,
+  TooltipData,
+  WebGLRenderer,
+  WebGPURenderer,
+} from "./base-chart";
+// Base chart infrastructure (reusable for all chart types)
+export {
+  ChartAxes,
+  ChartRoot,
+  ChartTooltip,
+  formatValue,
+  getDomain,
+  getTicks,
+  hexToRgb,
+  useBaseChart,
+} from "./base-chart";
+export type {
+  ChartMinimapProps,
+  MinimapContainerProps,
+  MinimapSeries,
+} from "./chart-minimap";
+
+// Chart minimap
+export { ChartMinimap, MinimapContainer } from "./chart-minimap";
+export type {
+  BrushSelection,
+  ChartBrushProps,
+  ChartBrushSelectorProps,
+  ChartClickProps,
+  ChartCrosshairProps,
+  ChartInteractionsProps,
+  ClickEvent,
+  CrosshairPosition,
+} from "./interactions";
+// Chart interactions
+export {
+  ChartBrush,
+  ChartBrushSelector,
+  ChartClick,
+  ChartCrosshair,
+  ChartInteractions,
+} from "./interactions";

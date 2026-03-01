@@ -1,15 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { GanttChart } from "@plexusui/components/charts/gantt";
 import type { Task } from "@plexusui/components/charts/gantt";
-import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
+import { GanttChart } from "@plexusui/components/charts/gantt";
 import { addHours, addMinutes } from "date-fns";
+import { useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { useColorScheme } from "@/components/color-scheme-provider";
+import { ComponentPreview } from "@/components/component-preview";
 
 function SatelliteContactSchedule() {
   const now = new Date();
@@ -198,12 +195,7 @@ function MissionOperationsTimeline() {
 />`}
       preview={
         <div className="w-full">
-          <GanttChart
-            tasks={tasks}
-            variant="compact"
-            timeWindowHours={2}
-            rowHeight={40}
-          />
+          <GanttChart tasks={tasks} variant="compact" timeWindowHours={2} rowHeight={40} />
         </div>
       }
     />
@@ -296,8 +288,7 @@ const ganttChartProps: ApiProp[] = [
     name: "timezone",
     type: "string",
     default: '"UTC"',
-    description:
-      "IANA timezone identifier (e.g., 'America/New_York', 'Europe/London')",
+    description: "IANA timezone identifier (e.g., 'America/New_York', 'Europe/London')",
   },
   {
     name: "timeWindowHours",
@@ -316,8 +307,7 @@ const ganttChartProps: ApiProp[] = [
     name: "rowHeight",
     type: "number",
     default: "40",
-    description:
-      "Height of each task row in pixels (overrides variant default)",
+    description: "Height of each task row in pixels (overrides variant default)",
   },
   {
     name: "use12HourFormat",
@@ -434,15 +424,13 @@ const ganttPrimitiveProps: ApiProp[] = [
     name: "GanttChart.Container",
     type: "component",
     default: "-",
-    description:
-      "Main container with horizontal scrolling. Must contain Viewport and LeftPanel",
+    description: "Main container with horizontal scrolling. Must contain Viewport and LeftPanel",
   },
   {
     name: "GanttChart.Viewport",
     type: "component",
     default: "-",
-    description:
-      "Scrollable timeline viewport. Contains Grid, Header, Tasks, CurrentTime",
+    description: "Scrollable timeline viewport. Contains Grid, Header, Tasks, CurrentTime",
   },
   {
     name: "GanttChart.Grid",
@@ -496,8 +484,8 @@ export function GanttExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            GanttChart component for timeline visualization and task scheduling.
-            SVG-based rendering optimized for 1000+ tasks.
+            GanttChart component for timeline visualization and task scheduling. SVG-based rendering
+            optimized for 1000+ tasks.
           </p>
         </div>
 

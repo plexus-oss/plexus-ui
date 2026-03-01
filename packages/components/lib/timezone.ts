@@ -70,11 +70,7 @@ export interface TimeWindowOption {
  * formatTimeInZone(new Date(), "Europe/London", false)    // "14:30"
  * ```
  */
-export function formatTimeInZone(
-  date: Date,
-  timezone: string,
-  use12Hour: boolean = false
-): string {
+export function formatTimeInZone(date: Date, timezone: string, use12Hour: boolean = false): string {
   const options: Intl.DateTimeFormatOptions = {
     timeZone: timezone,
     hour: "2-digit",
@@ -159,10 +155,7 @@ export function formatDateInZone(
  * getTimezoneOffset("Europe/London")     // 0 (GMT) or 1 (BST)
  * ```
  */
-export function getTimezoneOffset(
-  timezone: string,
-  date: Date = new Date()
-): number {
+export function getTimezoneOffset(timezone: string, date: Date = new Date()): number {
   // Create a date string in the target timezone
   const tzDate = new Date(date.toLocaleString("en-US", { timeZone: timezone }));
 

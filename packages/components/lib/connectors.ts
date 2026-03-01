@@ -80,8 +80,7 @@ export abstract class BaseConnector<TData = any> implements Connector<TData> {
   protected status: ConnectionStatus = ConnectionStatus.DISCONNECTED;
   protected lastError: ConnectionError | null = null;
   protected dataSubscribers: Set<(data: TData) => void> = new Set();
-  protected statusSubscribers: Set<(status: ConnectionStatus) => void> =
-    new Set();
+  protected statusSubscribers: Set<(status: ConnectionStatus) => void> = new Set();
   protected errorSubscribers: Set<(error: ConnectionError) => void> = new Set();
   protected reconnectAttempt: number = 0;
   protected reconnectTimer?: ReturnType<typeof setTimeout>;
@@ -125,11 +124,15 @@ export abstract class BaseConnector<TData = any> implements Connector<TData> {
 
   protected setStatus(status: ConnectionStatus): void {
     this.status = status;
-    this.statusSubscribers.forEach((callback) => callback(status));
+    this.statusSubscribers.forEach((callback) => {
+      callback(status);
+    });
   }
 
   protected emitData(data: TData): void {
-    this.dataSubscribers.forEach((callback) => callback(data));
+    this.dataSubscribers.forEach((callback) => {
+      callback(data);
+    });
   }
 
   protected emitError(message: string, code?: string): void {
@@ -139,7 +142,9 @@ export abstract class BaseConnector<TData = any> implements Connector<TData> {
       timestamp: Date.now(),
     };
     this.lastError = error;
-    this.errorSubscribers.forEach((callback) => callback(error));
+    this.errorSubscribers.forEach((callback) => {
+      callback(error);
+    });
     this.setStatus(ConnectionStatus.ERROR);
   }
 
@@ -159,7 +164,7 @@ export abstract class BaseConnector<TData = any> implements Connector<TData> {
       try {
         await this.connect();
         this.reconnectAttempt = 0; // Reset on successful connection
-      } catch (error) {
+      } catch (_error) {
         this.scheduleReconnect();
       }
     }, this.config.reconnectInterval);

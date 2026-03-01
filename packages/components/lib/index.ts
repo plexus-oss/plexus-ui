@@ -5,10 +5,10 @@
  * Import utilities and types from here to ensure consistency.
  */
 
-export * from "./timezone";
-export * from "./utils";
-export * from "./data-utils";
+export * from "./animations";
 export * from "./color-scales";
 export * from "./connectors";
-export * from "./animations";
+export * from "./data-utils";
+export * from "./timezone";
+export * from "./utils";
 export * from "./visibility";

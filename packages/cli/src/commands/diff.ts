@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import ora from "ora";
 import fs from "fs-extra";
+import ora from "ora";
 import { getComponent } from "../registry/index.js";
 import {
   detectProjectStructure,

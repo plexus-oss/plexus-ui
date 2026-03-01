@@ -1,17 +1,11 @@
 "use client";
 
-import { AreaChart } from "@plexusui/components/charts/area-chart";
 import type { DataPoint } from "@plexusui/components/charts/area-chart";
+import { AreaChart } from "@plexusui/components/charts/area-chart";
+import { useEffect, useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
+import { useColorScheme, useMultiColors } from "@/components/color-scheme-provider";
 import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
-import { useState, useEffect } from "react";
-import {
-  useColorScheme,
-  useMultiColors,
-} from "@/components/color-scheme-provider";
 
 // ============================================================================
 // Example Data
@@ -317,8 +311,7 @@ const areaChartProps: ApiProp[] = [
     name: "preferWebGPU",
     type: "boolean",
     default: "true",
-    description:
-      "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
+    description: "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
   },
   {
     name: "className",
@@ -446,8 +439,7 @@ export function AreaChartExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            AreaChart component for visualizing trends and cumulative data with
-            filled areas
+            AreaChart component for visualizing trends and cumulative data with filled areas
           </p>
         </div>
 

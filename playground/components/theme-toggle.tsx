@@ -1,7 +1,7 @@
-/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: decorative SVG icons inside labeled button */
 "use client";
-import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
@@ -14,11 +14,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button
-        className="cursor-pointer"
-        variant="ghost"
-        aria-label="Toggle theme"
-      >
+      <Button className="cursor-pointer" variant="ghost" aria-label="Toggle theme">
         <div className="w-5 h-5" />
       </Button>
     );

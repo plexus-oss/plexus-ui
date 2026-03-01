@@ -28,16 +28,16 @@
  */
 "use client";
 
-import { createContext, useContext, useRef, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import {
+  ChartRoot,
   createWebGLRenderer,
   createWebGPURenderer,
-  ChartRoot,
   hexToRgb,
   type RendererProps,
+  useBaseChart,
   type WebGLRenderer,
   type WebGPURenderer,
-  useBaseChart,
 } from "./base-chart";
 
 // ============================================================================
@@ -136,15 +136,12 @@ interface AttitudeIndicatorContextType {
   horizonColor: string;
 }
 
-const AttitudeIndicatorContext =
-  createContext<AttitudeIndicatorContextType | null>(null);
+const AttitudeIndicatorContext = createContext<AttitudeIndicatorContextType | null>(null);
 
 function useAttitudeIndicatorData() {
   const ctx = useContext(AttitudeIndicatorContext);
   if (!ctx) {
-    throw new Error(
-      "AttitudeIndicator components must be used within AttitudeIndicator.Root"
-    );
+    throw new Error("AttitudeIndicator components must be used within AttitudeIndicator.Root");
   }
   return ctx;
 }
@@ -429,11 +426,7 @@ function createBankIndicator(
   return { positions, colors };
 }
 
-function createAircraftSymbol(
-  centerX: number,
-  centerY: number,
-  color: [number, number, number]
-) {
+function createAircraftSymbol(centerX: number, centerY: number, color: [number, number, number]) {
   const positions: number[] = [];
   const colors: number[] = [];
 
@@ -457,30 +450,14 @@ function createAircraftSymbol(
   const wingY = centerY;
   const wingLeft = centerX - 60;
   const wingLeftInner = centerX - 15;
-  const geomLeft = createLineGeometry(
-    wingLeft,
-    wingY,
-    wingLeftInner,
-    wingY,
-    4,
-    color,
-    1
-  );
+  const geomLeft = createLineGeometry(wingLeft, wingY, wingLeftInner, wingY, 4, color, 1);
   positions.push(...geomLeft.positions);
   colors.push(...geomLeft.colors);
 
   // Right wing
   const wingRight = centerX + 60;
   const wingRightInner = centerX + 15;
-  const geomRight = createLineGeometry(
-    wingRightInner,
-    wingY,
-    wingRight,
-    wingY,
-    4,
-    color,
-    1
-  );
+  const geomRight = createLineGeometry(wingRightInner, wingY, wingRight, wingY, 4, color, 1);
   positions.push(...geomRight.positions);
   colors.push(...geomRight.colors);
 
@@ -586,24 +563,12 @@ function createWebGLAttitudeRenderer(
       const cos = Math.cos(rollRad);
       const sin = Math.sin(rollRad);
       const horizonLineLength = radius * 2;
-      const hx1 =
-        centerX + (-horizonLineLength / 2) * cos - -verticalOffset * sin;
-      const hy1 =
-        centerY + (-horizonLineLength / 2) * sin + -verticalOffset * cos;
-      const hx2 =
-        centerX + (horizonLineLength / 2) * cos - -verticalOffset * sin;
-      const hy2 =
-        centerY + (horizonLineLength / 2) * sin + -verticalOffset * cos;
+      const hx1 = centerX + (-horizonLineLength / 2) * cos - -verticalOffset * sin;
+      const hy1 = centerY + (-horizonLineLength / 2) * sin + -verticalOffset * cos;
+      const hx2 = centerX + (horizonLineLength / 2) * cos - -verticalOffset * sin;
+      const hy2 = centerY + (horizonLineLength / 2) * sin + -verticalOffset * cos;
 
-      const horizonGeom = createLineGeometry(
-        hx1,
-        hy1,
-        hx2,
-        hy2,
-        4,
-        horizonRgb,
-        1
-      );
+      const horizonGeom = createLineGeometry(hx1, hy1, hx2, hy2, 4, horizonRgb, 1);
       allPositions.push(...horizonGeom.positions);
       allColors.push(...horizonGeom.colors);
 
@@ -626,24 +591,14 @@ function createWebGLAttitudeRenderer(
       // Bank indicator
       if (showBankIndicator) {
         const bankColor = hexToRgb("#ffffff");
-        const bankGeom = createBankIndicator(
-          centerX,
-          centerY,
-          radius,
-          roll,
-          bankColor
-        );
+        const bankGeom = createBankIndicator(centerX, centerY, radius, roll, bankColor);
         allPositions.push(...bankGeom.positions);
         allColors.push(...bankGeom.colors);
       }
 
       // Fixed aircraft symbol (always in center, not rotated)
       const aircraftColor = hexToRgb("#ffff00");
-      const aircraftGeom = createAircraftSymbol(
-        centerX,
-        centerY,
-        aircraftColor
-      );
+      const aircraftGeom = createAircraftSymbol(centerX, centerY, aircraftColor);
       allPositions.push(...aircraftGeom.positions);
       allColors.push(...aircraftGeom.colors);
 
@@ -656,21 +611,13 @@ function createWebGLAttitudeRenderer(
       }
 
       gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(allPositions),
-        gl.STATIC_DRAW
-      );
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(allPositions), gl.STATIC_DRAW);
       const positionLoc = gl.getAttribLocation(program, "a_position");
       gl.enableVertexAttribArray(positionLoc);
       gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(allColors),
-        gl.STATIC_DRAW
-      );
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(allColors), gl.STATIC_DRAW);
       const colorLoc = gl.getAttribLocation(program, "a_color");
       gl.enableVertexAttribArray(colorLoc);
       gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
@@ -826,24 +773,12 @@ async function createWebGPUAttitudeRenderer(
       const cos = Math.cos(rollRad);
       const sin = Math.sin(rollRad);
       const horizonLineLength = radius * 2;
-      const hx1 =
-        centerX + (-horizonLineLength / 2) * cos - -verticalOffset * sin;
-      const hy1 =
-        centerY + (-horizonLineLength / 2) * sin + -verticalOffset * cos;
-      const hx2 =
-        centerX + (horizonLineLength / 2) * cos - -verticalOffset * sin;
-      const hy2 =
-        centerY + (horizonLineLength / 2) * sin + -verticalOffset * cos;
+      const hx1 = centerX + (-horizonLineLength / 2) * cos - -verticalOffset * sin;
+      const hy1 = centerY + (-horizonLineLength / 2) * sin + -verticalOffset * cos;
+      const hx2 = centerX + (horizonLineLength / 2) * cos - -verticalOffset * sin;
+      const hy2 = centerY + (horizonLineLength / 2) * sin + -verticalOffset * cos;
 
-      const horizonGeom = createLineGeometry(
-        hx1,
-        hy1,
-        hx2,
-        hy2,
-        4,
-        horizonRgb,
-        1
-      );
+      const horizonGeom = createLineGeometry(hx1, hy1, hx2, hy2, 4, horizonRgb, 1);
       allPositions.push(...horizonGeom.positions);
       allColors.push(...horizonGeom.colors);
 
@@ -866,24 +801,14 @@ async function createWebGPUAttitudeRenderer(
       // Bank indicator
       if (showBankIndicator) {
         const bankColor = hexToRgb("#ffffff");
-        const bankGeom = createBankIndicator(
-          centerX,
-          centerY,
-          radius,
-          roll,
-          bankColor
-        );
+        const bankGeom = createBankIndicator(centerX, centerY, radius, roll, bankColor);
         allPositions.push(...bankGeom.positions);
         allColors.push(...bankGeom.colors);
       }
 
       // Fixed aircraft symbol
       const aircraftColor = hexToRgb("#ffff00");
-      const aircraftGeom = createAircraftSymbol(
-        centerX,
-        centerY,
-        aircraftColor
-      );
+      const aircraftGeom = createAircraftSymbol(centerX, centerY, aircraftColor);
       allPositions.push(...aircraftGeom.positions);
       allColors.push(...aircraftGeom.colors);
 
@@ -891,10 +816,7 @@ async function createWebGPUAttitudeRenderer(
       const positionData = new Float32Array(allPositions);
       const colorData = new Float32Array(allColors);
 
-      if (
-        !buffers.position ||
-        buffers.position.size < positionData.byteLength * 1.5
-      ) {
+      if (!buffers.position || buffers.position.size < positionData.byteLength * 1.5) {
         buffers.position?.destroy();
         buffers.position = device.createBuffer({
           size: Math.ceil(positionData.byteLength * 1.5),
@@ -1026,9 +948,7 @@ function Canvas() {
   const ctx = useAttitudeIndicator();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<
-    | WebGLRenderer<AttitudeRendererProps>
-    | WebGPURenderer<AttitudeRendererProps>
-    | null
+    WebGLRenderer<AttitudeRendererProps> | WebGPURenderer<AttitudeRendererProps> | null
   >(null);
   const [isInitializing, setIsInitializing] = useState(false);
 

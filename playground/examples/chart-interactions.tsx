@@ -1,18 +1,18 @@
 "use client";
 
-import { LineChart } from "@plexusui/components/charts/line-chart";
-import { ScatterChart } from "@plexusui/components/charts/scatter-chart";
 import {
-  ChartInteractions,
-  ChartClick,
-  ChartBrush,
-  ChartCrosshair,
-  type ClickEvent,
   type BrushSelection,
+  ChartBrush,
+  ChartClick,
+  ChartCrosshair,
+  ChartInteractions,
+  type ClickEvent,
   type CrosshairPosition,
 } from "@plexusui/components/charts/interactions";
-import { ComponentPreview } from "@/components/component-preview";
+import { LineChart } from "@plexusui/components/charts/line-chart";
+import { ScatterChart } from "@plexusui/components/charts/scatter-chart";
 import { useState } from "react";
+import { ComponentPreview } from "@/components/component-preview";
 
 // ============================================================================
 // Example Data
@@ -136,11 +136,7 @@ function BrushSelectionExample() {
 
     // Count points within selection
     const count = telemetryData.filter(
-      (p) =>
-        p.x >= sel.xStart &&
-        p.x <= sel.xEnd &&
-        p.y >= sel.yStart &&
-        p.y <= sel.yEnd
+      (p) => p.x >= sel.xStart && p.x <= sel.xEnd && p.y >= sel.yStart && p.y <= sel.yEnd
     ).length;
     setSelectedPoints(count);
   };
@@ -175,9 +171,7 @@ import { ChartBrush } from "@/components/plexusui/charts/interactions";
 
           <div className="w-full h-[400px] relative">
             <LineChart.Root
-              series={[
-                { name: "Telemetry", data: telemetryData, color: "#8b5cf6" },
-              ]}
+              series={[{ name: "Telemetry", data: telemetryData, color: "#8b5cf6" }]}
               width="100%"
               height={400}
               preferWebGPU
@@ -248,9 +242,7 @@ import { ChartCrosshair } from "@/components/plexusui/charts/interactions";
         <div className="w-full space-y-4">
           <div className="w-full h-[400px] relative">
             <LineChart.Root
-              series={[
-                { name: "Telemetry", data: telemetryData, color: "#ef4444" },
-              ]}
+              series={[{ name: "Telemetry", data: telemetryData, color: "#ef4444" }]}
               width="100%"
               height={400}
               xAxis={{ label: "Sample Index" }}
@@ -374,15 +366,11 @@ const [mode, setMode] = useState('crosshair');
               <ScatterChart.Axes />
               <ChartInteractions
                 enableClick={mode === "click"}
-                onClick={(e) =>
-                  addLog(`Clicked: X=${e.dataX.toFixed(2)}, Y=${e.dataY.toFixed(2)}`)
-                }
+                onClick={(e) => addLog(`Clicked: X=${e.dataX.toFixed(2)}, Y=${e.dataY.toFixed(2)}`)}
                 showClickMarker={mode === "click"}
                 enableBrush={mode === "brush"}
                 onBrushEnd={(sel) =>
-                  addLog(
-                    `Brushed: X=[${sel.xStart.toFixed(2)}, ${sel.xEnd.toFixed(2)}]`
-                  )
+                  addLog(`Brushed: X=[${sel.xStart.toFixed(2)}, ${sel.xEnd.toFixed(2)}]`)
                 }
                 enableCrosshair={mode === "crosshair"}
                 showLabels={mode === "crosshair"}

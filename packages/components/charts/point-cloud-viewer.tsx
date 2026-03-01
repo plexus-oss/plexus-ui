@@ -1,25 +1,24 @@
 "use client";
 
+import { Grid, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Grid } from "@react-three/drei";
 import {
   createContext,
-  useContext,
-  useRef,
-  useMemo,
-  useState,
-  Suspense,
   type ReactNode,
+  Suspense,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import * as THREE from "three";
 import { viridis } from "../lib/color-scales";
 import {
   buildOctree,
-  selectNodesLOD,
   mergeNodeData,
   type OctreeNode,
   type OctreeOptions,
-  type LODOptions,
+  selectNodesLOD,
 } from "../lib/point-cloud-octree";
 
 // ============================================================================
@@ -193,15 +192,12 @@ interface PointCloudViewerContextType {
   octreeRoot?: OctreeNode;
 }
 
-const PointCloudViewerContext =
-  createContext<PointCloudViewerContextType | null>(null);
+const PointCloudViewerContext = createContext<PointCloudViewerContextType | null>(null);
 
 function usePointCloudViewerData() {
   const ctx = useContext(PointCloudViewerContext);
   if (!ctx) {
-    throw new Error(
-      "PointCloudViewer components must be used within PointCloudViewer.Root"
-    );
+    throw new Error("PointCloudViewer components must be used within PointCloudViewer.Root");
   }
   return ctx;
 }
@@ -382,30 +378,18 @@ function PointCloud() {
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
     // Generate colors
-    const colors = generateColors(
-      activeData,
-      colorMode,
-      colorScale,
-      minValue,
-      maxValue
-    );
+    const colors = generateColors(activeData, colorMode, colorScale, minValue, maxValue);
     geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
     // Compute bounding sphere for proper camera framing
     geometry.computeBoundingSphere();
 
     return { geometry, colors };
-  }, [enableLOD ? lodData : data, colorMode, colorScale, minValue, maxValue]);
+  }, [colorMode, colorScale, minValue, maxValue, data, enableLOD, lodData]);
 
   return (
     <points ref={pointsRef} geometry={geometry}>
-      <pointsMaterial
-        size={pointSize}
-        vertexColors
-        sizeAttenuation
-        transparent
-        opacity={0.8}
-      />
+      <pointsMaterial size={pointSize} vertexColors sizeAttenuation transparent opacity={0.8} />
     </points>
   );
 }
@@ -420,9 +404,7 @@ function Scene() {
   // Calculate bounds for proper camera positioning
   const bounds = useMemo(() => {
     const positions =
-      data.positions instanceof Float32Array
-        ? data.positions
-        : new Float32Array(data.positions);
+      data.positions instanceof Float32Array ? data.positions : new Float32Array(data.positions);
     return calculateBounds(positions);
   }, [data.positions]);
 
@@ -449,8 +431,7 @@ function Scene() {
 // ============================================================================
 
 function Controls() {
-  const { autoRotate, enableDamping, maxDistance, minDistance } =
-    usePointCloudViewerData();
+  const { autoRotate, enableDamping, maxDistance, minDistance } = usePointCloudViewerData();
 
   return (
     <OrbitControls
@@ -528,9 +509,7 @@ function Root({
   // Calculate bounds for proper camera setup
   const bounds = useMemo(() => {
     const positions =
-      data.positions instanceof Float32Array
-        ? data.positions
-        : new Float32Array(data.positions);
+      data.positions instanceof Float32Array ? data.positions : new Float32Array(data.positions);
     return calculateBounds(positions);
   }, [data.positions]);
 

@@ -1,27 +1,18 @@
-/** biome-ignore-all lint/a11y/useButtonType: <explanation> */
-/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
+/** biome-ignore-all lint/a11y/useButtonType: playground demo buttons where explicit type is unnecessary */
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: decorative SVG icons in point cloud controls */
 "use client";
 
-import { useState, useMemo } from "react";
-import { PointCloudViewer } from "@plexusui/components/charts/point-cloud-viewer";
-import type {
-  PointCloudData,
-  ColorMode,
-} from "@plexusui/components/charts/point-cloud-viewer";
 import {
-  loadPointCloud,
-  detectFormat,
-} from "@plexusui/components/lib/point-cloud-loaders";
-import {
-  PointCloudInteractions,
   type BoundingBox3D,
   type Measurement,
+  PointCloudInteractions,
 } from "@plexusui/components/charts/point-cloud-interactions";
+import type { ColorMode, PointCloudData } from "@plexusui/components/charts/point-cloud-viewer";
+import { PointCloudViewer } from "@plexusui/components/charts/point-cloud-viewer";
+import { detectFormat, loadPointCloud } from "@plexusui/components/lib/point-cloud-loaders";
+import { useMemo, useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
 
 // ============================================================================
 // Synthetic Point Cloud Data Generators
@@ -41,10 +32,7 @@ function generateTerrainPointCloud(
   for (let x = 0; x < width; x += resolution) {
     for (let z = 0; z < depth; z += resolution) {
       // Create hilly terrain using sine waves
-      const y =
-        Math.sin(x * 0.1) * 5 +
-        Math.cos(z * 0.1) * 3 +
-        Math.sin(x * 0.05 + z * 0.05) * 2;
+      const y = Math.sin(x * 0.1) * 5 + Math.cos(z * 0.1) * 3 + Math.sin(x * 0.05 + z * 0.05) * 2;
 
       positions.push(x - width / 2, y, z - depth / 2);
 
@@ -122,11 +110,7 @@ function generateBuildingScanPointCloud(): PointCloudData {
       const radius = Math.random() * 2;
       const height = Math.random() * 8 + 2;
 
-      positions.push(
-        tx + Math.cos(angle) * radius,
-        height,
-        tz + Math.sin(angle) * radius
-      );
+      positions.push(tx + Math.cos(angle) * radius, height, tz + Math.sin(angle) * radius);
       classifications.push(5); // High vegetation
     }
   }
@@ -140,10 +124,7 @@ function generateBuildingScanPointCloud(): PointCloudData {
 /**
  * Generate a synthetic RGB point cloud (colored sphere)
  */
-function generateColoredSpherePointCloud(
-  radius: number,
-  numPoints: number
-): PointCloudData {
+function generateColoredSpherePointCloud(radius: number, numPoints: number): PointCloudData {
   const positions: number[] = [];
   const colors: number[] = [];
 
@@ -192,10 +173,7 @@ function generateLIDARScanPointCloud(): PointCloudData {
 
       // Simulate returns at various distances with some noise
       const baseRange = 20 + Math.random() * 30;
-      const range = Math.min(
-        baseRange + Math.sin(horizontalAngle * 3) * 10,
-        maxRange
-      );
+      const range = Math.min(baseRange + Math.sin(horizontalAngle * 3) * 10, maxRange);
 
       const x = range * Math.cos(verticalAngle) * Math.cos(horizontalAngle);
       const y = range * Math.sin(verticalAngle);
@@ -204,10 +182,7 @@ function generateLIDARScanPointCloud(): PointCloudData {
       positions.push(x, y, z);
 
       // Intensity varies with distance and angle (simulating reflectivity)
-      const intensity = Math.max(
-        0.2,
-        1 - range / maxRange + Math.random() * 0.2
-      );
+      const intensity = Math.max(0.2, 1 - range / maxRange + Math.random() * 0.2);
       intensities.push(intensity);
     }
   }
@@ -373,9 +348,7 @@ function ComposableExample() {
             <button
               onClick={() => setColorMode("height")}
               className={`px-3 py-1 text-xs rounded ${
-                colorMode === "height"
-                  ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-400"
+                colorMode === "height" ? "bg-blue-600 text-white" : "bg-zinc-800 text-zinc-400"
               }`}
             >
               Height
@@ -383,9 +356,7 @@ function ComposableExample() {
             <button
               onClick={() => setColorMode("intensity")}
               className={`px-3 py-1 text-xs rounded ${
-                colorMode === "intensity"
-                  ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-400"
+                colorMode === "intensity" ? "bg-blue-600 text-white" : "bg-zinc-800 text-zinc-400"
               }`}
             >
               Intensity
@@ -474,12 +445,7 @@ const handleFileChange = async (e) => {
         <div className="w-full space-y-4">
           <div className="flex flex-col gap-3">
             <label className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded cursor-pointer w-fit">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -491,8 +457,8 @@ const handleFileChange = async (e) => {
                 {loading
                   ? "Loading..."
                   : fileName
-                  ? `${fileName}`
-                  : "Choose file (.xyz, .pcd, .las)"}
+                    ? `${fileName}`
+                    : "Choose file (.xyz, .pcd, .las)"}
               </span>
               <input
                 type="file"
@@ -502,14 +468,12 @@ const handleFileChange = async (e) => {
               />
             </label>
             {error && (
-              <div className="text-xs text-red-400 bg-red-900/20 px-3 py-2 rounded">
-                {error}
-              </div>
+              <div className="text-xs text-red-400 bg-red-900/20 px-3 py-2 rounded">{error}</div>
             )}
             {!pointCloud && !loading && (
               <div className="text-xs text-zinc-500 bg-zinc-900 px-3 py-2 rounded">
-                Upload a point cloud file to visualize. For demo purposes, files
-                are limited to 100,000 points.
+                Upload a point cloud file to visualize. For demo purposes, files are limited to
+                100,000 points.
               </div>
             )}
           </div>
@@ -564,9 +528,7 @@ import { PointCloudInteractions } from "@plexusui/components/charts/point-cloud-
             <button
               onClick={() => setMode(mode === "box" ? null : "box")}
               className={`px-3 py-1 text-xs rounded ${
-                mode === "box"
-                  ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-400"
+                mode === "box" ? "bg-blue-600 text-white" : "bg-zinc-800 text-zinc-400"
               }`}
             >
               Bounding Box
@@ -574,9 +536,7 @@ import { PointCloudInteractions } from "@plexusui/components/charts/point-cloud-
             <button
               onClick={() => setMode(mode === "measure" ? null : "measure")}
               className={`px-3 py-1 text-xs rounded ${
-                mode === "measure"
-                  ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-400"
+                mode === "measure" ? "bg-blue-600 text-white" : "bg-zinc-800 text-zinc-400"
               }`}
             >
               Measure
@@ -595,8 +555,7 @@ import { PointCloudInteractions } from "@plexusui/components/charts/point-cloud-
 
           {measurements.length > 0 && (
             <div className="text-xs bg-zinc-900 px-3 py-2 rounded">
-              Last measurement:{" "}
-              {measurements[measurements.length - 1].distance.toFixed(2)} units
+              Last measurement: {measurements[measurements.length - 1].distance.toFixed(2)} units
             </div>
           )}
 
@@ -656,8 +615,7 @@ const pointCloudViewerProps: ApiProp[] = [
     name: "colorScale",
     type: "(value: number) => string",
     default: "viridis",
-    description:
-      "Color scale function for height/intensity mapping (0-1 input)",
+    description: "Color scale function for height/intensity mapping (0-1 input)",
   },
   {
     name: "minValue",
@@ -699,8 +657,7 @@ const pointCloudViewerProps: ApiProp[] = [
     name: "cameraPosition",
     type: "[number, number, number]",
     default: "auto",
-    description:
-      "Camera position [x, y, z]. Auto-calculated based on point cloud bounds",
+    description: "Camera position [x, y, z]. Auto-calculated based on point cloud bounds",
   },
   {
     name: "backgroundColor",
@@ -745,22 +702,19 @@ const pointCloudDataType: ApiProp[] = [
     name: "colors",
     type: "Uint8Array | number[]",
     default: "undefined",
-    description:
-      "RGB colors as flat array [r1, g1, b1, ...] (0-255). Used with colorMode='rgb'",
+    description: "RGB colors as flat array [r1, g1, b1, ...] (0-255). Used with colorMode='rgb'",
   },
   {
     name: "intensities",
     type: "Float32Array | number[]",
     default: "undefined",
-    description:
-      "Per-point intensity values (0-1 or 0-255). Used with colorMode='intensity'",
+    description: "Per-point intensity values (0-1 or 0-255). Used with colorMode='intensity'",
   },
   {
     name: "classifications",
     type: "Uint8Array | number[]",
     default: "undefined",
-    description:
-      "LAS classification codes (2=Ground, 5=Vegetation, 6=Building, etc.)",
+    description: "LAS classification codes (2=Ground, 5=Vegetation, 6=Building, etc.)",
   },
 ];
 
@@ -812,8 +766,7 @@ export function PointCloudViewerExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            High-performance 3D point cloud visualization with multiple color
-            modes
+            High-performance 3D point cloud visualization with multiple color modes
           </p>
         </div>
 

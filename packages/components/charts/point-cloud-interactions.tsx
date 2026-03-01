@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useRef,
-  useEffect,
-  type ReactNode,
-} from "react";
-import { useThree, useFrame } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
+import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 // ============================================================================
@@ -146,12 +139,7 @@ export function PointSelection({
       {selectedPoints.map((point, idx) => (
         <mesh key={idx} position={[point.x, point.y, point.z]}>
           <sphereGeometry args={[markerSize, 16, 16]} />
-          <meshBasicMaterial
-            color={highlightColor}
-            transparent
-            opacity={0.6}
-            depthTest={false}
-          />
+          <meshBasicMaterial color={highlightColor} transparent opacity={0.6} depthTest={false} />
         </mesh>
       ))}
     </>
@@ -297,15 +285,9 @@ export function BoundingBox3D({
     <mesh
       ref={boxRef}
       position={[currentBox.center.x, currentBox.center.y, currentBox.center.z]}
-      rotation={[
-        currentBox.rotation.x,
-        currentBox.rotation.y,
-        currentBox.rotation.z,
-      ]}
+      rotation={[currentBox.rotation.x, currentBox.rotation.y, currentBox.rotation.z]}
     >
-      <boxGeometry
-        args={[currentBox.size.x, currentBox.size.y, currentBox.size.z]}
-      />
+      <boxGeometry args={[currentBox.size.x, currentBox.size.y, currentBox.size.z]} />
       <meshBasicMaterial
         color={boxColor}
         transparent
@@ -314,13 +296,7 @@ export function BoundingBox3D({
       />
       <lineSegments>
         <edgesGeometry
-          args={[
-            new THREE.BoxGeometry(
-              currentBox.size.x,
-              currentBox.size.y,
-              currentBox.size.z
-            ),
-          ]}
+          args={[new THREE.BoxGeometry(currentBox.size.x, currentBox.size.y, currentBox.size.z)]}
         />
         <lineBasicMaterial color={boxColor} linewidth={2} />
       </lineSegments>
@@ -394,16 +370,8 @@ export function MeasurementTool({
 
           // If we have 2 points, calculate distance
           if (newPoints.length === 2) {
-            const p1 = new THREE.Vector3(
-              newPoints[0].x,
-              newPoints[0].y,
-              newPoints[0].z
-            );
-            const p2 = new THREE.Vector3(
-              newPoints[1].x,
-              newPoints[1].y,
-              newPoints[1].z
-            );
+            const p1 = new THREE.Vector3(newPoints[0].x, newPoints[0].y, newPoints[0].z);
+            const p2 = new THREE.Vector3(newPoints[1].x, newPoints[1].y, newPoints[1].z);
             const dist = p1.distanceTo(p2);
             _setDistance(dist);
 
@@ -580,16 +548,7 @@ export function SegmentationBrush({
       canvas?.removeEventListener("mousedown", handleMouseDown);
       canvas?.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [
-    camera,
-    raycaster,
-    scene,
-    isPainting,
-    selectedIndices,
-    brushColor,
-    label,
-    onRegionComplete,
-  ]);
+  }, [camera, raycaster, scene, isPainting, selectedIndices, brushColor, label, onRegionComplete]);
 
   return (
     <>
@@ -698,13 +657,7 @@ export function PlaneFit({
 
       {/* Fitted plane visualization */}
       {fittedPlane && (
-        <mesh
-          position={[
-            fittedPlane.point.x,
-            fittedPlane.point.y,
-            fittedPlane.point.z,
-          ]}
-        >
+        <mesh position={[fittedPlane.point.x, fittedPlane.point.y, fittedPlane.point.z]}>
           <planeGeometry args={[planeSize, planeSize]} />
           <meshBasicMaterial
             color={planeColor}
@@ -764,15 +717,12 @@ interface PointCloudInteractionsContextType {
   ) => void;
 }
 
-const PointCloudInteractionsContext =
-  createContext<PointCloudInteractionsContextType | null>(null);
+const PointCloudInteractionsContext = createContext<PointCloudInteractionsContextType | null>(null);
 
 export function usePointCloudInteractions() {
   const ctx = useContext(PointCloudInteractionsContext);
   if (!ctx) {
-    throw new Error(
-      "usePointCloudInteractions must be used within PointCloudInteractionsProvider"
-    );
+    throw new Error("usePointCloudInteractions must be used within PointCloudInteractionsProvider");
   }
   return ctx;
 }
@@ -871,16 +821,11 @@ export function PointCloudInteractions({
   return (
     <>
       {mode === "select" && (
-        <PointSelection
-          onSelect={onPointSelect}
-          onMultiSelect={onPointsSelect}
-        />
+        <PointSelection onSelect={onPointSelect} onMultiSelect={onPointsSelect} />
       )}
       {mode === "box" && <BoundingBox3D onBoxComplete={onBoxComplete} />}
       {mode === "measure" && <MeasurementTool onMeasure={onMeasure} />}
-      {mode === "segment" && (
-        <SegmentationBrush onRegionComplete={onSegmentComplete} />
-      )}
+      {mode === "segment" && <SegmentationBrush onRegionComplete={onSegmentComplete} />}
       {mode === "plane" && <PlaneFit onPlaneFit={onPlaneFit} />}
     </>
   );

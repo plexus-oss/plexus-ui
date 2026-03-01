@@ -11,8 +11,8 @@
  * - Distance-based LOD: Render higher detail for closer nodes
  */
 
-import type { PointCloudData } from "../charts/point-cloud-viewer";
 import * as THREE from "three";
+import type { PointCloudData } from "../charts/point-cloud-viewer";
 
 // ============================================================================
 // Types
@@ -131,16 +131,8 @@ export interface LODOptions {
 /**
  * Build octree from point cloud data
  */
-export function buildOctree(
-  data: PointCloudData,
-  options: OctreeOptions = {}
-): OctreeNode {
-  const {
-    maxPointsPerNode = 10000,
-    maxDepth = 8,
-    minNodeSize = 0.01,
-    initialSpacing,
-  } = options;
+export function buildOctree(data: PointCloudData, options: OctreeOptions = {}): OctreeNode {
+  const { maxPointsPerNode = 10000, maxDepth = 8, minNodeSize = 0.01, initialSpacing } = options;
 
   // Calculate bounding box
   const boundingBox = calculateBoundingBox(data.positions);
@@ -153,8 +145,7 @@ export function buildOctree(
 
   // Calculate initial spacing if not provided
   const spacing =
-    initialSpacing ||
-    Math.sqrt((halfSize * halfSize * 2) / (data.positions.length / 3));
+    initialSpacing || Math.sqrt((halfSize * halfSize * 2) / (data.positions.length / 3));
 
   // Create root node
   const root: OctreeNode = {
@@ -253,11 +244,7 @@ function insertPoint(
     addPointToNode(node, pointIndex, data);
 
     // Subdivide if necessary
-    if (
-      node.numPoints > maxPointsPerNode &&
-      node.level < maxDepth &&
-      node.size > minNodeSize
-    ) {
+    if (node.numPoints > maxPointsPerNode && node.level < maxDepth && node.size > minNodeSize) {
       subdivideNode(node, data, maxPointsPerNode, maxDepth, minNodeSize);
     }
   } else {
@@ -298,25 +285,14 @@ function insertPoint(
     }
 
     // Recursively insert into child
-    insertPoint(
-      child,
-      pointIndex,
-      data,
-      maxPointsPerNode,
-      maxDepth,
-      minNodeSize
-    );
+    insertPoint(child, pointIndex, data, maxPointsPerNode, maxDepth, minNodeSize);
   }
 }
 
 /**
  * Add point data to node
  */
-function addPointToNode(
-  node: OctreeNode,
-  pointIndex: number,
-  data: PointCloudData
-): void {
+function addPointToNode(node: OctreeNode, pointIndex: number, data: PointCloudData): void {
   const oldSize = node.positions.length;
   const newSize = oldSize + 3;
 
@@ -362,7 +338,7 @@ function addPointToNode(
  */
 function subdivideNode(
   node: OctreeNode,
-  data: PointCloudData,
+  _data: PointCloudData,
   maxPointsPerNode: number,
   maxDepth: number,
   minNodeSize: number
@@ -403,28 +379,14 @@ function subdivideNode(
 /**
  * Select nodes to render based on LOD criteria
  */
-export function selectNodesLOD(
-  root: OctreeNode,
-  options: LODOptions
-): OctreeNode[] {
-  const {
-    pointBudget = 1000000,
-    camera,
-    lodMultiplier = 1.0,
-    minScreenSpaceError = 1.0,
-  } = options;
+export function selectNodesLOD(root: OctreeNode, options: LODOptions): OctreeNode[] {
+  const { pointBudget = 1000000, camera, lodMultiplier = 1.0, minScreenSpaceError = 1.0 } = options;
 
   const frustum = new THREE.Frustum();
   const projectionMatrix = new THREE.Matrix4();
 
-  if (
-    camera instanceof THREE.PerspectiveCamera ||
-    camera instanceof THREE.OrthographicCamera
-  ) {
-    projectionMatrix.multiplyMatrices(
-      camera.projectionMatrix,
-      camera.matrixWorldInverse
-    );
+  if (camera instanceof THREE.PerspectiveCamera || camera instanceof THREE.OrthographicCamera) {
+    projectionMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.setFromProjectionMatrix(projectionMatrix);
   }
 

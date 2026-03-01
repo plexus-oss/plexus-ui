@@ -1,19 +1,13 @@
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: <explanation> */
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: chart demo containers use custom pointer event handling */
 "use client";
 
-import { BarChart } from "@plexusui/components/charts/bar-chart";
 import type { DataPoint } from "@plexusui/components/charts/bar-chart";
-import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
-import {
-  useColorScheme,
-  useMultiColors,
-} from "@/components/color-scheme-provider";
-import React, { useMemo, useState } from "react";
+import { BarChart } from "@plexusui/components/charts/bar-chart";
 import { MinimapContainer } from "@plexusui/components/charts/chart-minimap";
+import React, { useMemo, useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
+import { useColorScheme, useMultiColors } from "@/components/color-scheme-provider";
+import { ComponentPreview } from "@/components/component-preview";
 
 // ============================================================================
 // Example Data
@@ -66,14 +60,8 @@ function generateTimeSeriesData() {
     const endDate = new Date(endYear, 11, 31);
 
     // Generate weekly data points
-    for (
-      let d = new Date(startDate);
-      d <= endDate;
-      d.setDate(d.getDate() + 7)
-    ) {
-      const dayOfYear = Math.floor(
-        (d.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 7)) {
+      const dayOfYear = Math.floor((d.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
       // Create realistic variation with trends and seasonality
       const trend = dayOfYear * 0.002; // Gradual increase over time
@@ -85,10 +73,7 @@ function generateTimeSeriesData() {
       if (catIdx > 5 && d.getFullYear() < 2019) continue;
       if (catIdx > 8 && d.getFullYear() < 2020) continue;
 
-      const value = Math.max(
-        0,
-        trend + seasonality + noise + categoryOffset + 20
-      );
+      const value = Math.max(0, trend + seasonality + noise + categoryOffset + 20);
 
       data.push({
         x: d.getTime(),
@@ -327,9 +312,7 @@ function PrimitiveBarChart() {
       preview={
         <div className="w-full h-[400px]">
           <BarChart.Root
-            series={[
-              { name: "Custom Metrics", data: monthlyData, color: color },
-            ]}
+            series={[{ name: "Custom Metrics", data: monthlyData, color: color }]}
             width="100%"
             height={400}
             preferWebGPU={true}
@@ -346,10 +329,7 @@ function PrimitiveBarChart() {
 
 function HighDensityTimeSeriesBarChart() {
   const colors = useMultiColors(10);
-  const { series: rawSeries, categories } = useMemo(
-    () => generateTimeSeriesData(),
-    []
-  );
+  const { series: rawSeries, categories } = useMemo(() => generateTimeSeriesData(), []);
 
   // Current visible range (default to last 6 months of data)
   const visibleRange = useMemo(() => {
@@ -363,9 +343,7 @@ function HighDensityTimeSeriesBarChart() {
     return rawSeries.map((data, idx) => ({
       name: categories[idx],
       data: data.filter(
-        (d) =>
-          (d.x as number) >= visibleRange.start &&
-          (d.x as number) <= visibleRange.end
+        (d) => (d.x as number) >= visibleRange.start && (d.x as number) <= visibleRange.end
       ),
       color: colors[idx],
     }));
@@ -431,9 +409,9 @@ function SimpleMinimap({
   visibleRange: { start: number; end: number };
   onRangeChange: (start: number, end: number) => void;
 }) {
-  const [dragMode, setDragMode] = React.useState<
-    "pan" | "resize-left" | "resize-right" | null
-  >(null);
+  const [dragMode, setDragMode] = React.useState<"pan" | "resize-left" | "resize-right" | null>(
+    null
+  );
   const [dragStart, setDragStart] = React.useState({
     x: 0,
     startVal: 0,
@@ -443,8 +421,7 @@ function SimpleMinimap({
 
   const rangeWidth = fullRange.max - fullRange.min;
   const leftPercent = ((visibleRange.start - fullRange.min) / rangeWidth) * 100;
-  const widthPercent =
-    ((visibleRange.end - visibleRange.start) / rangeWidth) * 100;
+  const widthPercent = ((visibleRange.end - visibleRange.start) / rangeWidth) * 100;
 
   const handlePanStart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -561,10 +538,7 @@ function SimpleMinimap({
       </div>
 
       {/* Overlay */}
-      <div
-        className="absolute inset-0"
-        style={{ pointerEvents: "none", zIndex: 10 }}
-      >
+      <div className="absolute inset-0" style={{ pointerEvents: "none", zIndex: 10 }}>
         {/* Left dimmed area */}
         <div
           className="absolute inset-y-0 bg-black/60"
@@ -605,10 +579,7 @@ function SimpleMinimap({
 
 function TimeSeriesWithMinimap() {
   const colors = useMultiColors(3);
-  const { series: rawSeries, categories } = useMemo(
-    () => generateTimeSeriesData(),
-    []
-  );
+  const { series: rawSeries, categories } = useMemo(() => generateTimeSeriesData(), []);
 
   // Use only first 3 series to keep it clean
   const limitedSeries = useMemo(() => rawSeries.slice(0, 3), [rawSeries]);
@@ -616,9 +587,7 @@ function TimeSeriesWithMinimap() {
 
   // Calculate full time range
   const fullTimeRange = useMemo(() => {
-    const allTimestamps = limitedSeries.flatMap((s) =>
-      s.map((d) => d.x as number)
-    );
+    const allTimestamps = limitedSeries.flatMap((s) => s.map((d) => d.x as number));
     return {
       min: Math.min(...allTimestamps),
       max: Math.max(...allTimestamps),
@@ -649,9 +618,7 @@ function TimeSeriesWithMinimap() {
     const filtered = limitedSeries.map((data, idx) => ({
       name: limitedCategories[idx],
       data: data.filter(
-        (d) =>
-          (d.x as number) >= visibleRange.start &&
-          (d.x as number) <= visibleRange.end
+        (d) => (d.x as number) >= visibleRange.start && (d.x as number) <= visibleRange.end
       ),
       color: colors[idx],
     }));
@@ -760,10 +727,7 @@ const [visibleRange, setVisibleRange] = useState({
               barWidth={8}
               xAxis={{
                 label: "Date",
-                domain: [visibleRange.start, visibleRange.end] as [
-                  number,
-                  number
-                ],
+                domain: [visibleRange.start, visibleRange.end] as [number, number],
                 formatter: (val: number) => formatDate(val),
               }}
               yAxis={{ label: "Messages" }}
@@ -784,8 +748,7 @@ const barChartProps: ApiProp[] = [
     name: "series",
     type: "Series[]",
     default: "required",
-    description:
-      "Array of data series. Series: { name: string, data: Point[], color?: string }",
+    description: "Array of data series. Series: { name: string, data: Point[], color?: string }",
   },
   {
     name: "xAxis",
@@ -809,15 +772,13 @@ const barChartProps: ApiProp[] = [
     name: "grouped",
     type: "boolean",
     default: "false",
-    description:
-      "Display multiple series side-by-side (grouped) or as single bars",
+    description: "Display multiple series side-by-side (grouped) or as single bars",
   },
   {
     name: "barWidth",
     type: "number",
     default: "auto",
-    description:
-      "Width of each bar in pixels (or bar group width when grouped)",
+    description: "Width of each bar in pixels (or bar group width when grouped)",
   },
   {
     name: "width",
@@ -853,8 +814,7 @@ const barChartProps: ApiProp[] = [
     name: "preferWebGPU",
     type: "boolean",
     default: "true",
-    description:
-      "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
+    description: "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
   },
   {
     name: "className",
@@ -875,8 +835,7 @@ const barSeriesType: ApiProp[] = [
     name: "data",
     type: "Point[]",
     default: "required",
-    description:
-      "Array of data points. Point: { x: string | number, y: number }",
+    description: "Array of data points. Point: { x: string | number, y: number }",
   },
   {
     name: "color",
@@ -992,8 +951,7 @@ export function BarChartExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            BarChart component for comparing categorical data with vertical or
-            horizontal bars
+            BarChart component for comparing categorical data with vertical or horizontal bars
           </p>
         </div>
 

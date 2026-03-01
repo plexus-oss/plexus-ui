@@ -1,17 +1,11 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
 import type { DataPoint } from "@plexusui/components/charts/scatter-chart";
-import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
-import {
-  useColorScheme,
-  useMultiColors,
-} from "@/components/color-scheme-provider";
 import { ScatterChart } from "@plexusui/components/charts/scatter-chart";
+import { useEffect, useMemo, useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
+import { useColorScheme, useMultiColors } from "@/components/color-scheme-provider";
+import { ComponentPreview } from "@/components/component-preview";
 
 // ============================================================================
 // Example Data
@@ -175,23 +169,14 @@ function RealtimeStreamingScatterChart() {
       let memory: number;
 
       if (cluster < 0.65) {
-        cpu = Math.min(
-          40,
-          Math.max(5, 15 + (Math.random() + Math.random() + Math.random()) * 5)
-        );
+        cpu = Math.min(40, Math.max(5, 15 + (Math.random() + Math.random() + Math.random()) * 5));
         memory = Math.min(
           60,
           Math.max(15, 35 + (Math.random() + Math.random() + Math.random()) * 8)
         );
       } else if (cluster < 0.85) {
-        cpu = Math.min(
-          95,
-          Math.max(60, 75 + (Math.random() + Math.random()) * 8)
-        );
-        memory = Math.min(
-          95,
-          Math.max(60, 75 + (Math.random() + Math.random()) * 8)
-        );
+        cpu = Math.min(95, Math.max(60, 75 + (Math.random() + Math.random()) * 8));
+        memory = Math.min(95, Math.max(60, 75 + (Math.random() + Math.random()) * 8));
       } else if (cluster < 0.95) {
         cpu = Math.min(30, Math.max(5, 15 + Math.random() * 10));
         memory = Math.min(95, Math.max(70, 80 + Math.random() * 10));
@@ -400,8 +385,7 @@ const scatterChartProps: ApiProp[] = [
     name: "preferWebGPU",
     type: "boolean",
     default: "true",
-    description:
-      "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
+    description: "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
   },
   {
     name: "className",
@@ -422,8 +406,7 @@ const scatterSeriesType: ApiProp[] = [
     name: "data",
     type: "Point[]",
     default: "required",
-    description:
-      "Array of data points. Point: { x: number, y: number, size?: number }",
+    description: "Array of data points. Point: { x: number, y: number, size?: number }",
   },
   {
     name: "color",
@@ -529,8 +512,7 @@ export function ScatterChartExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            ScatterChart component for visualizing correlations and
-            distributions in 2D space
+            ScatterChart component for visualizing correlations and distributions in 2D space
           </p>
         </div>
 

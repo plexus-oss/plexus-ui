@@ -1,8 +1,8 @@
 "use client";
 
+import { Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Lock } from "lucide-react";
 
 interface ComponentPreviewProProps {
   preview: React.ReactNode;

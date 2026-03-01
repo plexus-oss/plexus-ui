@@ -1,31 +1,22 @@
 "use client";
 
 import {
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-  useCallback,
-  memo,
-  lazy,
-  Suspense,
-} from "react";
-import { LineChart } from "@plexusui/components/charts/line-chart";
-import { AreaChart } from "@plexusui/components/charts/area-chart";
-import { BarChart } from "@plexusui/components/charts/bar-chart";
-import { ScatterChart } from "@plexusui/components/charts/scatter-chart";
-import { HistogramChart } from "@plexusui/components/charts/histogram-chart";
-import { GanttChart, type Task } from "@plexusui/components/charts/gantt";
-import {
+  type Annotation,
   ChartAnnotations,
   ChartRuler,
-  type Annotation,
   type Measurement,
 } from "@plexusui/components/charts/annotations";
+import { AreaChart } from "@plexusui/components/charts/area-chart";
+import { BarChart } from "@plexusui/components/charts/bar-chart";
+import { GanttChart, type Task } from "@plexusui/components/charts/gantt";
+import { HistogramChart } from "@plexusui/components/charts/histogram-chart";
+import { LineChart } from "@plexusui/components/charts/line-chart";
+import { ScatterChart } from "@plexusui/components/charts/scatter-chart";
 import { downsampleLTTB } from "@plexusui/components/lib/data-utils";
-import { Card } from "@/components/ui/card";
-import { Activity, Gauge, Zap, Radio, Pencil } from "lucide-react";
+import { Activity, Gauge, Pencil, Radio, Zap } from "lucide-react";
+import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useColorScheme } from "@/components/color-scheme-provider";
+import { Card } from "@/components/ui/card";
 import { Button } from "./ui/button";
 
 // Lazy load heavy 3D component
@@ -144,12 +135,7 @@ export function TelemetryDemo() {
           (Math.random() - 0.5) * 0.3;
         positions.push(xPos, height, zPos);
         // Intensity based on height + some noise
-        intensities.push(
-          Math.min(
-            1,
-            Math.max(0, (height + 5) / 10 + (Math.random() - 0.5) * 0.1)
-          )
-        );
+        intensities.push(Math.min(1, Math.max(0, (height + 5) / 10 + (Math.random() - 0.5) * 0.1)));
       }
     }
 
@@ -160,15 +146,9 @@ export function TelemetryDemo() {
   }, []);
 
   // Historical data
-  const [velocityHistory, setVelocityHistory] = useState<
-    Array<{ x: number; y: number }>
-  >([]);
-  const [accelHistory, setAccelHistory] = useState<
-    Array<{ x: number; y: number }>
-  >([]);
-  const [signalHistory, setSignalHistory] = useState<
-    Array<{ x: number; y: number }>
-  >([]);
+  const [velocityHistory, setVelocityHistory] = useState<Array<{ x: number; y: number }>>([]);
+  const [accelHistory, setAccelHistory] = useState<Array<{ x: number; y: number }>>([]);
+  const [signalHistory, setSignalHistory] = useState<Array<{ x: number; y: number }>>([]);
 
   // Performance tracking
   const frameCountRef = useRef(0);
@@ -182,36 +162,23 @@ export function TelemetryDemo() {
 
     // Velocity: cruising with variations (0-25 m/s)
     const velocity =
-      12 +
-      Math.sin(t / 3000) * 5 +
-      Math.sin(t / 1000) * 3 +
-      (Math.random() - 0.5) * 1;
+      12 + Math.sin(t / 3000) * 5 + Math.sin(t / 1000) * 3 + (Math.random() - 0.5) * 1;
 
     // Acceleration: centered around 1G with variations
     const acceleration =
-      1.0 +
-      Math.sin(t / 800) * 0.3 +
-      Math.cos(t / 400) * 0.15 +
-      (Math.random() - 0.5) * 0.1;
+      1.0 + Math.sin(t / 800) * 0.3 + Math.cos(t / 400) * 0.15 + (Math.random() - 0.5) * 0.1;
 
     // Temperature: slowly drifting
-    const temperature =
-      25 + Math.sin(t / 10000) * 3 + (Math.random() - 0.5) * 0.5;
+    const temperature = 25 + Math.sin(t / 10000) * 3 + (Math.random() - 0.5) * 0.5;
 
     // Signal strength: mostly stable with occasional dips
     const signalBase = 95 + Math.sin(t / 5000) * 3;
     const signalDrop = Math.random() > 0.98 ? -15 : 0;
-    const signal = Math.max(
-      60,
-      Math.min(100, signalBase + signalDrop + (Math.random() - 0.5) * 2)
-    );
+    const signal = Math.max(60, Math.min(100, signalBase + signalDrop + (Math.random() - 0.5) * 2));
 
     // Altitude: slowly varying around 1000m
     const altitude =
-      1000 +
-      Math.sin(t / 4000) * 50 +
-      Math.cos(t / 1500) * 20 +
-      (Math.random() - 0.5) * 5;
+      1000 + Math.sin(t / 4000) * 50 + Math.cos(t / 1500) * 20 + (Math.random() - 0.5) * 5;
 
     // Power: battery level with slow drain
     const power = Math.max(20, 85 - (t / 100000) * 10 + Math.sin(t / 2000) * 2);
@@ -316,7 +283,7 @@ export function TelemetryDemo() {
     [downsampledAccel, color]
   );
 
-  const signalSeries = useMemo(
+  const _signalSeries = useMemo(
     () => [
       {
         name: "Signal",
@@ -360,18 +327,9 @@ export function TelemetryDemo() {
   );
 
   // Memoized axis configs
-  const velocityYAxis = useMemo(
-    () => ({ label: "m/s", domain: [0, 25] as [number, number] }),
-    []
-  );
-  const accelYAxis = useMemo(
-    () => ({ label: "G", domain: [0, 2] as [number, number] }),
-    []
-  );
-  const signalYAxis = useMemo(
-    () => ({ label: "%", domain: [50, 100] as [number, number] }),
-    []
-  );
+  const velocityYAxis = useMemo(() => ({ label: "m/s", domain: [0, 25] as [number, number] }), []);
+  const accelYAxis = useMemo(() => ({ label: "G", domain: [0, 2] as [number, number] }), []);
+  const _signalYAxis = useMemo(() => ({ label: "%", domain: [50, 100] as [number, number] }), []);
   // Dynamic x-axis based on actual time data
   const xAxis = useMemo(() => {
     if (velocityHistory.length === 0) {
@@ -410,9 +368,7 @@ export function TelemetryDemo() {
               </div>
               <div className="flex items-center gap-1.5">
                 <Zap className="h-3.5 w-3.5" />
-                <span className="tabular-nums font-medium">
-                  {dataPoints.toLocaleString()} pts
-                </span>
+                <span className="tabular-nums font-medium">{dataPoints.toLocaleString()} pts</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Radio className="h-3.5 w-3.5" />
@@ -445,11 +401,7 @@ export function TelemetryDemo() {
                 Clear ({annotations.length + measurements.length})
               </Button>
             )}
-            <Button
-              onClick={() => setIsStreaming(!isStreaming)}
-              variant="outline"
-              size="sm"
-            >
+            <Button onClick={() => setIsStreaming(!isStreaming)} variant="outline" size="sm">
               {isStreaming ? "Pause" : "Resume"}
             </Button>
           </div>
@@ -494,9 +446,7 @@ export function TelemetryDemo() {
         {/* Velocity Chart */}
         <ChartCard
           title="Velocity"
-          description={
-            annotationMode ? "Drag to measure" : "Speed over time (m/s)"
-          }
+          description={annotationMode ? "Drag to measure" : "Speed over time (m/s)"}
         >
           {velocityHistory.length > 10 ? (
             <AreaChart.Root
@@ -526,9 +476,7 @@ export function TelemetryDemo() {
         {/* G-Force Chart with Annotations */}
         <ChartCard
           title="Acceleration"
-          description={
-            annotationMode ? "Click to add annotations" : "G-Force readings"
-          }
+          description={annotationMode ? "Click to add annotations" : "G-Force readings"}
         >
           {accelHistory.length > 10 ? (
             <LineChart.Root
@@ -560,10 +508,7 @@ export function TelemetryDemo() {
         {/* Signal Strength */}
 
         {/* Velocity vs G-Force Scatter */}
-        <ChartCard
-          title="Velocity vs G-Force"
-          description="Correlation analysis"
-        >
+        <ChartCard title="Velocity vs G-Force" description="Correlation analysis">
           {scatterData.length > 10 ? (
             <ScatterChart
               series={scatterSeries}
@@ -584,10 +529,7 @@ export function TelemetryDemo() {
       {/* Tertiary Charts */}
       <div className="grid gap-3 md:grid-cols-2">
         {/* G-Force Distribution */}
-        <ChartCard
-          title="G-Force Distribution"
-          description="Statistical histogram"
-        >
+        <ChartCard title="G-Force Distribution" description="Statistical histogram">
           {accelHistory.length > 20 ? (
             <HistogramChart
               data={accelHistory.map((d) => d.y)}
@@ -620,17 +562,9 @@ export function TelemetryDemo() {
       </div>
 
       {/* Mission Timeline - Gantt Chart */}
-      <ChartCard
-        title="Mission Operations"
-        description="Real-time mission task timeline"
-      >
+      <ChartCard title="Mission Operations" description="Real-time mission task timeline">
         {missionTasks.length > 0 ? (
-          <GanttChart
-            tasks={missionTasks}
-            timeWindowHours={3}
-            rowHeight={30}
-            variant="compact"
-          />
+          <GanttChart tasks={missionTasks} timeWindowHours={3} rowHeight={30} variant="compact" />
         ) : (
           <div className="flex items-center justify-center h-[200px] text-gray-500 text-xs">
             Loading mission timeline...
@@ -639,10 +573,7 @@ export function TelemetryDemo() {
       </ChartCard>
 
       <div className="grid gap-3 md:grid-cols-1">
-        <ChartCard
-          title="LiDAR Terrain Scan"
-          description="Real-time terrain mapping (2,500 pts)"
-        >
+        <ChartCard title="LiDAR Terrain Scan" description="Real-time terrain mapping (2,500 pts)">
           <Suspense
             fallback={
               <div className="flex items-center justify-center h-[280px] text-gray-500 text-xs">
@@ -712,13 +643,7 @@ const ChartCard = memo(function ChartCard({
   );
 });
 
-function LoadingState({
-  count,
-  target = 10,
-}: {
-  count: number;
-  target?: number;
-}) {
+function LoadingState({ count, target = 10 }: { count: number; target?: number }) {
   return (
     <div className="flex items-center justify-center h-[200px] text-gray-500 text-xs">
       Collecting data... ({count}/{target})

@@ -71,10 +71,7 @@ export function data3DToVertexArray(data: DataPoint3D[]): Float32Array {
  * Downsample data using LTTB (Largest Triangle Three Buckets) algorithm
  * Optimized for time series data visualization
  */
-export function downsampleLTTB(
-  data: DataPoint[],
-  targetPoints: number
-): DataPoint[] {
+export function downsampleLTTB(data: DataPoint[], targetPoints: number): DataPoint[] {
   if (data.length <= targetPoints) return data;
   if (targetPoints < 3) return [data[0], data[data.length - 1]];
 
@@ -86,10 +83,7 @@ export function downsampleLTTB(
 
   for (let i = 0; i < targetPoints - 2; i++) {
     const avgRangeStart = Math.floor((i + 1) * bucketSize) + 1;
-    const avgRangeEnd = Math.min(
-      Math.floor((i + 2) * bucketSize) + 1,
-      data.length
-    );
+    const avgRangeEnd = Math.min(Math.floor((i + 2) * bucketSize) + 1, data.length);
     const avgRangeLength = avgRangeEnd - avgRangeStart;
 
     // Calculate average point in next bucket
@@ -111,10 +105,7 @@ export function downsampleLTTB(
 
     // Find point in current bucket with largest triangle area
     const rangeStart = Math.floor(i * bucketSize) + 1;
-    const rangeEnd = Math.min(
-      Math.floor((i + 1) * bucketSize) + 1,
-      data.length
-    );
+    const rangeEnd = Math.min(Math.floor((i + 1) * bucketSize) + 1, data.length);
 
     const pointAX = result[result.length - 1].x;
     const pointAY = result[result.length - 1].y;
@@ -124,8 +115,7 @@ export function downsampleLTTB(
 
     for (let j = rangeStart; j < rangeEnd && j < data.length; j++) {
       const area = Math.abs(
-        (pointAX - avgX) * (data[j].y - pointAY) -
-          (pointAX - data[j].x) * (avgY - pointAY)
+        (pointAX - avgX) * (data[j].y - pointAY) - (pointAX - data[j].x) * (avgY - pointAY)
       );
 
       if (area > maxArea) {
@@ -146,10 +136,7 @@ export function downsampleLTTB(
 /**
  * Simple min/max downsampling - faster but less accurate than LTTB
  */
-export function downsampleMinMax(
-  data: DataPoint[],
-  targetPoints: number
-): DataPoint[] {
+export function downsampleMinMax(data: DataPoint[], targetPoints: number): DataPoint[] {
   if (data.length <= targetPoints) return data;
 
   const result: DataPoint[] = [];
@@ -278,7 +265,7 @@ export function calculateNiceBounds(
   // Helper to find "nice" numbers (1, 2, 5, 10, 20, 50, etc.)
   const niceNum = (range: number, round: boolean): number => {
     const exponent = Math.floor(Math.log10(range));
-    const fraction = range / Math.pow(10, exponent);
+    const fraction = range / 10 ** exponent;
     let niceFraction: number;
 
     if (round) {
@@ -293,7 +280,7 @@ export function calculateNiceBounds(
       else niceFraction = 10;
     }
 
-    return niceFraction * Math.pow(10, exponent);
+    return niceFraction * 10 ** exponent;
   };
 
   const xRange = niceNum(bounds.xMax - bounds.xMin, false);
@@ -335,10 +322,7 @@ export type BinMethod =
 /**
  * Calculate optimal number of bins using various methods
  */
-export function calculateBinCount(
-  data: number[],
-  method: BinMethod = "sturges"
-): number {
+export function calculateBinCount(data: number[], method: BinMethod = "sturges"): number {
   const n = data.length;
   if (n === 0) return 1;
 
@@ -354,7 +338,7 @@ export function calculateBinCount(
     case "scott": {
       // Bin width = 3.5 * σ * n^(-1/3)
       const stdDev = calculateStdDev(data);
-      const binWidth = 3.5 * stdDev * Math.pow(n, -1 / 3);
+      const binWidth = 3.5 * stdDev * n ** (-1 / 3);
       const [min, max] = [Math.min(...data), Math.max(...data)];
       const range = max - min;
       return Math.max(1, Math.ceil(range / binWidth));
@@ -363,7 +347,7 @@ export function calculateBinCount(
     case "freedman-diaconis": {
       // Bin width = 2 * IQR * n^(-1/3)
       const iqr = calculateIQR(data);
-      const binWidth = 2 * iqr * Math.pow(n, -1 / 3);
+      const binWidth = 2 * iqr * n ** (-1 / 3);
       const [min, max] = [Math.min(...data), Math.max(...data)];
       const range = max - min;
       return Math.max(1, Math.ceil(range / binWidth));
@@ -432,8 +416,7 @@ export function createHistogramBins(
 function calculateStdDev(data: number[]): number {
   if (data.length === 0) return 0;
   const mean = data.reduce((sum, val) => sum + val, 0) / data.length;
-  const variance =
-    data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / data.length;
+  const variance = data.reduce((sum, val) => sum + (val - mean) ** 2, 0) / data.length;
   return Math.sqrt(variance);
 }
 
@@ -451,10 +434,7 @@ function calculateIQR(data: number[]): number {
 /**
  * Calculate normal distribution curve for overlay
  */
-export function calculateNormalCurve(
-  data: number[],
-  points = 100
-): DataPoint[] {
+export function calculateNormalCurve(data: number[], points = 100): DataPoint[] {
   if (data.length === 0) return [];
 
   const mean = data.reduce((sum, val) => sum + val, 0) / data.length;
@@ -470,10 +450,7 @@ export function calculateNormalCurve(
   for (let i = 0; i < points; i++) {
     const x = min + (i / (points - 1)) * range;
     const z = (x - mean) / stdDev;
-    const y =
-      (1 / (stdDev * Math.sqrt(2 * Math.PI))) *
-      Math.exp(-0.5 * z * z) *
-      data.length;
+    const y = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z) * data.length;
     curve.push({ x, y });
   }
 
@@ -625,7 +602,7 @@ export function getTicks(domain: [number, number], count: number): number[] {
 
   // Find a nice step value
   const exponent = Math.floor(Math.log10(roughStep));
-  const fraction = roughStep / Math.pow(10, exponent);
+  const fraction = roughStep / 10 ** exponent;
 
   let niceStep: number;
   if (fraction <= 1) niceStep = 1;
@@ -633,7 +610,7 @@ export function getTicks(domain: [number, number], count: number): number[] {
   else if (fraction <= 5) niceStep = 5;
   else niceStep = 10;
 
-  niceStep *= Math.pow(10, exponent);
+  niceStep *= 10 ** exponent;
 
   const niceMin = Math.floor(min / niceStep) * niceStep;
   const niceMax = Math.ceil(max / niceStep) * niceStep;
@@ -668,10 +645,7 @@ export interface WindowResult {
   windowCorrection: number; // Normalization factor for power spectrum
 }
 
-export function applyWindow(
-  data: number[],
-  windowType: WindowFunction = "hann"
-): number[] {
+export function applyWindow(data: number[], windowType: WindowFunction = "hann"): number[] {
   const result = applyWindowWithCorrection(data, windowType);
   return result.windowed;
 }
@@ -740,7 +714,7 @@ export interface SpectrogramPoint {
  * Find next power of 2 greater than or equal to n
  */
 export function nextPowerOf2(n: number): number {
-  return Math.pow(2, Math.ceil(Math.log2(n)));
+  return 2 ** Math.ceil(Math.log2(n));
 }
 
 /**
@@ -877,10 +851,7 @@ export interface GPUFFTCompute {
   destroy: () => void;
 }
 
-export const createGPUFFTCompute = (
-  device: GPUDevice,
-  fftSize: number
-): GPUFFTCompute => {
+export const createGPUFFTCompute = (device: GPUDevice, fftSize: number): GPUFFTCompute => {
   // Validate FFT size
   if ((fftSize & (fftSize - 1)) !== 0) {
     throw new Error("FFT size must be a power of 2");
@@ -984,9 +955,7 @@ export const createGPUFFTCompute = (
    */
   const compute = async (input: number[]): Promise<Complex[]> => {
     if (input.length !== fftSize) {
-      throw new Error(
-        `Input size ${input.length} does not match FFT size ${fftSize}`
-      );
+      throw new Error(`Input size ${input.length} does not match FFT size ${fftSize}`);
     }
 
     // Upload input data (real part, imaginary part is zero)
@@ -1056,20 +1025,8 @@ export const createGPUFFTCompute = (
     const finalReal = numPasses % 2 === 0 ? outputRealBuffer : inputRealBuffer;
     const finalImag = numPasses % 2 === 0 ? outputImagBuffer : inputImagBuffer;
 
-    commandEncoder.copyBufferToBuffer(
-      finalReal,
-      0,
-      readbackBuffer,
-      0,
-      fftSize * 4
-    );
-    commandEncoder.copyBufferToBuffer(
-      finalImag,
-      0,
-      readbackBuffer,
-      fftSize * 4,
-      fftSize * 4
-    );
+    commandEncoder.copyBufferToBuffer(finalReal, 0, readbackBuffer, 0, fftSize * 4);
+    commandEncoder.copyBufferToBuffer(finalImag, 0, readbackBuffer, fftSize * 4, fftSize * 4);
 
     device.queue.submit([commandEncoder.finish()]);
 

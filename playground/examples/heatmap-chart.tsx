@@ -1,13 +1,10 @@
 "use client";
 
-import { HeatmapChart } from "@plexusui/components/charts/heatmap-chart";
 import type { DataPoint } from "@plexusui/components/charts/heatmap-chart";
+import { HeatmapChart } from "@plexusui/components/charts/heatmap-chart";
+import { useEffect, useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
-import { useState, useEffect } from "react";
 
 // ============================================================================
 // Example Data
@@ -56,8 +53,7 @@ for (let i = 0; i < variables.length; i++) {
 const gridPerformanceData: DataPoint[] = [];
 for (let x = 0; x < 10; x++) {
   for (let y = 0; y < 10; y++) {
-    const value =
-      Math.sin(x / 2) * Math.cos(y / 2) * 50 + 50 + Math.random() * 10;
+    const value = Math.sin(x / 2) * Math.cos(y / 2) * 50 + 50 + Math.random() * 10;
     gridPerformanceData.push({ x, y, value });
   }
 }
@@ -98,19 +94,14 @@ function RealTimeSystemMonitor() {
     const interval = setInterval(() => {
       setCpuData((prev) => {
         const newTimeSlice: DataPoint[] = [];
-        const lastTime =
-          prev.length > 0
-            ? (prev[prev.length - 1].x as number)
-            : HISTORY_SECONDS;
+        const lastTime = prev.length > 0 ? (prev[prev.length - 1].x as number) : HISTORY_SECONDS;
         const newTime = lastTime + 1 / UPDATE_RATE;
 
         for (let core = 0; core < CPU_CORES; core++) {
           // Get previous value for this core
           const prevCoreData = prev.filter((p) => p.y === core);
           const prevValue =
-            prevCoreData.length > 0
-              ? prevCoreData[prevCoreData.length - 1].value
-              : 20;
+            prevCoreData.length > 0 ? prevCoreData[prevCoreData.length - 1].value : 20;
 
           // Simulate realistic CPU usage patterns
           let newValue = prevValue;
@@ -143,9 +134,7 @@ function RealTimeSystemMonitor() {
         }
 
         // Remove old data outside the time window
-        const filtered = prev.filter(
-          (p) => (p.x as number) > newTime - HISTORY_SECONDS
-        );
+        const filtered = prev.filter((p) => (p.x as number) > newTime - HISTORY_SECONDS);
 
         return [...filtered, ...newTimeSlice];
       });
@@ -211,12 +200,10 @@ useEffect(() => {
         <div className="w-full space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <div className="text-sm font-medium">
-                CPU Core Usage Monitor - {CPU_CORES} Cores
-              </div>
+              <div className="text-sm font-medium">CPU Core Usage Monitor - {CPU_CORES} Cores</div>
               <div className="text-xs text-zinc-500">
-                Update Rate: {UPDATE_RATE} Hz | Window: {HISTORY_SECONDS}s |
-                Data Points: {cpuData.length}
+                Update Rate: {UPDATE_RATE} Hz | Window: {HISTORY_SECONDS}s | Data Points:{" "}
+                {cpuData.length}
               </div>
             </div>
             <button
@@ -446,8 +433,7 @@ const heatmapChartProps: ApiProp[] = [
     name: "preferWebGPU",
     type: "boolean",
     default: "true",
-    description:
-      "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
+    description: "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
   },
   {
     name: "className",
@@ -582,8 +568,7 @@ export function HeatmapChartExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            HeatmapChart component for visualizing matrix data with
-            color-encoded values
+            HeatmapChart component for visualizing matrix data with color-encoded values
           </p>
         </div>
 

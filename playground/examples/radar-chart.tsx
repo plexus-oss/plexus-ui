@@ -1,20 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import type { RadarDataPoint, RadarSeries } from "@plexusui/components/charts/radar-chart";
 import { RadarChart } from "@plexusui/components/charts/radar-chart";
-import type {
-  RadarSeries,
-  RadarDataPoint,
-} from "@plexusui/components/charts/radar-chart";
+import { useEffect, useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
+import { useColorScheme, useMultiColors } from "@/components/color-scheme-provider";
 import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
-import {
-  useColorScheme,
-  useMultiColors,
-} from "@/components/color-scheme-provider";
 
 function SonarVisualization() {
   const { color } = useColorScheme();
@@ -133,10 +124,8 @@ function HighPerformanceTracking() {
             const newHeading = (target.heading + headingChange + 360) % 360;
 
             // Convert polar to cartesian, move, convert back
-            const currentX =
-              target.distance * Math.cos((target.angle * Math.PI) / 180);
-            const currentY =
-              target.distance * Math.sin((target.angle * Math.PI) / 180);
+            const currentX = target.distance * Math.cos((target.angle * Math.PI) / 180);
+            const currentY = target.distance * Math.sin((target.angle * Math.PI) / 180);
 
             // Move in heading direction
             const dx = target.speed * Math.cos((newHeading * Math.PI) / 180);
@@ -162,8 +151,7 @@ function HighPerformanceTracking() {
               angle: (newAngle + 360) % 360,
               distance: finalDistance,
               heading: finalHeading,
-              intensity:
-                0.7 + Math.sin(Date.now() * 0.002 + target.angle) * 0.15,
+              intensity: 0.7 + Math.sin(Date.now() * 0.002 + target.angle) * 0.15,
             };
           }),
         }))
@@ -250,10 +238,7 @@ useEffect(() => {
           <div className="flex gap-4 text-xs">
             {targets.map((series, i) => (
               <div key={i} className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: series.color }}
-                />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: series.color }} />
                 <span className="text-zinc-400">
                   {series.name}: {series.data.length}
                 </span>
@@ -421,8 +406,7 @@ const radarChartProps: ApiProp[] = [
     name: "preferWebGPU",
     type: "boolean",
     default: "true",
-    description:
-      "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
+    description: "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
   },
   {
     name: "className",
@@ -550,8 +534,8 @@ export function RadarChartExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            RadarChart component for polar coordinate visualization - ideal for
-            sonar, tracking, and directional data
+            RadarChart component for polar coordinate visualization - ideal for sonar, tracking, and
+            directional data
           </p>
         </div>
 

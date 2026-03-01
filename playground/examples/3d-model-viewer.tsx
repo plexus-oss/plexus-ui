@@ -1,22 +1,15 @@
-/** biome-ignore-all lint/a11y/useButtonType: <explanation> */
+/** biome-ignore-all lint/a11y/useButtonType: playground demo buttons where explicit type is unnecessary */
 "use client";
 
-import { useState, useMemo } from "react";
 import {
-  ModelViewer,
-  generateCubeSTL,
   generateBeamSTL,
+  generateCubeSTL,
+  ModelViewer,
 } from "@plexusui/components/charts/3d-model-viewer";
-import {
-  viridis,
-  plasma,
-  inferno,
-} from "@plexusui/components/lib/color-scales";
+import { inferno, plasma, viridis } from "@plexusui/components/lib/color-scales";
+import { useMemo, useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
 
 // ============================================================================
 // Synthetic Model Data Generators
@@ -25,11 +18,7 @@ import {
 /**
  * Generate a cylinder STL for demonstration
  */
-function generateCylinderSTL(
-  radius = 1,
-  height = 3,
-  segments = 32
-): ArrayBuffer {
+function _generateCylinderSTL(radius = 1, height = 3, segments = 32): ArrayBuffer {
   const vertices: number[] = [];
 
   // Generate cylinder sides
@@ -69,7 +58,7 @@ function generateCylinderSTL(
 /**
  * Generate an I-beam STL for structural analysis demo
  */
-function generateIBeamSTL(
+function _generateIBeamSTL(
   length = 10,
   flangeWidth = 2,
   flangeHeight = 0.3,
@@ -299,9 +288,7 @@ function WireframeExample() {
 }
 
 function ColorScaleComparisonExample() {
-  const [selectedScale, setSelectedScale] = useState<
-    "viridis" | "plasma" | "inferno"
-  >("viridis");
+  const [selectedScale, setSelectedScale] = useState<"viridis" | "plasma" | "inferno">("viridis");
   const { buffer, stressValues } = useMemo(() => generateBeamSTL(25), []);
 
   const colorScales = {
@@ -332,9 +319,7 @@ import { viridis, plasma, inferno } from "@plexusui/components/lib/color-scales"
                 key={scale}
                 onClick={() => setSelectedScale(scale)}
                 className={`px-3 py-1 text-xs rounded capitalize ${
-                  selectedScale === scale
-                    ? "bg-blue-600 text-white"
-                    : "bg-zinc-800 text-zinc-400"
+                  selectedScale === scale ? "bg-blue-600 text-white" : "bg-zinc-800 text-zinc-400"
                 }`}
               >
                 {scale}
@@ -477,6 +462,7 @@ const handleFileChange = async (e) => {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -486,11 +472,7 @@ const handleFileChange = async (e) => {
                 />
               </svg>
               <span className="text-sm">
-                {loading
-                  ? "Loading..."
-                  : fileName
-                  ? fileName
-                  : "Choose file (.stl, .obj)"}
+                {loading ? "Loading..." : fileName ? fileName : "Choose file (.stl, .obj)"}
               </span>
               <input
                 type="file"
@@ -500,14 +482,12 @@ const handleFileChange = async (e) => {
               />
             </label>
             {error && (
-              <div className="text-xs text-red-400 bg-red-900/20 px-3 py-2 rounded">
-                {error}
-              </div>
+              <div className="text-xs text-red-400 bg-red-900/20 px-3 py-2 rounded">{error}</div>
             )}
             {!modelData && !loading && (
               <div className="text-xs text-zinc-500 bg-zinc-900 px-3 py-2 rounded">
-                Upload an STL or OBJ file to visualize. Supports CAD exports, 3D
-                scans, and 3D printing models.
+                Upload an STL or OBJ file to visualize. Supports CAD exports, 3D scans, and 3D
+                printing models.
               </div>
             )}
           </div>
@@ -562,8 +542,7 @@ const modelViewerProps: ApiProp[] = [
     name: "colorScale",
     type: "(value: number) => string",
     default: "viridis",
-    description:
-      "Color scale function mapping normalized values (0-1) to hex colors",
+    description: "Color scale function mapping normalized values (0-1) to hex colors",
   },
   {
     name: "minValue",
@@ -635,8 +614,7 @@ const modelViewerProps: ApiProp[] = [
     name: "roughness",
     type: "number",
     default: "0.5",
-    description:
-      "Material roughness (0-1). Lower values appear more glossy/reflective",
+    description: "Material roughness (0-1). Lower values appear more glossy/reflective",
   },
   {
     name: "className",
@@ -658,8 +636,7 @@ const primitiveComponents: ApiProp[] = [
     name: "ModelViewer.Canvas",
     type: "component",
     default: "-",
-    description:
-      "The 3D canvas with camera and controls. Use within ModelViewer.Root",
+    description: "The 3D canvas with camera and controls. Use within ModelViewer.Root",
   },
   {
     name: "ModelViewer.Scene",
@@ -705,8 +682,8 @@ function ModelViewerExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            3D model viewer with support for STL/OBJ files and vertex color
-            visualization for engineering analysis
+            3D model viewer with support for STL/OBJ files and vertex color visualization for
+            engineering analysis
           </p>
         </div>
 

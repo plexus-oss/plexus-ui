@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { LineChart } from "@plexusui/components/charts/line-chart";
-import { HeatmapChart } from "@plexusui/components/charts/heatmap-chart";
 import type { DataPoint } from "@plexusui/components/charts/heatmap-chart";
+import { HeatmapChart } from "@plexusui/components/charts/heatmap-chart";
+import { LineChart } from "@plexusui/components/charts/line-chart";
+import { useEffect, useMemo, useState } from "react";
 import { ComponentPreview } from "@/components/component-preview";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // ============================================================================
 // EEG Data Generation
@@ -98,9 +98,7 @@ function generateEEGSignal(
     // Alpha (8-13 Hz) - Relaxed, eyes closed (dominant in resting state)
     const alphaFreq = 8 + Math.random() * 5;
     signal[i] +=
-      profile.alpha *
-      60 *
-      Math.sin(2 * Math.PI * alphaFreq * t + Math.random() * Math.PI);
+      profile.alpha * 60 * Math.sin(2 * Math.PI * alphaFreq * t + Math.random() * Math.PI);
 
     // Beta (13-30 Hz) - Active thinking, focus
     const betaFreq = 13 + Math.random() * 17;
@@ -193,32 +191,30 @@ function EEGMonitoringDashboard() {
       setChannelData(newChannelData);
 
       // Update electrode activity heatmap
-      const activity: DataPoint[] = ELECTRODE_POSITIONS.map(
-        (electrode, idx) => {
-          // Use cyclic channel assignment
-          const channelIdx = idx % NUM_CHANNELS;
-          const channelSignal = newChannelData[channelIdx];
+      const activity: DataPoint[] = ELECTRODE_POSITIONS.map((electrode, idx) => {
+        // Use cyclic channel assignment
+        const channelIdx = idx % NUM_CHANNELS;
+        const channelSignal = newChannelData[channelIdx];
 
-          // Calculate alpha band power as proxy for activity level
-          const alphaPower = calculateBandPower(
-            channelSignal.slice(-512),
-            SAMPLE_RATE,
-            EEG_BANDS.alpha.range as [number, number]
-          );
+        // Calculate alpha band power as proxy for activity level
+        const alphaPower = calculateBandPower(
+          channelSignal.slice(-512),
+          SAMPLE_RATE,
+          EEG_BANDS.alpha.range as [number, number]
+        );
 
-          return {
-            x: electrode.x,
-            y: electrode.y,
-            value: alphaPower,
-          };
-        }
-      );
+        return {
+          x: electrode.x,
+          y: electrode.y,
+          value: alphaPower,
+        };
+      });
 
       setElectrodeActivity(activity);
     }, 2000); // Update every 2 seconds
 
     return () => clearInterval(interval);
-  }, [isRecording, mentalState]);
+  }, [isRecording, mentalState, SAMPLES_PER_WINDOW]);
 
   // Prepare multi-channel line chart data
   const multiChannelData = useMemo(
@@ -280,20 +276,16 @@ const channelData = Array.from({ length: 8 }, () =>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg">
-                    EEG Session - Subject 001
-                  </CardTitle>
+                  <CardTitle className="text-lg">EEG Session - Subject 001</CardTitle>
                   <div className="text-sm text-muted-foreground mt-1">
-                    Sample Rate: {SAMPLE_RATE} Hz | Channels: {NUM_CHANNELS} |
-                    10-20 Electrode System
+                    Sample Rate: {SAMPLE_RATE} Hz | Channels: {NUM_CHANNELS} | 10-20 Electrode
+                    System
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <select
                     value={mentalState}
-                    onChange={(e) =>
-                      setMentalState(e.target.value as MentalState)
-                    }
+                    onChange={(e) => setMentalState(e.target.value as MentalState)}
                     className="px-3 py-2 rounded-md border bg-background"
                   >
                     <option value="resting">Resting (Eyes Closed)</option>
@@ -302,10 +294,7 @@ const channelData = Array.from({ length: 8 }, () =>
                     <option value="meditation">Meditation</option>
                     <option value="alert">Alert (Eyes Open)</option>
                   </select>
-                  <Badge
-                    variant={isRecording ? "default" : "outline"}
-                    className="text-sm"
-                  >
+                  <Badge variant={isRecording ? "default" : "outline"} className="text-sm">
                     {isRecording ? "🔴 Recording" : "⏸ Paused"}
                   </Badge>
                   <Button
@@ -321,10 +310,7 @@ const channelData = Array.from({ length: 8 }, () =>
               <div className="flex gap-4">
                 {Object.entries(EEG_BANDS).map(([key, band]) => (
                   <div key={key} className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded"
-                      style={{ backgroundColor: band.color }}
-                    />
+                    <div className="w-3 h-3 rounded" style={{ backgroundColor: band.color }} />
                     <span className="text-xs">{band.label}</span>
                   </div>
                 ))}
@@ -405,8 +391,7 @@ const channelData = Array.from({ length: 8 }, () =>
                   xAxis={{
                     label: "Time (s)",
                     formatter: (v: number | string) => {
-                      const num =
-                        typeof v === "number" ? v : parseFloat(String(v));
+                      const num = typeof v === "number" ? v : parseFloat(String(v));
                       return `${num.toFixed(2)}s`;
                     },
                   }}
@@ -419,8 +404,8 @@ const channelData = Array.from({ length: 8 }, () =>
                 />
               </div>
               <div className="text-xs text-muted-foreground text-center mt-2">
-                Channels are vertically offset for visualization. Each channel
-                represents a different electrode location.
+                Channels are vertically offset for visualization. Each channel represents a
+                different electrode location.
               </div>
             </CardContent>
           </Card>
@@ -434,34 +419,27 @@ const channelData = Array.from({ length: 8 }, () =>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-5 gap-4">
-                {Object.entries(MENTAL_STATE_PROFILES[mentalState]).map(
-                  ([band, power]) => (
-                    <div key={band} className="text-center">
-                      <div className="text-xs text-muted-foreground capitalize">
-                        {band}
-                      </div>
-                      <div className="mt-2 mb-1">
-                        <div className="h-24 bg-muted rounded flex items-end">
-                          <div
-                            className="w-full rounded transition-all"
-                            style={{
-                              height: `${power * 100}%`,
-                              backgroundColor:
-                                EEG_BANDS[band as keyof typeof EEG_BANDS].color,
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div className="text-lg font-mono font-bold">
-                        {(power * 100).toFixed(0)}%
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {EEG_BANDS[band as keyof typeof EEG_BANDS].range[0]}-
-                        {EEG_BANDS[band as keyof typeof EEG_BANDS].range[1]} Hz
+                {Object.entries(MENTAL_STATE_PROFILES[mentalState]).map(([band, power]) => (
+                  <div key={band} className="text-center">
+                    <div className="text-xs text-muted-foreground capitalize">{band}</div>
+                    <div className="mt-2 mb-1">
+                      <div className="h-24 bg-muted rounded flex items-end">
+                        <div
+                          className="w-full rounded transition-all"
+                          style={{
+                            height: `${power * 100}%`,
+                            backgroundColor: EEG_BANDS[band as keyof typeof EEG_BANDS].color,
+                          }}
+                        />
                       </div>
                     </div>
-                  )
-                )}
+                    <div className="text-lg font-mono font-bold">{(power * 100).toFixed(0)}%</div>
+                    <div className="text-xs text-muted-foreground">
+                      {EEG_BANDS[band as keyof typeof EEG_BANDS].range[0]}-
+                      {EEG_BANDS[band as keyof typeof EEG_BANDS].range[1]} Hz
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

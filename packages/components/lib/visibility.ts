@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, RefObject } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 
 /**
  * Combined visibility state from IntersectionObserver + Page Visibility API
@@ -50,19 +50,16 @@ export function useChartVisibility(
     const element = elementRef.current;
     if (!element) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsIntersecting(entry.isIntersecting);
-      },
-      options
-    );
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsIntersecting(entry.isIntersecting);
+    }, options);
 
     observer.observe(element);
 
     return () => {
       observer.disconnect();
     };
-  }, [elementRef, options.threshold, options.root, options.rootMargin]);
+  }, [elementRef, options.threshold, options.root, options.rootMargin, options]);
 
   // Page Visibility API for tab visibility
   useEffect(() => {

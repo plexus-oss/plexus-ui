@@ -53,8 +53,7 @@ function springStep(
 
   // Check if at rest
   const isAtRest =
-    Math.abs(newVelocity) < config.precision &&
-    Math.abs(newValue - target) < config.precision;
+    Math.abs(newVelocity) < config.precision && Math.abs(newValue - target) < config.precision;
 
   return {
     value: isAtRest ? target : newValue,
@@ -82,13 +81,7 @@ export function useSpring(target: number, config: SpringConfig = {}): number {
       const dt = Math.min((now - prevTime) / 1000, 0.1); // Cap at 100ms
 
       setCurrent((prev) => {
-        const result = springStep(
-          prev,
-          targetRef.current,
-          velocityRef.current,
-          finalConfig,
-          dt
-        );
+        const result = springStep(prev, targetRef.current, velocityRef.current, finalConfig, dt);
 
         velocityRef.current = result.velocity;
 
@@ -108,7 +101,7 @@ export function useSpring(target: number, config: SpringConfig = {}): number {
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [target, finalConfig.stiffness, finalConfig.damping, finalConfig.mass]);
+  }, [target, finalConfig.stiffness, finalConfig.damping, finalConfig.mass, finalConfig]);
 
   return current;
 }
@@ -149,13 +142,7 @@ export function useAnimatedData<T extends { x: number; y: number }>(
 
           // Animate Y value
           const velocity = velocitiesRef.current.get(key) || 0;
-          const result = springStep(
-            current.y,
-            target.y,
-            velocity,
-            finalConfig,
-            dt
-          );
+          const result = springStep(current.y, target.y, velocity, finalConfig, dt);
 
           velocitiesRef.current.set(key, result.velocity);
 
@@ -184,13 +171,7 @@ export function useAnimatedData<T extends { x: number; y: number }>(
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [
-    data,
-    enabled,
-    finalConfig.stiffness,
-    finalConfig.damping,
-    finalConfig.mass,
-  ]);
+  }, [data, enabled, finalConfig.stiffness, finalConfig.damping, finalConfig.mass, finalConfig]);
 
   return enabled ? animatedData : data;
 }
@@ -254,7 +235,7 @@ export function useAnimatedValue(
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [target, duration, easingFn]);
+  }, [target, duration, easingFn, current]);
 
   return current;
 }
@@ -335,6 +316,7 @@ export function useStaggeredSpring(
     finalConfig.stiffness,
     finalConfig.damping,
     finalConfig.mass,
+    finalConfig,
   ]);
 
   return values;

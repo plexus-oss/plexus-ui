@@ -1,12 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { DataGrid } from "@plexusui/components/charts/data-grid";
+import { useEffect, useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
 
 // ============================================================================
 // Example 1: Real-time Telemetry Table
@@ -24,14 +21,7 @@ interface TelemetryData {
 }
 
 function generateTelemetryData(count: number): TelemetryData[] {
-  const satellites = [
-    "ISS",
-    "Hubble",
-    "JWST",
-    "Sentinel-1",
-    "Landsat-9",
-    "Terra",
-  ];
+  const satellites = ["ISS", "Hubble", "JWST", "Sentinel-1", "Landsat-9", "Terra"];
   const statuses = ["Nominal", "Warning", "Critical", "Standby"];
 
   return Array.from({ length: count }, (_, i) => ({
@@ -47,9 +37,7 @@ function generateTelemetryData(count: number): TelemetryData[] {
 }
 
 function TelemetryTable() {
-  const [data, setData] = useState<TelemetryData[]>(() =>
-    generateTelemetryData(50)
-  );
+  const [data, setData] = useState<TelemetryData[]>(() => generateTelemetryData(50));
 
   // Simulate real-time updates
   useEffect(() => {
@@ -239,15 +227,13 @@ function FlightDashboard() {
       id: "departure",
       label: "Departure",
       width: 140,
-      formatter: (value: unknown) =>
-        new Date(value as number).toLocaleTimeString(),
+      formatter: (value: unknown) => new Date(value as number).toLocaleTimeString(),
     },
     {
       id: "arrival",
       label: "Arrival",
       width: 140,
-      formatter: (value: unknown) =>
-        new Date(value as number).toLocaleTimeString(),
+      formatter: (value: unknown) => new Date(value as number).toLocaleTimeString(),
     },
     {
       id: "passengers",
@@ -305,10 +291,7 @@ const flights = generateFlightData(10000);
 // ============================================================================
 
 function PrimitiveCompositionExample() {
-  const [selectedRow, setSelectedRow] = useState<Record<
-    string,
-    unknown
-  > | null>(null);
+  const [selectedRow, setSelectedRow] = useState<Record<string, unknown> | null>(null);
 
   const data = [
     {
@@ -428,13 +411,8 @@ function PrimitiveCompositionExample() {
                 <p className="text-sm text-blue-100">
                   <span className="font-semibold">Selected Mission:</span>{" "}
                   {selectedRow.name as string} •{" "}
-                  <span className="opacity-80">
-                    Duration: {selectedRow.duration as string}
-                  </span>{" "}
-                  •{" "}
-                  <span className="opacity-80">
-                    Distance: {selectedRow.distance as string}
-                  </span>
+                  <span className="opacity-80">Duration: {selectedRow.duration as string}</span> •{" "}
+                  <span className="opacity-80">Distance: {selectedRow.distance as string}</span>
                 </p>
               </div>
             )}
@@ -756,8 +734,7 @@ const dataGridRootProps: ApiProp[] = [
     name: "children",
     type: "ReactNode",
     default: "undefined",
-    description:
-      "Primitive components (Table, Header, Body, Footer, Pagination)",
+    description: "Primitive components (Table, Header, Body, Footer, Pagination)",
   },
 ];
 
@@ -815,8 +792,7 @@ export function DataGridExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            DataGrid component for displaying tabular data with sorting,
-            filtering, and pagination
+            DataGrid component for displaying tabular data with sorting, filtering, and pagination
           </p>
         </div>
 

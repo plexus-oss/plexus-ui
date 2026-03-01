@@ -1,17 +1,11 @@
 "use client";
 
-import { LineChart } from "@plexusui/components/charts/line-chart";
 import type { DataPoint } from "@plexusui/components/charts/line-chart";
+import { LineChart } from "@plexusui/components/charts/line-chart";
+import { useEffect, useMemo, useState } from "react";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
+import { useColorScheme, useMultiColors } from "@/components/color-scheme-provider";
 import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
-import { useState, useEffect, useMemo } from "react";
-import {
-  useColorScheme,
-  useMultiColors,
-} from "@/components/color-scheme-provider";
 
 // ============================================================================
 // Beautiful Revenue Chart (Inspired by shadcn but better with WebGPU)
@@ -22,20 +16,7 @@ function RevenueChart() {
 
   // Monthly revenue data for the year
   const months = useMemo(
-    () => [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
+    () => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     []
   );
 
@@ -111,22 +92,12 @@ const revenueData = [
         <div className="w-full">
           <div className="mb-4 flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: colors[0] }}
-              />
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                2024
-              </span>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[0] }} />
+              <span className="text-sm text-zinc-600 dark:text-zinc-400">2024</span>
             </div>
             <div className="flex items-center gap-2">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: colors[1] }}
-              />
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                2023
-              </span>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[1] }} />
+              <span className="text-sm text-zinc-600 dark:text-zinc-400">2023</span>
             </div>
           </div>
           <LineChart.Root
@@ -176,11 +147,7 @@ function MinimalChart() {
     () =>
       Array.from({ length: 30 }, (_, i) => ({
         x: i,
-        y:
-          50 +
-          Math.sin(i / 5) * 20 +
-          Math.cos(i / 3) * 10 +
-          (Math.random() - 0.5) * 5,
+        y: 50 + Math.sin(i / 5) * 20 + Math.cos(i / 3) * 10 + (Math.random() - 0.5) * 5,
       })),
     []
   );
@@ -218,9 +185,7 @@ const trendData = Array.from({ length: 30 }, (_, i) => ({
           <div className="mb-2 flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold">+12.5%</div>
-              <div className="text-sm text-zinc-500 dark:text-zinc-400">
-                vs last month
-              </div>
+              <div className="text-sm text-zinc-500 dark:text-zinc-400">vs last month</div>
             </div>
           </div>
           <LineChart.Root
@@ -286,8 +251,7 @@ function StreamingChart() {
       setPrimaryData((prev) => {
         const lastTime = prev[prev.length - 1].x;
         const newTime = lastTime + 1 / UPDATE_RATE;
-        const newValue =
-          50 + Math.sin(newTime * 2) * 20 + (Math.random() - 0.5) * 3;
+        const newValue = 50 + Math.sin(newTime * 2) * 20 + (Math.random() - 0.5) * 3;
 
         return [...prev.slice(-(WINDOW_SIZE - 1)), { x: newTime, y: newValue }];
       });
@@ -295,8 +259,7 @@ function StreamingChart() {
       setSecondaryData((prev) => {
         const lastTime = prev[prev.length - 1].x;
         const newTime = lastTime + 1 / UPDATE_RATE;
-        const newValue =
-          60 + Math.cos(newTime * 1.5) * 15 + (Math.random() - 0.5) * 2;
+        const newValue = 60 + Math.cos(newTime * 1.5) * 15 + (Math.random() - 0.5) * 2;
 
         return [...prev.slice(-(WINDOW_SIZE - 1)), { x: newTime, y: newValue }];
       });
@@ -309,7 +272,7 @@ function StreamingChart() {
     return () => {
       cancelAnimationFrame(animationFrame);
     };
-  }, [isPaused, WINDOW_SIZE, UPDATE_RATE]);
+  }, [isPaused, WINDOW_SIZE]);
 
   const xMin = primaryData[0]?.x || 0;
   const xMax = primaryData[primaryData.length - 1]?.x || WINDOW_DURATION;
@@ -360,22 +323,12 @@ function RealTimeChart() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: colors[0] }}
-                />
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Primary
-                </span>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[0] }} />
+                <span className="text-sm text-zinc-600 dark:text-zinc-400">Primary</span>
               </div>
               <div className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: colors[1] }}
-                />
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Secondary
-                </span>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[1] }} />
+                <span className="text-sm text-zinc-600 dark:text-zinc-400">Secondary</span>
               </div>
             </div>
             <button
@@ -483,8 +436,7 @@ const lineChartProps: ApiProp[] = [
     name: "preferWebGPU",
     type: "boolean",
     default: "true",
-    description:
-      "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
+    description: "Prefer WebGPU rendering over WebGL. Falls back automatically if unavailable",
   },
   {
     name: "className",
@@ -601,8 +553,8 @@ export function LineChartExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            LineChart component for time-series and multi-series data
-            visualization with WebGPU acceleration
+            LineChart component for time-series and multi-series data visualization with WebGPU
+            acceleration
           </p>
         </div>
 

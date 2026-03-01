@@ -6,11 +6,7 @@
     "displayName": "Lib",
     "type": "infrastructure",
     "description": "Shared utility functions, constants, and type definitions (automatically installed)",
-    "files": [
-      "lib/utils.ts",
-      "lib/timezone.ts",
-      "lib/index.ts"
-    ],
+    "files": ["lib/utils.ts", "lib/timezone.ts", "lib/index.ts"],
     "dependencies": [],
     "registryDependencies": []
   },
@@ -23,28 +19,13 @@
       "complexity": "simple",
       "maturity": "stable",
       "description": "Multi-series line chart with GPU-accelerated rendering. Handles 100k+ points smoothly. Use cases: Time-series trends, sensor data plotting, stock prices, temperature curves, signal analysis.",
-      "files": [
-        "charts/line-chart.tsx",
-        "charts/base-chart.tsx",
-        "lib/data-utils.ts"
-      ],
+      "files": ["charts/line-chart.tsx", "charts/base-chart.tsx", "lib/data-utils.ts"],
       "dependencies": [],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
+      "devDependencies": ["@webgpu/types"],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "real-time",
-        "streaming",
-        "telemetry",
-        "time-series",
-        "gpu-accelerated"
-      ],
-      "relatedComponents": [
-        "area-chart",
-        "scatter-chart"
-      ],
+      "tags": ["real-time", "streaming", "telemetry", "time-series", "gpu-accelerated"],
+      "relatedComponents": ["area-chart", "scatter-chart"],
       "performance": {
         "dataPointsSupported": 100000,
         "targetFPS": 60,
@@ -65,27 +46,13 @@
       "complexity": "simple",
       "maturity": "beta",
       "description": "Scatter plot with variable point sizes and colors. Use cases: Correlation analysis, cluster visualization, quality control plots, particle distribution, measurement scatter.",
-      "files": [
-        "charts/scatter-chart.tsx",
-        "charts/base-chart.tsx",
-        "lib/data-utils.ts"
-      ],
+      "files": ["charts/scatter-chart.tsx", "charts/base-chart.tsx", "lib/data-utils.ts"],
       "dependencies": [],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
+      "devDependencies": ["@webgpu/types"],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "correlation",
-        "clustering",
-        "statistical",
-        "gpu-accelerated"
-      ],
-      "relatedComponents": [
-        "line-chart",
-        "histogram-chart"
-      ],
+      "tags": ["correlation", "clustering", "statistical", "gpu-accelerated"],
+      "relatedComponents": ["line-chart", "histogram-chart"],
       "performance": {
         "dataPointsSupported": 50000,
         "targetFPS": 60,
@@ -105,26 +72,13 @@
       "complexity": "simple",
       "maturity": "beta",
       "description": "Bar chart with vertical/horizontal orientation. Supports grouped and stacked layouts. Use cases: Categorical comparisons, test results, production counts, event frequencies.",
-      "files": [
-        "charts/bar-chart.tsx",
-        "charts/base-chart.tsx",
-        "lib/data-utils.ts"
-      ],
+      "files": ["charts/bar-chart.tsx", "charts/base-chart.tsx", "lib/data-utils.ts"],
       "dependencies": [],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
+      "devDependencies": ["@webgpu/types"],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "categorical",
-        "comparison",
-        "grouped",
-        "stacked"
-      ],
-      "relatedComponents": [
-        "histogram-chart"
-      ],
+      "tags": ["categorical", "comparison", "grouped", "stacked"],
+      "relatedComponents": ["histogram-chart"],
       "performance": {
         "dataPointsSupported": 10000,
         "targetFPS": 60,
@@ -144,26 +98,13 @@
       "complexity": "simple",
       "maturity": "beta",
       "description": "Area chart with filled regions and stacked support. Use cases: Cumulative data, bandwidth usage, memory consumption, power draw over time, filled envelopes.",
-      "files": [
-        "charts/area-chart.tsx",
-        "charts/base-chart.tsx",
-        "lib/data-utils.ts"
-      ],
+      "files": ["charts/area-chart.tsx", "charts/base-chart.tsx", "lib/data-utils.ts"],
       "dependencies": [],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
+      "devDependencies": ["@webgpu/types"],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "time-series",
-        "cumulative",
-        "stacked",
-        "real-time"
-      ],
-      "relatedComponents": [
-        "line-chart"
-      ],
+      "tags": ["time-series", "cumulative", "stacked", "real-time"],
+      "relatedComponents": ["line-chart"],
       "performance": {
         "dataPointsSupported": 100000,
         "targetFPS": 60,
@@ -183,27 +124,13 @@
       "complexity": "moderate",
       "maturity": "beta",
       "description": "2D grid heatmap with custom color scales. Use cases: Thermal imaging (FLIR cameras), correlation matrices, pressure sensor arrays, PCB thermal maps, tactile sensor grids, seat occupancy.",
-      "files": [
-        "charts/heatmap-chart.tsx",
-        "charts/base-chart.tsx",
-        "lib/data-utils.ts"
-      ],
+      "files": ["charts/heatmap-chart.tsx", "charts/base-chart.tsx", "lib/data-utils.ts"],
       "dependencies": [],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
+      "devDependencies": ["@webgpu/types"],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "thermal",
-        "grid",
-        "2d-data",
-        "color-mapping",
-        "sensor-array"
-      ],
-      "relatedComponents": [
-        "point-cloud-viewer"
-      ],
+      "tags": ["thermal", "grid", "2d-data", "color-mapping", "sensor-array"],
+      "relatedComponents": ["point-cloud-viewer"],
       "performance": {
         "dataPointsSupported": 100000,
         "targetFPS": 60,
@@ -230,21 +157,11 @@
         "lib/data-utils.ts"
       ],
       "dependencies": [],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
+      "devDependencies": ["@webgpu/types"],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "distribution",
-        "statistical",
-        "binning",
-        "quality-control"
-      ],
-      "relatedComponents": [
-        "bar-chart",
-        "scatter-chart"
-      ],
+      "tags": ["distribution", "statistical", "binning", "quality-control"],
+      "relatedComponents": ["bar-chart", "scatter-chart"],
       "performance": {
         "dataPointsSupported": 50000,
         "targetFPS": 60,
@@ -265,25 +182,13 @@
       "complexity": "moderate",
       "maturity": "beta",
       "description": "Radar-style polar display with rotating sweep. Use cases: Air traffic control displays, weather radar visualization, sonar plots, 360° sensor sweeps, LIDAR scans.",
-      "files": [
-        "charts/radar-chart.tsx",
-        "charts/base-chart.tsx"
-      ],
+      "files": ["charts/radar-chart.tsx", "charts/base-chart.tsx"],
       "dependencies": [],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
+      "devDependencies": ["@webgpu/types"],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "polar",
-        "radar",
-        "sweep",
-        "360-degree"
-      ],
-      "relatedComponents": [
-        "point-cloud-viewer"
-      ],
+      "tags": ["polar", "radar", "sweep", "360-degree"],
+      "relatedComponents": ["point-cloud-viewer"],
       "performance": {
         "dataPointsSupported": 10000,
         "targetFPS": 60,
@@ -304,25 +209,13 @@
       "complexity": "moderate",
       "maturity": "stable",
       "description": "High-performance data table with virtual scrolling (10k+ rows). Use cases: Telemetry logs, test results tables, event logs, CSV data viewers, database query results, flight data records.",
-      "files": [
-        "charts/data-grid.tsx",
-        "charts/base-chart.tsx"
-      ],
+      "files": ["charts/data-grid.tsx", "charts/base-chart.tsx"],
       "dependencies": [],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
+      "devDependencies": ["@webgpu/types"],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "table",
-        "virtual-scrolling",
-        "large-datasets",
-        "logs"
-      ],
-      "relatedComponents": [
-        "gantt"
-      ],
+      "tags": ["table", "virtual-scrolling", "large-datasets", "logs"],
+      "relatedComponents": ["gantt"],
       "performance": {
         "dataPointsSupported": 10000,
         "targetFPS": 60,
@@ -343,23 +236,12 @@
       "complexity": "advanced",
       "maturity": "stable",
       "description": "Artificial horizon showing pitch and roll orientation. Use cases: Aircraft displays, drone ground stations, spacecraft attitude, surgical robot orientation, gimbal stabilization, ROV navigation.",
-      "files": [
-        "charts/attitude-indicator.tsx",
-        "charts/base-chart.tsx"
-      ],
+      "files": ["charts/attitude-indicator.tsx", "charts/base-chart.tsx"],
       "dependencies": [],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
+      "devDependencies": ["@webgpu/types"],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "aviation",
-        "orientation",
-        "pitch",
-        "roll",
-        "artificial-horizon"
-      ],
+      "tags": ["aviation", "orientation", "pitch", "roll", "artificial-horizon"],
       "performance": {
         "dataPointsSupported": 3,
         "targetFPS": 60,
@@ -381,24 +263,13 @@
       "complexity": "moderate",
       "maturity": "stable",
       "description": "Interactive timeline visualization with infinite scroll, zoom controls, and live time tracking. Use cases: Ground station contact schedules, mission planning, flight operations, maintenance windows, spacecraft subsystem timelines.",
-      "files": [
-        "charts/gantt.tsx"
-      ],
-      "dependencies": [
-        "date-fns"
-      ],
+      "files": ["charts/gantt.tsx"],
+      "dependencies": ["date-fns"],
       "devDependencies": [],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "timeline",
-        "scheduling",
-        "planning",
-        "temporal"
-      ],
-      "relatedComponents": [
-        "data-grid"
-      ],
+      "tags": ["timeline", "scheduling", "planning", "temporal"],
+      "relatedComponents": ["data-grid"],
       "performance": {
         "dataPointsSupported": 1000,
         "targetFPS": 60,
@@ -420,24 +291,13 @@
       "complexity": "simple",
       "maturity": "stable",
       "description": "Minimal text annotation system for labeling chart data. Click to add, inline editing, compact design that doesn't obscure your data. Perfect for data labeling workflows in robotics, medicine, and ML training.",
-      "files": [
-        "charts/annotations.tsx",
-        "charts/base-chart.tsx"
-      ],
+      "files": ["charts/annotations.tsx", "charts/base-chart.tsx"],
       "dependencies": [],
       "devDependencies": [],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "annotation",
-        "labeling",
-        "interactive",
-        "data-markup"
-      ],
-      "relatedComponents": [
-        "chart-region",
-        "chart-ruler"
-      ],
+      "tags": ["annotation", "labeling", "interactive", "data-markup"],
+      "relatedComponents": ["chart-region", "chart-ruler"],
       "performance": {
         "dataPointsSupported": 100,
         "targetFPS": 60,
@@ -458,24 +318,13 @@
       "complexity": "simple",
       "maturity": "stable",
       "description": "Mark time ranges or segments with shaded vertical regions. Perfect for highlighting flight phases, operational modes, time windows, or any span of data on X-axis. Uses data coordinates so regions stay locked during streaming.",
-      "files": [
-        "charts/annotations.tsx",
-        "charts/base-chart.tsx"
-      ],
+      "files": ["charts/annotations.tsx", "charts/base-chart.tsx"],
       "dependencies": [],
       "devDependencies": [],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "region",
-        "time-range",
-        "phase-marking",
-        "interactive"
-      ],
-      "relatedComponents": [
-        "chart-annotations",
-        "gantt"
-      ],
+      "tags": ["region", "time-range", "phase-marking", "interactive"],
+      "relatedComponents": ["chart-annotations", "gantt"],
       "performance": {
         "dataPointsSupported": 50,
         "targetFPS": 60,
@@ -496,23 +345,13 @@
       "complexity": "simple",
       "maturity": "stable",
       "description": "Interactive measurement tool for calculating distances and deltas between points. Click and drag to measure ΔX, ΔY, and Euclidean distance. Perfect for analyzing rates of change, time differences, or amplitude changes in telemetry data.",
-      "files": [
-        "charts/annotations.tsx",
-        "charts/base-chart.tsx"
-      ],
+      "files": ["charts/annotations.tsx", "charts/base-chart.tsx"],
       "dependencies": [],
       "devDependencies": [],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "measurement",
-        "delta",
-        "interactive",
-        "analysis"
-      ],
-      "relatedComponents": [
-        "chart-annotations"
-      ],
+      "tags": ["measurement", "delta", "interactive", "analysis"],
+      "relatedComponents": ["chart-annotations"],
       "performance": {
         "dataPointsSupported": 2,
         "targetFPS": 60,
@@ -533,29 +372,13 @@
       "complexity": "advanced",
       "maturity": "stable",
       "description": "Interactive 3D model viewer with vertex color overlay support for stress/thermal/fatigue visualization. Supports STL, OBJ, GLTF, and GLB formats. Use cases: FEA stress analysis, thermal imaging overlays, CAD model inspection, structural health monitoring, component fatigue visualization.",
-      "files": [
-        "charts/3d-model-viewer.tsx",
-        "lib/color-scales.ts"
-      ],
-      "dependencies": [
-        "three",
-        "@react-three/fiber",
-        "@react-three/drei",
-        "@types/three"
-      ],
+      "files": ["charts/3d-model-viewer.tsx", "lib/color-scales.ts"],
+      "dependencies": ["three", "@react-three/fiber", "@react-three/drei", "@types/three"],
       "devDependencies": [],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "3d",
-        "model",
-        "visualization",
-        "cad",
-        "stress-analysis"
-      ],
-      "relatedComponents": [
-        "point-cloud-viewer"
-      ],
+      "tags": ["3d", "model", "visualization", "cad", "stress-analysis"],
+      "relatedComponents": ["point-cloud-viewer"],
       "performance": {
         "dataPointsSupported": 1000000,
         "targetFPS": 60,
@@ -577,30 +400,13 @@
       "complexity": "advanced",
       "maturity": "stable",
       "description": "High-performance 3D point cloud visualization with color mapping by height, intensity, or classification. Supports millions of points with interactive camera controls. Use cases: LIDAR scans (terrain/building mapping), photogrammetry output, 3D scanning (industrial inspection), satellite/aerial imaging, medical 3D reconstructions (CT/MRI), robotics perception (depth sensors, SLAM).",
-      "files": [
-        "charts/point-cloud-viewer.tsx",
-        "lib/color-scales.ts"
-      ],
-      "dependencies": [
-        "three",
-        "@react-three/fiber",
-        "@react-three/drei",
-        "@types/three"
-      ],
+      "files": ["charts/point-cloud-viewer.tsx", "lib/color-scales.ts"],
+      "dependencies": ["three", "@react-three/fiber", "@react-three/drei", "@types/three"],
       "devDependencies": [],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "3d",
-        "point-cloud",
-        "lidar",
-        "photogrammetry",
-        "visualization"
-      ],
-      "relatedComponents": [
-        "3d-model-viewer",
-        "heatmap-chart"
-      ],
+      "tags": ["3d", "point-cloud", "lidar", "photogrammetry", "visualization"],
+      "relatedComponents": ["3d-model-viewer", "heatmap-chart"],
       "performance": {
         "dataPointsSupported": 10000000,
         "targetFPS": 60,

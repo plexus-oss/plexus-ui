@@ -1,6 +1,6 @@
-/** biome-ignore-all lint/complexity/noUselessFragments: <explanation> */
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: <explanation> */
+/** biome-ignore-all lint/complexity/noUselessFragments: fragments used as wrappers for conditional chart interaction overlays */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: chart interactions are pointer-driven (pan, zoom, hover) */
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: chart overlays require custom pointer event handling */
 "use client";
 
 import * as React from "react";
@@ -95,26 +95,19 @@ export function ChartClick({
     const relX = screenX - ctx.margin.left;
     const relY = screenY - ctx.margin.top;
 
-    const dataX =
-      ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
+    const dataX = ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
     const dataY =
-      ctx.yDomain[0] +
-      ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
+      ctx.yDomain[0] + ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
 
     onClick?.({ dataX, dataY, screenX, screenY });
 
     // Show visual marker
     if (showClickMarker) {
-      setClickMarkers((prev) => [
-        ...prev,
-        { x: screenX, y: screenY, timestamp: Date.now() },
-      ]);
+      setClickMarkers((prev) => [...prev, { x: screenX, y: screenY, timestamp: Date.now() }]);
 
       // Remove marker after duration
       setTimeout(() => {
-        setClickMarkers((prev) =>
-          prev.filter((m) => Date.now() - m.timestamp < markerDuration)
-        );
+        setClickMarkers((prev) => prev.filter((m) => Date.now() - m.timestamp < markerDuration));
       }, markerDuration);
     }
   };
@@ -138,11 +131,9 @@ export function ChartClick({
     const relX = screenX - ctx.margin.left;
     const relY = screenY - ctx.margin.top;
 
-    const dataX =
-      ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
+    const dataX = ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
     const dataY =
-      ctx.yDomain[0] +
-      ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
+      ctx.yDomain[0] + ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
 
     onDoubleClick?.({ dataX, dataY, screenX, screenY });
   };
@@ -243,11 +234,9 @@ export function ChartBrush({
     const relX = screenX - ctx.margin.left;
     const relY = screenY - ctx.margin.top;
 
-    const dataX =
-      ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
+    const dataX = ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
     const dataY =
-      ctx.yDomain[0] +
-      ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
+      ctx.yDomain[0] + ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
 
     return { dataX, dataY };
   };
@@ -278,14 +267,8 @@ export function ChartBrush({
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const clampedX = Math.max(
-      ctx.margin.left,
-      Math.min(ctx.width - ctx.margin.right, x)
-    );
-    const clampedY = Math.max(
-      ctx.margin.top,
-      Math.min(ctx.height - ctx.margin.bottom, y)
-    );
+    const clampedX = Math.max(ctx.margin.left, Math.min(ctx.width - ctx.margin.right, x));
+    const clampedY = Math.max(ctx.margin.top, Math.min(ctx.height - ctx.margin.bottom, y));
 
     setBrushEnd({ x: clampedX, y: clampedY });
     if (onBrushing) {
@@ -470,13 +453,9 @@ export function ChartCrosshair({
       const relX = x - ctx.margin.left;
       const relY = y - ctx.margin.top;
 
-      const dataX =
-        ctx.xDomain[0] +
-        (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
+      const dataX = ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
       const dataY =
-        ctx.yDomain[0] +
-        ((innerHeight - relY) / innerHeight) *
-          (ctx.yDomain[1] - ctx.yDomain[0]);
+        ctx.yDomain[0] + ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
 
       onMove({ dataX, dataY, screenX: x, screenY: y });
     }
@@ -499,11 +478,9 @@ export function ChartCrosshair({
     const relX = position.x - ctx.margin.left;
     const relY = position.y - ctx.margin.top;
 
-    const dataX =
-      ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
+    const dataX = ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
     const dataY =
-      ctx.yDomain[0] +
-      ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
+      ctx.yDomain[0] + ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
 
     return { dataX, dataY };
   };
@@ -512,11 +489,7 @@ export function ChartCrosshair({
 
   // Determine line style
   const borderStyle =
-    lineStyle === "dashed"
-      ? "2px 4px"
-      : lineStyle === "dotted"
-      ? "1px 2px"
-      : undefined;
+    lineStyle === "dashed" ? "2px 4px" : lineStyle === "dotted" ? "1px 2px" : undefined;
 
   return (
     <>
@@ -539,9 +512,7 @@ export function ChartCrosshair({
                   width: lineWidth,
 
                   opacity: 0.6,
-                  borderLeft: borderStyle
-                    ? `${lineWidth}px dashed ${lineColor}`
-                    : undefined,
+                  borderLeft: borderStyle ? `${lineWidth}px dashed ${lineColor}` : undefined,
                   backgroundColor: borderStyle ? "transparent" : lineColor,
                 }}
               />
@@ -558,9 +529,7 @@ export function ChartCrosshair({
                   height: lineWidth,
 
                   opacity: 0.6,
-                  borderTop: borderStyle
-                    ? `${lineWidth}px dashed ${lineColor}`
-                    : undefined,
+                  borderTop: borderStyle ? `${lineWidth}px dashed ${lineColor}` : undefined,
                   backgroundColor: borderStyle ? "transparent" : lineColor,
                 }}
               />
@@ -705,20 +674,17 @@ export function ChartBrushSelector({
       end,
       fullMin,
       fullMax,
-      leftPercent: leftPercent.toFixed(2) + "%",
-      widthPercent: widthPercent.toFixed(2) + "%",
+      leftPercent: `${leftPercent.toFixed(2)}%`,
+      widthPercent: `${widthPercent.toFixed(2)}%`,
       containerClass,
       selectionBox: {
-        leftPosition: leftPercent + "%",
-        width: widthPercent + "%",
+        leftPosition: `${leftPercent}%`,
+        width: `${widthPercent}%`,
       },
     });
   }, [start, end, fullMin, fullMax, leftPercent, widthPercent, containerClass]);
 
-  const handleMouseDown = (
-    e: React.MouseEvent,
-    type: "left" | "right" | "body"
-  ) => {
+  const handleMouseDown = (e: React.MouseEvent, type: "left" | "right" | "body") => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -737,9 +703,7 @@ export function ChartBrushSelector({
     if (!isDragging && !isResizingLeft && !isResizingRight) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const container = document.querySelector(
-        `.${containerClass}`
-      ) as HTMLElement;
+      const container = document.querySelector(`.${containerClass}`) as HTMLElement;
       if (!container) return;
 
       const rect = container.getBoundingClientRect();
@@ -767,18 +731,12 @@ export function ChartBrushSelector({
       } else if (isResizingLeft) {
         // Resize from left
         let newStart = dragStart.startVal + deltaValue;
-        newStart = Math.max(
-          fullMin,
-          Math.min(newStart, dragStart.endVal - rangeWidth * 0.01)
-        ); // Min 1% width
+        newStart = Math.max(fullMin, Math.min(newStart, dragStart.endVal - rangeWidth * 0.01)); // Min 1% width
         onSelectionChange(newStart, dragStart.endVal);
       } else if (isResizingRight) {
         // Resize from right
         let newEnd = dragStart.endVal + deltaValue;
-        newEnd = Math.min(
-          fullMax,
-          Math.max(newEnd, dragStart.startVal + rangeWidth * 0.01)
-        ); // Min 1% width
+        newEnd = Math.min(fullMax, Math.max(newEnd, dragStart.startVal + rangeWidth * 0.01)); // Min 1% width
         onSelectionChange(dragStart.startVal, newEnd);
       }
     };
@@ -828,9 +786,7 @@ export function ChartBrushSelector({
 
       {/* Selection box */}
       <div
-        className={`absolute inset-y-0 group ${
-          isDragging ? "cursor-grabbing" : "cursor-grab"
-        }`}
+        className={`absolute inset-y-0 group ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
         style={{
           left: `${leftPercent}%`,
           width: `${widthPercent}%`,

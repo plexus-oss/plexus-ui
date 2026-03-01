@@ -1,10 +1,10 @@
-/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: <explanation> */
-import prompts from "prompts";
+/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: forEach callbacks used for side effects, not iteration returns */
 import chalk from "chalk";
-import ora from "ora";
 import fs from "fs-extra";
-import { registry, getComponent, getLib, isMonorepo, getLocalFilePath, getFileUrl, } from "../registry/index.js";
-import { loadConfig, detectProjectStructure, downloadFile, getComponentDestinationPath, getComponentSubdirectory, getInstalledDependencies, installDependencies, transformImports, } from "../utils/index.js";
+import ora from "ora";
+import prompts from "prompts";
+import { getComponent, getFileUrl, getLib, getLocalFilePath, isMonorepo, registry, } from "../registry/index.js";
+import { detectProjectStructure, downloadFile, getComponentDestinationPath, getComponentSubdirectory, getInstalledDependencies, installDependencies, loadConfig, transformImports, } from "../utils/index.js";
 /**
  * Get file content - either from local file system (monorepo) or download from URL
  */
@@ -176,7 +176,7 @@ export async function add(components) {
                     console.log(chalk.green("\n✅ Dependencies installed successfully!"));
                 }
                 catch (error) {
-                    console.log(chalk.yellow("\n⚠️  " + (error instanceof Error ? error.message : "Unknown error")));
+                    console.log(chalk.yellow(`\n⚠️  ${error instanceof Error ? error.message : "Unknown error"}`));
                 }
             }
             else {

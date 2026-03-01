@@ -1,9 +1,9 @@
 "use client";
 
-import { components } from "@/constants/components";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { components } from "@/constants/components";
 
 export const Sidenav = () => {
   const params = useParams();
@@ -12,9 +12,7 @@ export const Sidenav = () => {
   const freeComponents = components.filter((comp) => comp.tier !== "pro");
 
   // Get unique categories from components
-  const categories = Array.from(
-    new Set(freeComponents.map((comp) => comp.category))
-  ).sort();
+  const categories = Array.from(new Set(freeComponents.map((comp) => comp.category))).sort();
 
   return (
     <aside className="w-52 flex-shrink-0  bg-background overflow-y-auto">
@@ -33,9 +31,7 @@ export const Sidenav = () => {
                       <Button
                         variant="ghost"
                         className={`${
-                          comp.id === componentId
-                            ? "bg-zinc-200 dark:bg-zinc-800"
-                            : ""
+                          comp.id === componentId ? "bg-zinc-200 dark:bg-zinc-800" : ""
                         } cursor-pointer`}
                         size="sm"
                       >

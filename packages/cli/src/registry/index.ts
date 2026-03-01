@@ -1,8 +1,8 @@
-import { Registry, ComponentConfig } from "./schema.js";
-import registryData from "./registry.json" with { type: "json" };
-import * as path from "path";
-import { fileURLToPath } from "url";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import fs from "fs-extra";
+import registryData from "./registry.json" with { type: "json" };
+import type { ComponentConfig, Registry } from "./schema.js";
 
 /**
  * Base URL for downloading components from GitHub

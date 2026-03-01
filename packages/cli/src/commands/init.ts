@@ -1,9 +1,9 @@
+import { execSync } from "node:child_process";
+import * as path from "node:path";
 import chalk from "chalk";
-import prompts from "prompts";
-import ora from "ora";
-import { execSync } from "child_process";
 import fs from "fs-extra";
-import * as path from "path";
+import ora from "ora";
+import prompts from "prompts";
 import { detectProjectStructure, type PlexusConfig } from "../utils/index.js";
 
 export async function init() {
@@ -31,11 +31,7 @@ export async function init() {
   // Check if package.json exists
   const packageJsonPath = path.join(cwd, "package.json");
   if (!(await fs.pathExists(packageJsonPath))) {
-    console.log(
-      chalk.red(
-        "❌ No package.json found. Please run this in a Node.js project."
-      )
-    );
+    console.log(chalk.red("❌ No package.json found. Please run this in a Node.js project."));
     return;
   }
 
@@ -73,9 +69,7 @@ export async function init() {
     const plexusuiPath = path.join(componentsPath, "plexusui");
     const hasAtSymbol = componentsPath.startsWith("@/");
 
-    const componentsAlias = hasAtSymbol
-      ? componentsPath
-      : `@/${componentsPath}`;
+    const componentsAlias = hasAtSymbol ? componentsPath : `@/${componentsPath}`;
     const utilsAlias = structure.hasSrc ? "@/lib/utils" : "@/lib/utils";
     const plexusuiAlias = `${componentsAlias}/plexusui`;
 
@@ -91,15 +85,11 @@ export async function init() {
       resolvedPaths: {
         components: path.join(
           cwd,
-          componentsPath
-            .replace("@/", "")
-            .replace("src/", structure.hasSrc ? "src/" : "")
+          componentsPath.replace("@/", "").replace("src/", structure.hasSrc ? "src/" : "")
         ),
         plexusui: path.join(
           cwd,
-          plexusuiPath
-            .replace("@/", "")
-            .replace("src/", structure.hasSrc ? "src/" : "")
+          plexusuiPath.replace("@/", "").replace("src/", structure.hasSrc ? "src/" : "")
         ),
       },
     };
@@ -123,12 +113,8 @@ export async function init() {
     if (!installDeps) {
       console.log(chalk.yellow("\nSkipped dependency installation."));
       console.log(chalk.dim("You'll need to install these manually:\n"));
-      console.log(
-        "  npm install react react-dom three @react-three/fiber @react-three/drei"
-      );
-      console.log(
-        "  npm install -D @types/react @types/react-dom @types/three\n"
-      );
+      console.log("  npm install react react-dom three @react-three/fiber @react-three/drei");
+      console.log("  npm install -D @types/react @types/react-dom @types/three\n");
       console.log(chalk.green("✅ Configuration complete!"));
       console.log(chalk.dim("\nAdd components with:"));
       console.log(chalk.cyan("  npx @plexusui/cli add line-chart"));
@@ -138,13 +124,10 @@ export async function init() {
     const depSpinner = ora("Installing peer dependencies...").start();
 
     // Install runtime dependencies (React + Three.js ecosystem)
-    execSync(
-      "npm install react react-dom three @react-three/fiber @react-three/drei",
-      {
-        stdio: "pipe",
-        cwd,
-      }
-    );
+    execSync("npm install react react-dom three @react-three/fiber @react-three/drei", {
+      stdio: "pipe",
+      cwd,
+    });
 
     // Install dev dependencies
     execSync("npm install -D @types/react @types/react-dom @types/three", {
@@ -161,9 +144,7 @@ export async function init() {
     console.log(chalk.cyan("  npx @plexusui/cli add"));
   } catch (error) {
     spinner.fail("Failed to create configuration");
-    console.error(
-      chalk.dim(error instanceof Error ? error.message : "Unknown error")
-    );
+    console.error(chalk.dim(error instanceof Error ? error.message : "Unknown error"));
     process.exit(1);
   }
 }

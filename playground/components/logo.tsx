@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { clsx } from "clsx";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function Logo({ className }: { className?: string }) {
   const { resolvedTheme } = useTheme();
@@ -29,11 +29,6 @@ export function Logo({ className }: { className?: string }) {
 
 export function SimpleLogo({ darkMode = false }: { darkMode?: boolean }) {
   return (
-    <Image
-      src={darkMode ? "/white.png" : "/black.png"}
-      alt="Plexus Logo"
-      width={20}
-      height={20}
-    />
+    <Image src={darkMode ? "/white.png" : "/black.png"} alt="Plexus Logo" width={20} height={20} />
   );
 }

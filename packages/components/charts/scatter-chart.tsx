@@ -1,27 +1,20 @@
 "use client";
 
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import {
-  createWebGLRenderer,
-  createWebGPURenderer,
   ChartAxes,
   ChartRoot,
   ChartTooltip,
+  createWebGLRenderer,
+  createWebGPURenderer,
   getDomain,
   hexToRgb,
   type Point,
   type RendererProps,
+  useBaseChart,
   type WebGLRenderer,
   type WebGPURenderer,
-  useBaseChart,
 } from "./base-chart";
-import {
-  createContext,
-  useContext,
-  useRef,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
 
 // ============================================================================
 // Scatter Chart Types
@@ -71,9 +64,7 @@ const ScatterChartContext = createContext<ScatterChartContextType | null>(null);
 function useScatterChartData() {
   const ctx = useContext(ScatterChartContext);
   if (!ctx) {
-    throw new Error(
-      "ScatterChart components must be used within ScatterChart.Root"
-    );
+    throw new Error("ScatterChart components must be used within ScatterChart.Root");
   }
   return ctx;
 }
@@ -279,9 +270,7 @@ function drawGrid(
   const sizes: number[] = [];
 
   const isDark = document.documentElement.classList.contains("dark");
-  const gridColor: [number, number, number] = isDark
-    ? [0.4, 0.4, 0.4]
-    : [0.6, 0.6, 0.6];
+  const gridColor: [number, number, number] = isDark ? [0.4, 0.4, 0.4] : [0.6, 0.6, 0.6];
 
   // We'll draw grid as points along lines - not ideal but works with point rendering
   for (const tick of xTicks) {
@@ -342,19 +331,8 @@ function createWebGLScatterRenderer(
       fragmentSource: FRAGMENT_SHADER,
     }),
     onRender: (gl, program, props) => {
-      const {
-        series,
-        xDomain,
-        yDomain,
-        width,
-        height,
-        margin,
-        showGrid,
-        xTicks,
-        yTicks,
-      } = props;
+      const { series, xDomain, yDomain, width, height, margin, showGrid, xTicks, yTicks } = props;
 
-      // biome-ignore lint/correctness/useHookAtTopLevel: gl.useProgram is a WebGL method
       gl.useProgram(program);
 
       const resolutionLoc = gl.getUniformLocation(program, "u_resolution");
@@ -366,10 +344,8 @@ function createWebGLScatterRenderer(
       const matrixLoc = gl.getUniformLocation(program, "u_matrix");
       gl.uniformMatrix3fv(matrixLoc, false, matrix);
 
-      const xScale = (x: number) =>
-        ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
-      const yScale = (y: number) =>
-        ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
+      const xScale = (x: number) => ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
+      const yScale = (y: number) => ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
       const yScaleFlipped = (y: number) => innerHeight - yScale(y);
 
       if (showGrid) {
@@ -412,31 +388,19 @@ function createWebGLScatterRenderer(
         if (!buffers.size) buffers.size = gl.createBuffer();
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-        gl.bufferData(
-          gl.ARRAY_BUFFER,
-          new Float32Array(geometry.positions),
-          gl.STATIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry.positions), gl.STATIC_DRAW);
         const positionLoc = gl.getAttribLocation(program, "a_position");
         gl.enableVertexAttribArray(positionLoc);
         gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-        gl.bufferData(
-          gl.ARRAY_BUFFER,
-          new Float32Array(geometry.colors),
-          gl.STATIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry.colors), gl.STATIC_DRAW);
         const colorLoc = gl.getAttribLocation(program, "a_color");
         gl.enableVertexAttribArray(colorLoc);
         gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.size);
-        gl.bufferData(
-          gl.ARRAY_BUFFER,
-          new Float32Array(geometry.sizes),
-          gl.STATIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry.sizes), gl.STATIC_DRAW);
         const sizeLoc = gl.getAttribLocation(program, "a_size");
         gl.enableVertexAttribArray(sizeLoc);
         gl.vertexAttribPointer(sizeLoc, 1, gl.FLOAT, false, 0, 0);
@@ -515,21 +479,15 @@ function createWebGPUScatterRenderer(
           buffers: [
             {
               arrayStride: 8,
-              attributes: [
-                { shaderLocation: 0, offset: 0, format: "float32x2" },
-              ],
+              attributes: [{ shaderLocation: 0, offset: 0, format: "float32x2" }],
             },
             {
               arrayStride: 16,
-              attributes: [
-                { shaderLocation: 1, offset: 0, format: "float32x4" },
-              ],
+              attributes: [{ shaderLocation: 1, offset: 0, format: "float32x4" }],
             },
             {
               arrayStride: 8,
-              attributes: [
-                { shaderLocation: 2, offset: 0, format: "float32x2" },
-              ],
+              attributes: [{ shaderLocation: 2, offset: 0, format: "float32x2" }],
             },
           ],
         },
@@ -558,17 +516,7 @@ function createWebGPUScatterRenderer(
       });
     },
     onRender: async (device, context, pipeline, props) => {
-      const {
-        series,
-        xDomain,
-        yDomain,
-        width,
-        height,
-        margin,
-        showGrid,
-        xTicks,
-        yTicks,
-      } = props;
+      const { series, xDomain, yDomain, width, height, margin, showGrid, xTicks, yTicks } = props;
 
       const innerWidth = width - margin.left - margin.right;
       const innerHeight = height - margin.top - margin.bottom;
@@ -593,10 +541,8 @@ function createWebGPUScatterRenderer(
       ]);
       device.queue.writeBuffer(uniformBuffer, 0, uniformData);
 
-      const xScale = (x: number) =>
-        ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
-      const yScale = (y: number) =>
-        ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
+      const xScale = (x: number) => ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
+      const yScale = (y: number) => ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
       const yScaleFlipped = (y: number) => innerHeight - yScale(y);
 
       const commandEncoder = device.createCommandEncoder();
@@ -623,9 +569,7 @@ function createWebGPUScatterRenderer(
         const pointCoords: number[] = [];
 
         const isDark = document.documentElement.classList.contains("dark");
-        const gridColor: [number, number, number] = isDark
-          ? [0.4, 0.4, 0.4]
-          : [0.6, 0.6, 0.6];
+        const gridColor: [number, number, number] = isDark ? [0.4, 0.4, 0.4] : [0.6, 0.6, 0.6];
         const gridSize = 2; // Size of grid line dots
 
         // Vertical grid lines (x-axis ticks)
@@ -704,10 +648,7 @@ function createWebGPUScatterRenderer(
           const pointCoordData = new Float32Array(pointCoords);
 
           // Create or resize position buffer with 1.5x growth factor
-          if (
-            !gridBuffers.position ||
-            gridBuffers.position.size < positionData.byteLength * 1.5
-          ) {
+          if (!gridBuffers.position || gridBuffers.position.size < positionData.byteLength * 1.5) {
             gridBuffers.position?.destroy();
             gridBuffers.position = device.createBuffer({
               size: Math.ceil(positionData.byteLength * 1.5),
@@ -716,10 +657,7 @@ function createWebGPUScatterRenderer(
           }
 
           // Create or resize color buffer with 1.5x growth factor
-          if (
-            !gridBuffers.color ||
-            gridBuffers.color.size < colorData.byteLength * 1.5
-          ) {
+          if (!gridBuffers.color || gridBuffers.color.size < colorData.byteLength * 1.5) {
             gridBuffers.color?.destroy();
             gridBuffers.color = device.createBuffer({
               size: Math.ceil(colorData.byteLength * 1.5),
@@ -825,21 +763,9 @@ function createWebGPUScatterRenderer(
         }
 
         // Write data to buffers (reusing existing buffers)
-        device.queue.writeBuffer(
-          bufferSet.position,
-          0,
-          new Float32Array(geometry.positions)
-        );
-        device.queue.writeBuffer(
-          bufferSet.color,
-          0,
-          new Float32Array(geometry.colors)
-        );
-        device.queue.writeBuffer(
-          bufferSet.pointCoord,
-          0,
-          new Float32Array(geometry.pointCoords)
-        );
+        device.queue.writeBuffer(bufferSet.position, 0, new Float32Array(geometry.positions));
+        device.queue.writeBuffer(bufferSet.color, 0, new Float32Array(geometry.colors));
+        device.queue.writeBuffer(bufferSet.pointCoord, 0, new Float32Array(geometry.pointCoords));
 
         passEncoder.setVertexBuffer(0, bufferSet.position);
         passEncoder.setVertexBuffer(1, bufferSet.color);
@@ -934,9 +860,7 @@ function Root({
       preferWebGPU={preferWebGPU}
       className={className}
     >
-      <ScatterChartContext.Provider value={{ series }}>
-        {children}
-      </ScatterChartContext.Provider>
+      <ScatterChartContext.Provider value={{ series }}>{children}</ScatterChartContext.Provider>
     </ChartRoot>
   );
 }
@@ -944,9 +868,7 @@ function Root({
 function Canvas({ showGrid = false }: { showGrid?: boolean }) {
   const ctx = useScatterChart();
   const rendererRef = useRef<
-    | WebGLRenderer<ScatterRendererProps>
-    | WebGPURenderer<ScatterRendererProps>
-    | null
+    WebGLRenderer<ScatterRendererProps> | WebGPURenderer<ScatterRendererProps> | null
   >(null);
   const mountedRef = useRef(true);
   const [rendererReady, setRendererReady] = useState(false);
@@ -1073,6 +995,16 @@ function Canvas({ showGrid = false }: { showGrid?: boolean }) {
     ctx.devicePixelRatio,
     ctx.preferWebGPU,
     ctx.setRenderMode,
+    ctx.margin.bottom,
+    ctx.margin.left,
+    ctx.margin.right,
+    ctx.margin.top,
+    ctx.series,
+    ctx.xDomain,
+    ctx.xTicks,
+    ctx.yDomain,
+    ctx.yTicks,
+    showGrid,
   ]);
 
   // Render on data/config changes
@@ -1232,8 +1164,7 @@ function Tooltip() {
           <div
             className="w-4 h-4 rounded-full border-2 border-white dark:border-zinc-900 animate-pulse"
             style={{
-              backgroundColor:
-                ctx.series[ctx.hoveredPoint.seriesIdx].color || "#3b82f6",
+              backgroundColor: ctx.series[ctx.hoveredPoint.seriesIdx].color || "#3b82f6",
             }}
           />
         </div>

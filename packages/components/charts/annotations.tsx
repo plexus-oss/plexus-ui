@@ -3,9 +3,9 @@
  *
  * Minimal text annotation tool for labeling data.
  */
-/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: <explanation> */
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: decorative SVG annotations do not need titles */
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: chart annotation overlays require custom pointer handling */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: chart annotation interactions are pointer-driven */
 "use client";
 
 import * as React from "react";
@@ -196,10 +196,8 @@ export function ChartAnnotations({
       const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
       const innerHeight = ctx.height - ctx.margin.top - ctx.margin.bottom;
 
-      const normalizedX =
-        (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
-      const normalizedY =
-        (dataY - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
+      const normalizedX = (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
+      const normalizedY = (dataY - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
 
       const x = ctx.margin.left + normalizedX * innerWidth;
       const y = ctx.height - ctx.margin.bottom - normalizedY * innerHeight;
@@ -216,13 +214,9 @@ export function ChartAnnotations({
       const relX = screenX - ctx.margin.left;
       const relY = screenY - ctx.margin.top;
 
-      const dataX =
-        ctx.xDomain[0] +
-        (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
+      const dataX = ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
       const dataY =
-        ctx.yDomain[0] +
-        ((innerHeight - relY) / innerHeight) *
-          (ctx.yDomain[1] - ctx.yDomain[0]);
+        ctx.yDomain[0] + ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
 
       return { dataX, dataY };
     },
@@ -331,13 +325,11 @@ export function ChartReferenceLine({
   const getScreenPosition = () => {
     if (axis === "x") {
       const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
-      const normalizedX =
-        (value - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
+      const normalizedX = (value - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
       return ctx.margin.left + normalizedX * innerWidth;
     } else {
       const innerHeight = ctx.height - ctx.margin.top - ctx.margin.bottom;
-      const normalizedY =
-        (value - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
+      const normalizedY = (value - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
       return ctx.height - ctx.margin.bottom - normalizedY * innerHeight;
     }
   };
@@ -345,11 +337,7 @@ export function ChartReferenceLine({
   const position = getScreenPosition();
 
   const borderStyleCSS =
-    lineStyle === "dashed"
-      ? "4px 4px"
-      : lineStyle === "dotted"
-      ? "2px 2px"
-      : undefined;
+    lineStyle === "dashed" ? "4px 4px" : lineStyle === "dotted" ? "2px 2px" : undefined;
 
   const isHorizontal = axis === "y";
 
@@ -359,8 +347,8 @@ export function ChartReferenceLine({
         labelPosition === "start"
           ? ctx.margin.left + 10
           : labelPosition === "end"
-          ? ctx.width - ctx.margin.right - 10
-          : (ctx.margin.left + ctx.width - ctx.margin.right) / 2;
+            ? ctx.width - ctx.margin.right - 10
+            : (ctx.margin.left + ctx.width - ctx.margin.right) / 2;
 
       return { x, y: position };
     } else {
@@ -368,8 +356,8 @@ export function ChartReferenceLine({
         labelPosition === "start"
           ? ctx.margin.top + 20
           : labelPosition === "end"
-          ? ctx.height - ctx.margin.bottom - 10
-          : (ctx.margin.top + ctx.height - ctx.margin.bottom) / 2;
+            ? ctx.height - ctx.margin.bottom - 10
+            : (ctx.margin.top + ctx.height - ctx.margin.bottom) / 2;
 
       return { x: position, y };
     }
@@ -389,9 +377,7 @@ export function ChartReferenceLine({
                 left: ctx.margin.left,
                 width: ctx.width - ctx.margin.left - ctx.margin.right,
                 height: thickness,
-                borderTop: borderStyleCSS
-                  ? `${thickness}px ${lineStyle} ${color}`
-                  : undefined,
+                borderTop: borderStyleCSS ? `${thickness}px ${lineStyle} ${color}` : undefined,
                 backgroundColor: borderStyleCSS ? "transparent" : color,
               }
             : {
@@ -399,9 +385,7 @@ export function ChartReferenceLine({
                 top: ctx.margin.top,
                 height: ctx.height - ctx.margin.top - ctx.margin.bottom,
                 width: thickness,
-                borderLeft: borderStyleCSS
-                  ? `${thickness}px ${lineStyle} ${color}`
-                  : undefined,
+                borderLeft: borderStyleCSS ? `${thickness}px ${lineStyle} ${color}` : undefined,
                 backgroundColor: borderStyleCSS ? "transparent" : color,
               }),
           opacity: 0.8,
@@ -420,13 +404,13 @@ export function ChartReferenceLine({
               ? labelPosition === "end"
                 ? "translate(-100%, -50%)"
                 : labelPosition === "start"
-                ? "translate(0, -50%)"
-                : "translate(-50%, -50%)"
+                  ? "translate(0, -50%)"
+                  : "translate(-50%, -50%)"
               : labelPosition === "end"
-              ? "translate(-50%, -100%)"
-              : labelPosition === "start"
-              ? "translate(-50%, 0)"
-              : "translate(-50%, -50%)",
+                ? "translate(-50%, -100%)"
+                : labelPosition === "start"
+                  ? "translate(-50%, 0)"
+                  : "translate(-50%, -50%)",
             backgroundColor: color,
             color: "#fff",
             opacity: 0.9,
@@ -488,8 +472,7 @@ export function ChartRegion({
 
   const getScreenX = (dataX: number) => {
     const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
-    const normalizedX =
-      (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
+    const normalizedX = (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
     return ctx.margin.left + normalizedX * innerWidth;
   };
 
@@ -605,13 +588,9 @@ export function ChartRuler({
       const relX = screenX - ctx.margin.left;
       const relY = screenY - ctx.margin.top;
 
-      const dataX =
-        ctx.xDomain[0] +
-        (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
+      const dataX = ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
       const dataY =
-        ctx.yDomain[0] +
-        ((innerHeight - relY) / innerHeight) *
-          (ctx.yDomain[1] - ctx.yDomain[0]);
+        ctx.yDomain[0] + ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
 
       return { dataX, dataY };
     },
@@ -623,10 +602,8 @@ export function ChartRuler({
       const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
       const innerHeight = ctx.height - ctx.margin.top - ctx.margin.bottom;
 
-      const normalizedX =
-        (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
-      const normalizedY =
-        (dataY - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
+      const normalizedX = (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
+      const normalizedY = (dataY - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
 
       const x = ctx.margin.left + normalizedX * innerWidth;
       const y = ctx.height - ctx.margin.bottom - normalizedY * innerHeight;

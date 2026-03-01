@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { init } from "./commands/init.js";
 import { add } from "./commands/add.js";
-import { list } from "./commands/list.js";
 import { diff } from "./commands/diff.js";
+import { init } from "./commands/init.js";
+import { list } from "./commands/list.js";
 
 const program = new Command();
 
@@ -27,10 +27,7 @@ program
 program
   .command("list")
   .description("List all available components")
-  .option(
-    "-c, --category <category>",
-    "filter by category (3d, charts, orbital, primitives)"
-  )
+  .option("-c, --category <category>", "filter by category (3d, charts, orbital, primitives)")
   .action((options) => {
     list(options);
   });

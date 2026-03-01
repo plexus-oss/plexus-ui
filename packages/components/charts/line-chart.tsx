@@ -1,26 +1,19 @@
 "use client";
 
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
-  createContext,
-  useContext,
-  useRef,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  createWebGLRenderer,
-  createWebGPURenderer,
   ChartAxes,
   ChartRoot,
   ChartTooltip,
+  createWebGLRenderer,
+  createWebGPURenderer,
   getDomain,
   hexToRgb,
   type Point,
   type RendererProps,
+  useBaseChart,
   type WebGLRenderer,
   type WebGPURenderer,
-  useBaseChart,
 } from "./base-chart";
 
 // ============================================================================
@@ -279,9 +272,7 @@ function createLineGeometry(
 }
 
 // Factory function to create WebGL line renderer
-function createWebGLLineRenderer(
-  canvas: HTMLCanvasElement
-): WebGLRenderer<LineRendererProps> {
+function createWebGLLineRenderer(canvas: HTMLCanvasElement): WebGLRenderer<LineRendererProps> {
   const buffers = {
     position: null as WebGLBuffer | null,
     color: null as WebGLBuffer | null,
@@ -296,19 +287,8 @@ function createWebGLLineRenderer(
       fragmentSource: FRAGMENT_SHADER,
     }),
     onRender: (gl, program, props) => {
-      const {
-        series,
-        xDomain,
-        yDomain,
-        width,
-        height,
-        margin,
-        showGrid,
-        xTicks,
-        yTicks,
-      } = props;
+      const { series, xDomain, yDomain, width, height, margin, showGrid, xTicks, yTicks } = props;
 
-      // biome-ignore lint/correctness/useHookAtTopLevel: gl.useProgram is a WebGL method
       gl.useProgram(program);
 
       const resolutionLoc = gl.getUniformLocation(program, "u_resolution");
@@ -320,10 +300,8 @@ function createWebGLLineRenderer(
       const matrixLoc = gl.getUniformLocation(program, "u_matrix");
       gl.uniformMatrix3fv(matrixLoc, false, matrix);
 
-      const xScale = (x: number) =>
-        ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
-      const yScale = (y: number) =>
-        ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
+      const xScale = (x: number) => ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
+      const yScale = (y: number) => ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
       const yScaleFlipped = (y: number) => innerHeight - yScale(y);
 
       // Draw grid if enabled
@@ -334,9 +312,7 @@ function createWebGLLineRenderer(
         const widths: number[] = [];
 
         const isDark = document.documentElement.classList.contains("dark");
-        const gridColor: [number, number, number] = isDark
-          ? [0.4, 0.4, 0.4]
-          : [0.6, 0.6, 0.6];
+        const gridColor: [number, number, number] = isDark ? [0.4, 0.4, 0.4] : [0.6, 0.6, 0.6];
         const gridWidth = 1;
 
         for (const tick of xTicks) {
@@ -344,14 +320,7 @@ function createWebGLLineRenderer(
           positions.push(x, 0, x, height, x, 0);
           positions.push(x, height, x, 0, x, height);
           normals.push(1, 0, 1, 0, -1, 0, 1, 0, -1, 0, -1, 0);
-          widths.push(
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth
-          );
+          widths.push(gridWidth, gridWidth, gridWidth, gridWidth, gridWidth, gridWidth);
           colors.push(
             ...gridColor,
             0.2,
@@ -373,14 +342,7 @@ function createWebGLLineRenderer(
           positions.push(0, y, innerWidth, y, 0, y);
           positions.push(innerWidth, y, 0, y, innerWidth, y);
           normals.push(0, 1, 0, 1, 0, -1, 0, 1, 0, -1, 0, -1);
-          widths.push(
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth
-          );
+          widths.push(gridWidth, gridWidth, gridWidth, gridWidth, gridWidth, gridWidth);
           colors.push(
             ...gridColor,
             0.2,
@@ -404,41 +366,25 @@ function createWebGLLineRenderer(
           if (!buffers.width) buffers.width = gl.createBuffer();
 
           gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-          gl.bufferData(
-            gl.ARRAY_BUFFER,
-            new Float32Array(positions),
-            gl.STATIC_DRAW
-          );
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
           const positionLoc = gl.getAttribLocation(program, "a_position");
           gl.enableVertexAttribArray(positionLoc);
           gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
 
           gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-          gl.bufferData(
-            gl.ARRAY_BUFFER,
-            new Float32Array(colors),
-            gl.STATIC_DRAW
-          );
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
           const colorLoc = gl.getAttribLocation(program, "a_color");
           gl.enableVertexAttribArray(colorLoc);
           gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
 
           gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
-          gl.bufferData(
-            gl.ARRAY_BUFFER,
-            new Float32Array(normals),
-            gl.STATIC_DRAW
-          );
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
           const normalLoc = gl.getAttribLocation(program, "a_normal");
           gl.enableVertexAttribArray(normalLoc);
           gl.vertexAttribPointer(normalLoc, 2, gl.FLOAT, false, 0, 0);
 
           gl.bindBuffer(gl.ARRAY_BUFFER, buffers.width);
-          gl.bufferData(
-            gl.ARRAY_BUFFER,
-            new Float32Array(widths),
-            gl.STATIC_DRAW
-          );
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(widths), gl.STATIC_DRAW);
           const widthLoc = gl.getAttribLocation(program, "a_width");
           gl.enableVertexAttribArray(widthLoc);
           gl.vertexAttribPointer(widthLoc, 1, gl.FLOAT, false, 0, 0);
@@ -455,13 +401,7 @@ function createWebGLLineRenderer(
 
         const color = hexToRgb(s.color || "#3b82f6");
         const lineWidth = s.strokeWidth || 1.5;
-        const geometry = createLineGeometry(
-          s.data,
-          xScale,
-          yScaleFlipped,
-          color,
-          lineWidth
-        );
+        const geometry = createLineGeometry(s.data, xScale, yScaleFlipped, color, lineWidth);
 
         if (!buffers.position) buffers.position = gl.createBuffer();
         if (!buffers.color) buffers.color = gl.createBuffer();
@@ -469,41 +409,25 @@ function createWebGLLineRenderer(
         if (!buffers.width) buffers.width = gl.createBuffer();
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-        gl.bufferData(
-          gl.ARRAY_BUFFER,
-          new Float32Array(geometry.positions),
-          gl.DYNAMIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry.positions), gl.DYNAMIC_DRAW);
         const positionLoc = gl.getAttribLocation(program, "a_position");
         gl.enableVertexAttribArray(positionLoc);
         gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-        gl.bufferData(
-          gl.ARRAY_BUFFER,
-          new Float32Array(geometry.colors),
-          gl.DYNAMIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry.colors), gl.DYNAMIC_DRAW);
         const colorLoc = gl.getAttribLocation(program, "a_color");
         gl.enableVertexAttribArray(colorLoc);
         gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
-        gl.bufferData(
-          gl.ARRAY_BUFFER,
-          new Float32Array(geometry.normals),
-          gl.DYNAMIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry.normals), gl.DYNAMIC_DRAW);
         const normalLoc = gl.getAttribLocation(program, "a_normal");
         gl.enableVertexAttribArray(normalLoc);
         gl.vertexAttribPointer(normalLoc, 2, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.width);
-        gl.bufferData(
-          gl.ARRAY_BUFFER,
-          new Float32Array(geometry.widths),
-          gl.DYNAMIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry.widths), gl.DYNAMIC_DRAW);
         const widthLoc = gl.getAttribLocation(program, "a_width");
         gl.enableVertexAttribArray(widthLoc);
         gl.vertexAttribPointer(widthLoc, 1, gl.FLOAT, false, 0, 0);
@@ -586,21 +510,15 @@ function createWebGPULineRenderer(
           buffers: [
             {
               arrayStride: 8,
-              attributes: [
-                { shaderLocation: 0, offset: 0, format: "float32x2" },
-              ],
+              attributes: [{ shaderLocation: 0, offset: 0, format: "float32x2" }],
             },
             {
               arrayStride: 16,
-              attributes: [
-                { shaderLocation: 1, offset: 0, format: "float32x4" },
-              ],
+              attributes: [{ shaderLocation: 1, offset: 0, format: "float32x4" }],
             },
             {
               arrayStride: 8,
-              attributes: [
-                { shaderLocation: 2, offset: 0, format: "float32x2" },
-              ],
+              attributes: [{ shaderLocation: 2, offset: 0, format: "float32x2" }],
             },
             {
               arrayStride: 4,
@@ -633,17 +551,7 @@ function createWebGPULineRenderer(
       });
     },
     onRender: async (device, context, pipeline, props) => {
-      const {
-        series,
-        xDomain,
-        yDomain,
-        width,
-        height,
-        margin,
-        showGrid,
-        xTicks,
-        yTicks,
-      } = props;
+      const { series, xDomain, yDomain, width, height, margin, showGrid, xTicks, yTicks } = props;
 
       const innerWidth = width - margin.left - margin.right;
       const innerHeight = height - margin.top - margin.bottom;
@@ -668,10 +576,8 @@ function createWebGPULineRenderer(
       ]);
       device.queue.writeBuffer(uniformBuffer, 0, uniformData);
 
-      const xScale = (x: number) =>
-        ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
-      const yScale = (y: number) =>
-        ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
+      const xScale = (x: number) => ((x - xDomain[0]) / (xDomain[1] - xDomain[0])) * innerWidth;
+      const yScale = (y: number) => ((y - yDomain[0]) / (yDomain[1] - yDomain[0])) * innerHeight;
       const yScaleFlipped = (y: number) => innerHeight - yScale(y);
 
       const commandEncoder = device.createCommandEncoder();
@@ -699,36 +605,14 @@ function createWebGPULineRenderer(
         const widths: number[] = [];
 
         const isDark = document.documentElement.classList.contains("dark");
-        const gridColor: [number, number, number] = isDark
-          ? [0.4, 0.4, 0.4]
-          : [0.6, 0.6, 0.6];
+        const gridColor: [number, number, number] = isDark ? [0.4, 0.4, 0.4] : [0.6, 0.6, 0.6];
         const gridWidth = 1;
 
         for (const tick of xTicks) {
           const x = xScale(tick);
-          positions.push(
-            x,
-            0,
-            x,
-            innerHeight,
-            x,
-            0,
-            x,
-            innerHeight,
-            x,
-            0,
-            x,
-            innerHeight
-          );
+          positions.push(x, 0, x, innerHeight, x, 0, x, innerHeight, x, 0, x, innerHeight);
           normals.push(1, 0, 1, 0, -1, 0, 1, 0, -1, 0, -1, 0);
-          widths.push(
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth
-          );
+          widths.push(gridWidth, gridWidth, gridWidth, gridWidth, gridWidth, gridWidth);
           colors.push(
             ...gridColor,
             0.2,
@@ -747,29 +631,9 @@ function createWebGPULineRenderer(
 
         for (const tick of yTicks) {
           const y = yScaleFlipped(tick);
-          positions.push(
-            0,
-            y,
-            innerWidth,
-            y,
-            0,
-            y,
-            innerWidth,
-            y,
-            0,
-            y,
-            innerWidth,
-            y
-          );
+          positions.push(0, y, innerWidth, y, 0, y, innerWidth, y, 0, y, innerWidth, y);
           normals.push(0, 1, 0, 1, 0, -1, 0, 1, 0, -1, 0, -1);
-          widths.push(
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth,
-            gridWidth
-          );
+          widths.push(gridWidth, gridWidth, gridWidth, gridWidth, gridWidth, gridWidth);
           colors.push(
             ...gridColor,
             0.2,
@@ -793,10 +657,7 @@ function createWebGPULineRenderer(
           const widthData = new Float32Array(widths);
 
           // Create or resize position buffer with 1.5x growth factor
-          if (
-            !gridBuffers.position ||
-            gridBuffers.position.size < positionData.byteLength * 1.5
-          ) {
+          if (!gridBuffers.position || gridBuffers.position.size < positionData.byteLength * 1.5) {
             gridBuffers.position?.destroy();
             gridBuffers.position = device.createBuffer({
               size: Math.ceil(positionData.byteLength * 1.5),
@@ -805,10 +666,7 @@ function createWebGPULineRenderer(
           }
 
           // Create or resize color buffer with 1.5x growth factor
-          if (
-            !gridBuffers.color ||
-            gridBuffers.color.size < colorData.byteLength * 1.5
-          ) {
+          if (!gridBuffers.color || gridBuffers.color.size < colorData.byteLength * 1.5) {
             gridBuffers.color?.destroy();
             gridBuffers.color = device.createBuffer({
               size: Math.ceil(colorData.byteLength * 1.5),
@@ -817,10 +675,7 @@ function createWebGPULineRenderer(
           }
 
           // Create or resize normal buffer with 1.5x growth factor
-          if (
-            !gridBuffers.normal ||
-            gridBuffers.normal.size < normalData.byteLength * 1.5
-          ) {
+          if (!gridBuffers.normal || gridBuffers.normal.size < normalData.byteLength * 1.5) {
             gridBuffers.normal?.destroy();
             gridBuffers.normal = device.createBuffer({
               size: Math.ceil(normalData.byteLength * 1.5),
@@ -829,10 +684,7 @@ function createWebGPULineRenderer(
           }
 
           // Create or resize width buffer with 1.5x growth factor
-          if (
-            !gridBuffers.width ||
-            gridBuffers.width.size < widthData.byteLength * 1.5
-          ) {
+          if (!gridBuffers.width || gridBuffers.width.size < widthData.byteLength * 1.5) {
             gridBuffers.width?.destroy();
             gridBuffers.width = device.createBuffer({
               size: Math.ceil(widthData.byteLength * 1.5),
@@ -864,13 +716,7 @@ function createWebGPULineRenderer(
 
         const color = hexToRgb(s.color || "#3b82f6");
         const lineWidth = s.strokeWidth || 1.5;
-        const geometry = createLineGeometry(
-          s.data,
-          xScale,
-          yScaleFlipped,
-          color,
-          lineWidth
-        );
+        const geometry = createLineGeometry(s.data, xScale, yScaleFlipped, color, lineWidth);
 
         const requiredSizes = {
           position: geometry.positions.length * 4,
@@ -941,26 +787,10 @@ function createWebGPULineRenderer(
         }
 
         // Write data to buffers (reusing existing buffers)
-        device.queue.writeBuffer(
-          bufferSet.position,
-          0,
-          new Float32Array(geometry.positions)
-        );
-        device.queue.writeBuffer(
-          bufferSet.color,
-          0,
-          new Float32Array(geometry.colors)
-        );
-        device.queue.writeBuffer(
-          bufferSet.normal,
-          0,
-          new Float32Array(geometry.normals)
-        );
-        device.queue.writeBuffer(
-          bufferSet.width,
-          0,
-          new Float32Array(geometry.widths)
-        );
+        device.queue.writeBuffer(bufferSet.position, 0, new Float32Array(geometry.positions));
+        device.queue.writeBuffer(bufferSet.color, 0, new Float32Array(geometry.colors));
+        device.queue.writeBuffer(bufferSet.normal, 0, new Float32Array(geometry.normals));
+        device.queue.writeBuffer(bufferSet.width, 0, new Float32Array(geometry.widths));
 
         passEncoder.setVertexBuffer(0, bufferSet.position);
         passEncoder.setVertexBuffer(1, bufferSet.color);
@@ -1040,13 +870,9 @@ function Root({
   const allPoints = series.flatMap((s) => s.data);
 
   const xDomain: [number, number] =
-    xAxis.domain === "auto" || !xAxis.domain
-      ? getDomain(allPoints, (p) => p.x, 0)
-      : xAxis.domain;
+    xAxis.domain === "auto" || !xAxis.domain ? getDomain(allPoints, (p) => p.x, 0) : xAxis.domain;
   const yDomain: [number, number] =
-    yAxis.domain === "auto" || !yAxis.domain
-      ? getDomain(allPoints, (p) => p.y, 0)
-      : yAxis.domain;
+    yAxis.domain === "auto" || !yAxis.domain ? getDomain(allPoints, (p) => p.y, 0) : yAxis.domain;
 
   return (
     <ChartRoot
@@ -1059,9 +885,7 @@ function Root({
       preferWebGPU={preferWebGPU}
       className={className}
     >
-      <LineChartContext.Provider value={{ series }}>
-        {children}
-      </LineChartContext.Provider>
+      <LineChartContext.Provider value={{ series }}>{children}</LineChartContext.Provider>
     </ChartRoot>
   );
 }
@@ -1071,7 +895,7 @@ function Canvas({ showGrid = false }: { showGrid?: boolean }) {
   const rendererRef = useRef<
     WebGLRenderer<LineRendererProps> | WebGPURenderer<LineRendererProps> | null
   >(null);
-  const [rendererReady, setRendererReady] = useState(false);
+  const [_rendererReady, setRendererReady] = useState(false);
 
   // Initialize renderer once
   useEffect(() => {
@@ -1213,7 +1037,6 @@ function Canvas({ showGrid = false }: { showGrid?: boolean }) {
     ctx.canvasRef,
     ctx.isVisible,
     showGrid,
-    rendererReady,
   ]);
 
   return (
@@ -1265,9 +1088,7 @@ function findClosestXCoordinate(
     });
   });
 
-  return closestXDist !== Infinity
-    ? { xValue: closestXValue, screenX: closestScreenX }
-    : null;
+  return closestXDist !== Infinity ? { xValue: closestXValue, screenX: closestScreenX } : null;
 }
 
 // Helper to find all series points at a given X value
@@ -1319,16 +1140,8 @@ function findSeriesPointsAtX(
 }
 
 // Helper to handle multi-series tooltip
-function handleMultiSeriesHover(
-  ctx: ReturnType<typeof useLineChart>,
-  mouseX: number
-) {
-  const closestX = findClosestXCoordinate(
-    ctx.series,
-    mouseX,
-    ctx.xScale,
-    ctx.xDomain
-  );
+function handleMultiSeriesHover(ctx: ReturnType<typeof useLineChart>, mouseX: number) {
+  const closestX = findClosestXCoordinate(ctx.series, mouseX, ctx.xScale, ctx.xDomain);
   if (!closestX) return false;
 
   const seriesPoints = findSeriesPointsAtX(
@@ -1348,10 +1161,7 @@ function handleMultiSeriesHover(
   const threshold = domainRange * 0.001;
 
   // Only update if X value has changed significantly
-  if (
-    currentX === undefined ||
-    Math.abs(currentX - closestX.xValue) > threshold
-  ) {
+  if (currentX === undefined || Math.abs(currentX - closestX.xValue) > threshold) {
     ctx.setHoveredPoint({
       seriesIdx: primaryPoint.seriesIdx,
       pointIdx: 0, // Not used anymore, but keeping for backwards compatibility
@@ -1367,9 +1177,7 @@ function handleMultiSeriesHover(
     const yFormatter = ctx.yAxis?.formatter;
 
     ctx.setTooltipData({
-      title: xFormatter
-        ? xFormatter(closestX.xValue)
-        : closestX.xValue.toFixed(2),
+      title: xFormatter ? xFormatter(closestX.xValue) : closestX.xValue.toFixed(2),
       items: seriesPoints.map((sp) => {
         const series = ctx.series[sp.seriesIdx];
         return {
@@ -1492,9 +1300,7 @@ function Tooltip() {
 
     // Multi-series: find closest X and show all series values
     const found =
-      ctx.series.length > 1
-        ? handleMultiSeriesHover(ctx, x)
-        : handleSingleSeriesHover(ctx, x, y);
+      ctx.series.length > 1 ? handleMultiSeriesHover(ctx, x) : handleSingleSeriesHover(ctx, x, y);
 
     // Clear hover state if no point found
     if (!found && ctx.hoveredPoint !== null) {
@@ -1525,9 +1331,7 @@ function Tooltip() {
       .map((sp) => {
         const series = ctx.series[sp.seriesIdx];
         // Find current position of this point (in case data shifted)
-        const currentPoint = series.data.find(
-          (p) => Math.abs(p.x - sp.point.x) < 0.0001
-        );
+        const currentPoint = series.data.find((p) => Math.abs(p.x - sp.point.x) < 0.0001);
 
         if (currentPoint) {
           return {
@@ -1538,10 +1342,7 @@ function Tooltip() {
         }
         return null;
       })
-      .filter(
-        (d): d is { screenX: number; screenY: number; color: string } =>
-          d !== null
-      );
+      .filter((d): d is { screenX: number; screenY: number; color: string } => d !== null);
   }, [ctx.hoveredPoint, ctx.series, ctx.xScale, ctx.yScale]);
 
   return (

@@ -7,10 +7,7 @@ import type { PlexusConfig } from "./config.js";
  * - `import { cn } from "../lib/utils"` -> `import { cn } from "@/components/plexusui/lib/utils"`
  * - `import type { CSSColor } from "../lib/types"` -> `import type { CSSColor } from "@/components/plexusui/lib/types"`
  */
-export function transformImports(
-  content: string,
-  config: PlexusConfig | null
-): string {
+export function transformImports(content: string, config: PlexusConfig | null): string {
   if (!config) return content;
 
   const plexusAlias = config.aliases.plexusui;
@@ -21,15 +18,12 @@ export function transformImports(
   const importRegex =
     /import\s+(type\s+)?(\{[^}]+\}|\*\s+as\s+\w+|\w+)\s+from\s+["']\.\.\/lib\/([^"']+)["']/g;
 
-  return content.replace(
-    importRegex,
-    (match, typeKeyword, imports, libPath) => {
-      // Remove .js, .ts, .tsx extensions if present
-      const cleanPath = libPath.replace(/\.(js|ts|tsx)$/, "");
+  return content.replace(importRegex, (_match, typeKeyword, imports, libPath) => {
+    // Remove .js, .ts, .tsx extensions if present
+    const cleanPath = libPath.replace(/\.(js|ts|tsx)$/, "");
 
-      // Build the new import with the alias
-      const type = typeKeyword ? "type " : "";
-      return `import ${type}${imports} from "${plexusAlias}/lib/${cleanPath}"`;
-    }
-  );
+    // Build the new import with the alias
+    const type = typeKeyword ? "type " : "";
+    return `import ${type}${imports} from "${plexusAlias}/lib/${cleanPath}"`;
+  });
 }

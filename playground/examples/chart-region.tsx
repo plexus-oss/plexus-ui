@@ -1,12 +1,9 @@
 "use client";
 
+import { ChartRegion, LineChart } from "@plexusui/components/charts";
 import * as React from "react";
-import { LineChart, ChartRegion } from "@plexusui/components/charts";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { ComponentPreview } from "@/components/component-preview";
-import {
-  ApiReferenceTable,
-  type ApiProp,
-} from "@/components/api-reference-table";
 
 /**
  * Generate sample telemetry data
@@ -62,20 +59,8 @@ function BasicExample() {
             <LineChart.Canvas />
             <LineChart.Axes />
 
-            <ChartRegion
-              startX={20}
-              endX={40}
-              label="Phase 1"
-              color="#3b82f6"
-              opacity={0.15}
-            />
-            <ChartRegion
-              startX={60}
-              endX={80}
-              label="Phase 2"
-              color="#10b981"
-              opacity={0.15}
-            />
+            <ChartRegion startX={20} endX={40} label="Phase 1" color="#3b82f6" opacity={0.15} />
+            <ChartRegion startX={60} endX={80} label="Phase 2" color="#10b981" opacity={0.15} />
           </LineChart.Root>
         </div>
       }
@@ -138,13 +123,7 @@ function FlightPhasesExample() {
             <LineChart.Canvas />
             <LineChart.Axes />
 
-            <ChartRegion
-              startX={0}
-              endX={15}
-              label="Pre-Flight"
-              color="#6366f1"
-              opacity={0.1}
-            />
+            <ChartRegion startX={0} endX={15} label="Pre-Flight" color="#6366f1" opacity={0.1} />
             <ChartRegion
               startX={15}
               endX={45}
@@ -152,27 +131,9 @@ function FlightPhasesExample() {
               color="#10b981"
               opacity={0.1}
             />
-            <ChartRegion
-              startX={45}
-              endX={90}
-              label="Cruise"
-              color="#3b82f6"
-              opacity={0.1}
-            />
-            <ChartRegion
-              startX={90}
-              endX={110}
-              label="Descent"
-              color="#f59e0b"
-              opacity={0.1}
-            />
-            <ChartRegion
-              startX={110}
-              endX={120}
-              label="Landing"
-              color="#ef4444"
-              opacity={0.1}
-            />
+            <ChartRegion startX={45} endX={90} label="Cruise" color="#3b82f6" opacity={0.1} />
+            <ChartRegion startX={90} endX={110} label="Descent" color="#f59e0b" opacity={0.1} />
+            <ChartRegion startX={110} endX={120} label="Landing" color="#ef4444" opacity={0.1} />
           </LineChart.Root>
         </div>
       }
@@ -204,13 +165,7 @@ function CustomOpacityExample() {
             <LineChart.Canvas />
             <LineChart.Axes />
 
-            <ChartRegion
-              startX={10}
-              endX={30}
-              label="Light (5%)"
-              color="#3b82f6"
-              opacity={0.05}
-            />
+            <ChartRegion startX={10} endX={30} label="Light (5%)" color="#3b82f6" opacity={0.05} />
             <ChartRegion
               startX={40}
               endX={60}
@@ -218,13 +173,7 @@ function CustomOpacityExample() {
               color="#10b981"
               opacity={0.15}
             />
-            <ChartRegion
-              startX={70}
-              endX={90}
-              label="Heavy (25%)"
-              color="#ef4444"
-              opacity={0.25}
-            />
+            <ChartRegion startX={70} endX={90} label="Heavy (25%)" color="#ef4444" opacity={0.25} />
           </LineChart.Root>
         </div>
       }
@@ -278,8 +227,8 @@ export function ChartRegionExamples() {
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Chart Region</h1>
         <p className="text-zinc-600 dark:text-zinc-400 text-lg">
-          Mark time ranges or segments with shaded vertical regions. Perfect for
-          highlighting phases, modes, or time windows.
+          Mark time ranges or segments with shaded vertical regions. Perfect for highlighting
+          phases, modes, or time windows.
         </p>
       </div>
 
@@ -293,8 +242,8 @@ export function ChartRegionExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            Declarative component for marking data ranges. Uses data coordinates
-            so regions stay locked during streaming.
+            Declarative component for marking data ranges. Uses data coordinates so regions stay
+            locked during streaming.
           </p>
         </div>
 
@@ -320,9 +269,7 @@ export function ChartRegionExamples() {
             </div>
             <div className="bg-zinc-900 p-4 rounded-lg">
               <div className="font-semibold mb-2">Time Windows</div>
-              <div className="text-sm text-zinc-400">
-                Mark specific time periods of interest
-              </div>
+              <div className="text-sm text-zinc-400">Mark specific time periods of interest</div>
             </div>
             <div className="bg-zinc-900 p-4 rounded-lg">
               <div className="font-semibold mb-2">Anomaly Ranges</div>
