@@ -13,10 +13,16 @@ export const TopNav = () => {
           <Logo />
         </Link>
         <nav className="flex items-center gap-6 text-sm">
-          <Link href="/line-chart" className="hover:text-foreground/80 transition-colors">
+          <Link
+            href="/line-chart"
+            className="hover:text-foreground/80 transition-colors"
+          >
             Components
           </Link>
-          <Link href="/docs" className="hover:text-foreground/80 transition-colors">
+          <Link
+            href="/docs"
+            className="hover:text-foreground/80 transition-colors"
+          >
             Docs
           </Link>
         </nav>
@@ -24,7 +30,11 @@ export const TopNav = () => {
       <div className="flex items-center gap-2">
         <ColorSchemeToggle />
         <ThemeToggle />
-        <Link href="https://github.com/plexus-space/ui" className="cursor-pointer" target="_blank">
+        <Link
+          href="https://github.com/plexus-oss/ui"
+          className="cursor-pointer"
+          target="_blank"
+        >
           <Button variant="ghost" size="sm">
             <Github />
           </Button>

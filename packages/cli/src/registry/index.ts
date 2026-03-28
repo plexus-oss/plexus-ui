@@ -10,7 +10,7 @@ import type { ComponentConfig, Registry } from "./schema.js";
  */
 export const BASE_URL =
   process.env.PLEXUSUI_REGISTRY_URL ||
-  "https://raw.githubusercontent.com/plexus-space/ui/main/packages/components";
+  "https://raw.githubusercontent.com/plexus-oss/ui/main/packages/components";
 
 /**
  * Check if we're running in the monorepo (for local development)

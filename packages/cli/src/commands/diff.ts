@@ -26,7 +26,9 @@ export async function diff(componentName: string) {
     const localPath = getComponentDestinationPath(mainFile, componentsDir);
 
     if (!(await fs.pathExists(localPath))) {
-      spinner.info(chalk.yellow(`Component "${componentName}" is not installed locally`));
+      spinner.info(
+        chalk.yellow(`Component "${componentName}" is not installed locally`),
+      );
       console.log(chalk.dim("\nTo install it, run:"));
       console.log(chalk.cyan(`  npx @plexusui/cli add ${componentName}\n`));
       return;
@@ -52,7 +54,7 @@ export async function diff(componentName: string) {
 
       // Download remote version and compare
       try {
-        const remoteUrl = `https://raw.githubusercontent.com/plexus-space/ui/main/packages/components/${file}`;
+        const remoteUrl = `https://raw.githubusercontent.com/plexus-oss/ui/main/packages/components/${file}`;
         const remoteContent = await downloadFile(remoteUrl);
         const localContent = await fs.readFile(filePath, "utf-8");
 
@@ -79,11 +81,15 @@ export async function diff(componentName: string) {
         console.log(chalk.yellow(`   • ${file}`));
       });
       console.log(
-        chalk.dim(`\n✓ ${totalFiles - filesWithDiff.length}/${totalFiles} files up to date`)
+        chalk.dim(
+          `\n✓ ${totalFiles - filesWithDiff.length}/${totalFiles} files up to date`,
+        ),
       );
     } else {
       spinner.succeed(
-        chalk.green(`${componentName} is up to date! (${totalFiles}/${totalFiles} files)`)
+        chalk.green(
+          `${componentName} is up to date! (${totalFiles}/${totalFiles} files)`,
+        ),
       );
     }
 
@@ -94,6 +100,8 @@ export async function diff(componentName: string) {
   } catch (error) {
     spinner.fail("Failed to check component");
     console.error(chalk.red("\n❌ Error:"));
-    console.error(chalk.dim(error instanceof Error ? error.message : "Unknown error"));
+    console.error(
+      chalk.dim(error instanceof Error ? error.message : "Unknown error"),
+    );
   }
 }

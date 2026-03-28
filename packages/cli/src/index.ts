@@ -11,7 +11,7 @@ const program = new Command();
 program
   .name("plexusui")
   .description("Add Plexus UI aerospace components to your project")
-  .version("0.0.11");
+  .version("0.0.24");
 
 program
   .command("init")

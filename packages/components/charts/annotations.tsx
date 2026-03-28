@@ -196,15 +196,17 @@ export function ChartAnnotations({
       const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
       const innerHeight = ctx.height - ctx.margin.top - ctx.margin.bottom;
 
-      const normalizedX = (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
-      const normalizedY = (dataY - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
+      const normalizedX =
+        (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
+      const normalizedY =
+        (dataY - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
 
       const x = ctx.margin.left + normalizedX * innerWidth;
       const y = ctx.height - ctx.margin.bottom - normalizedY * innerHeight;
 
       return { x, y };
     },
-    [ctx]
+    [ctx],
   );
 
   const screenToData = React.useCallback(
@@ -214,13 +216,17 @@ export function ChartAnnotations({
       const relX = screenX - ctx.margin.left;
       const relY = screenY - ctx.margin.top;
 
-      const dataX = ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
+      const dataX =
+        ctx.xDomain[0] +
+        (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
       const dataY =
-        ctx.yDomain[0] + ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
+        ctx.yDomain[0] +
+        ((innerHeight - relY) / innerHeight) *
+          (ctx.yDomain[1] - ctx.yDomain[0]);
 
       return { dataX, dataY };
     },
-    [ctx]
+    [ctx],
   );
 
   const handleChartClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -325,11 +331,13 @@ export function ChartReferenceLine({
   const getScreenPosition = () => {
     if (axis === "x") {
       const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
-      const normalizedX = (value - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
+      const normalizedX =
+        (value - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
       return ctx.margin.left + normalizedX * innerWidth;
     } else {
       const innerHeight = ctx.height - ctx.margin.top - ctx.margin.bottom;
-      const normalizedY = (value - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
+      const normalizedY =
+        (value - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
       return ctx.height - ctx.margin.bottom - normalizedY * innerHeight;
     }
   };
@@ -337,7 +345,11 @@ export function ChartReferenceLine({
   const position = getScreenPosition();
 
   const borderStyleCSS =
-    lineStyle === "dashed" ? "4px 4px" : lineStyle === "dotted" ? "2px 2px" : undefined;
+    lineStyle === "dashed"
+      ? "4px 4px"
+      : lineStyle === "dotted"
+        ? "2px 2px"
+        : undefined;
 
   const isHorizontal = axis === "y";
 
@@ -377,7 +389,9 @@ export function ChartReferenceLine({
                 left: ctx.margin.left,
                 width: ctx.width - ctx.margin.left - ctx.margin.right,
                 height: thickness,
-                borderTop: borderStyleCSS ? `${thickness}px ${lineStyle} ${color}` : undefined,
+                borderTop: borderStyleCSS
+                  ? `${thickness}px ${lineStyle} ${color}`
+                  : undefined,
                 backgroundColor: borderStyleCSS ? "transparent" : color,
               }
             : {
@@ -385,7 +399,9 @@ export function ChartReferenceLine({
                 top: ctx.margin.top,
                 height: ctx.height - ctx.margin.top - ctx.margin.bottom,
                 width: thickness,
-                borderLeft: borderStyleCSS ? `${thickness}px ${lineStyle} ${color}` : undefined,
+                borderLeft: borderStyleCSS
+                  ? `${thickness}px ${lineStyle} ${color}`
+                  : undefined,
                 backgroundColor: borderStyleCSS ? "transparent" : color,
               }),
           opacity: 0.8,
@@ -472,7 +488,8 @@ export function ChartRegion({
 
   const getScreenX = (dataX: number) => {
     const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
-    const normalizedX = (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
+    const normalizedX =
+      (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
     return ctx.margin.left + normalizedX * innerWidth;
   };
 
@@ -588,13 +605,17 @@ export function ChartRuler({
       const relX = screenX - ctx.margin.left;
       const relY = screenY - ctx.margin.top;
 
-      const dataX = ctx.xDomain[0] + (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
+      const dataX =
+        ctx.xDomain[0] +
+        (relX / innerWidth) * (ctx.xDomain[1] - ctx.xDomain[0]);
       const dataY =
-        ctx.yDomain[0] + ((innerHeight - relY) / innerHeight) * (ctx.yDomain[1] - ctx.yDomain[0]);
+        ctx.yDomain[0] +
+        ((innerHeight - relY) / innerHeight) *
+          (ctx.yDomain[1] - ctx.yDomain[0]);
 
       return { dataX, dataY };
     },
-    [ctx]
+    [ctx],
   );
 
   const dataToScreen = React.useCallback(
@@ -602,15 +623,17 @@ export function ChartRuler({
       const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
       const innerHeight = ctx.height - ctx.margin.top - ctx.margin.bottom;
 
-      const normalizedX = (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
-      const normalizedY = (dataY - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
+      const normalizedX =
+        (dataX - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
+      const normalizedY =
+        (dataY - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
 
       const x = ctx.margin.left + normalizedX * innerWidth;
       const y = ctx.height - ctx.margin.bottom - normalizedY * innerHeight;
 
       return { x, y };
     },
-    [ctx]
+    [ctx],
   );
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -641,11 +664,11 @@ export function ChartRuler({
     const rect = e.currentTarget.getBoundingClientRect();
     const screenX = Math.max(
       ctx.margin.left,
-      Math.min(ctx.width - ctx.margin.right, e.clientX - rect.left)
+      Math.min(ctx.width - ctx.margin.right, e.clientX - rect.left),
     );
     const screenY = Math.max(
       ctx.margin.top,
-      Math.min(ctx.height - ctx.margin.bottom, e.clientY - rect.top)
+      Math.min(ctx.height - ctx.margin.bottom, e.clientY - rect.top),
     );
 
     const { dataX, dataY } = screenToData(screenX, screenY);

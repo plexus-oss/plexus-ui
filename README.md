@@ -1,6 +1,6 @@
 # Plexus UI
 
-**GPU-accelerated React components for real-time visualization of physical systems.** WebGPU/WebGL2 charts, 3D viewers, and flight instruments that render 100k+ data points at 60fps — built for IoT dashboards, aerospace HUDs, robotics, and industrial monitoring.
+**GPU-accelerated React components for real-time visualization of physical systems.** WebGPU/WebGL2 charts, 3D viewers, and flight instruments that render 100k+ data points at 60fps — built for hardware dashboards, aerospace HUDs, robotics, and industrial monitoring.
 
 [![npm](https://img.shields.io/npm/v/@plexusui/cli)](https://www.npmjs.com/package/@plexusui/cli)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -38,43 +38,43 @@ Copy-paste components into your project — no runtime dependency to manage.
 
 ### Charts
 
-| Component | Description |
-|-----------|-------------|
-| **LineChart** | Multi-series line chart, 100k+ points, real-time streaming |
-| **AreaChart** | Filled area chart with stacking |
-| **BarChart** | Vertical/horizontal bars, grouped & stacked layouts |
-| **ScatterChart** | Scatter plot with variable point sizes/colors, 50k+ points |
+| Component          | Description                                                      |
+| ------------------ | ---------------------------------------------------------------- |
+| **LineChart**      | Multi-series line chart, 100k+ points, real-time streaming       |
+| **AreaChart**      | Filled area chart with stacking                                  |
+| **BarChart**       | Vertical/horizontal bars, grouped & stacked layouts              |
+| **ScatterChart**   | Scatter plot with variable point sizes/colors, 50k+ points       |
 | **HistogramChart** | Distribution with auto-binning (Sturges/Scott/Freedman-Diaconis) |
-| **HeatmapChart** | 2D grid heatmap for thermal/pressure arrays |
+| **HeatmapChart**   | 2D grid heatmap for thermal/pressure arrays                      |
 
 ### 3D Visualization
 
-| Component | Description |
-|-----------|-------------|
-| **PointCloudViewer** | 10M+ points, LIDAR/photogrammetry, color mapping by height/intensity |
-| **3DModelViewer** | STL/OBJ/GLTF/GLB with vertex color overlay for stress/thermal analysis |
+| Component            | Description                                                            |
+| -------------------- | ---------------------------------------------------------------------- |
+| **PointCloudViewer** | 10M+ points, LIDAR/photogrammetry, color mapping by height/intensity   |
+| **3DModelViewer**    | STL/OBJ/GLTF/GLB with vertex color overlay for stress/thermal analysis |
 
 ### Instruments
 
-| Component | Description |
-|-----------|-------------|
+| Component             | Description                                            |
+| --------------------- | ------------------------------------------------------ |
 | **AttitudeIndicator** | Artificial horizon (pitch/roll) for aerospace displays |
-| **RadarChart** | Polar radar sweep for air traffic, sonar, LIDAR |
+| **RadarChart**        | Polar radar sweep for air traffic, sonar, LIDAR        |
 
 ### Data & Timeline
 
-| Component | Description |
-|-----------|-------------|
-| **DataGrid** | Virtual scrolling table for 10k+ rows of telemetry logs |
-| **Gantt** | Interactive timeline with zoom/infinite scroll for mission planning |
+| Component    | Description                                                         |
+| ------------ | ------------------------------------------------------------------- |
+| **DataGrid** | Virtual scrolling table for 10k+ rows of telemetry logs             |
+| **Gantt**    | Interactive timeline with zoom/infinite scroll for mission planning |
 
 ### Interactive Overlays
 
-| Component | Description |
-|-----------|-------------|
-| **ChartAnnotations** | Click-to-add text labels on data points |
-| **ChartRegion** | Shaded vertical regions to mark time ranges/flight phases |
-| **ChartRuler** | Interactive measurement tool (ΔX, ΔY, distance) |
+| Component            | Description                                               |
+| -------------------- | --------------------------------------------------------- |
+| **ChartAnnotations** | Click-to-add text labels on data points                   |
+| **ChartRegion**      | Shaded vertical regions to mark time ranges/flight phases |
+| **ChartRuler**       | Interactive measurement tool (ΔX, ΔY, distance)           |
 
 ## Why Plexus UI
 
