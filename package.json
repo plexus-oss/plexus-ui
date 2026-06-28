@@ -1,0 +1,50 @@
+{
+  "name": "@plexus/ui-aerospace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GPU-accelerated component library for real-time visualization of physical systems - robotics, medical devices, aerospace, and industrial IoT",
+  "workspaces": [
+    "packages/*",
+    "playground"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @plexusui/playground",
+    "dev:playground": "npm run dev -w @plexusui/playground",
+    "build": "npm run build -w plexus-ui",
+    "build:cli": "npm run build -w plexus-ui",
+    "build:playground": "npm run build -w @plexusui/playground",
+    "publish": "npm run build:cli && npm publish -w plexus-ui --access public",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write ."
+  },
+  "keywords": [
+    "monorepo",
+    "ui",
+    "components",
+    "react",
+    "primitives",
+    "visualization",
+    "webgpu",
+    "gpu-accelerated",
+    "charts",
+    "physical-systems",
+    "robotics",
+    "medical-devices",
+    "aerospace",
+    "industrial-iot",
+    "real-time",
+    "shadcn"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plexus-oss/plexus-ui.git"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.4",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {}
+}

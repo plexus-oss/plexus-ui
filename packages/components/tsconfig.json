@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "jsx": "react-jsx",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "noEmit": false,
+    "types": ["react", "react-dom", "@webgpu/types"]
+  },
+  "include": ["**/*.ts", "**/*.tsx", "registry.json"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Plexus UI Configuration",
+  "description": "Configuration schema for Plexus UI component library",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON schema reference"
+    },
+    "style": {
+      "type": "string",
+      "enum": ["default", "minimal", "space"],
+      "default": "default",
+      "description": "Visual style variant for components"
+    },
+    "tsx": {
+      "type": "boolean",
+      "default": true,
+      "description": "Use TypeScript (.tsx) files"
+    },
+    "aliases": {
+      "type": "object",
+      "description": "Import path aliases",
+      "required": ["components", "utils"],
+      "properties": {
+        "components": {
+          "type": "string",
+          "default": "@/components",
+          "description": "Path alias for components directory"
+        },
+        "utils": {
+          "type": "string",
+          "default": "@/lib/utils",
+          "description": "Path alias for utilities"
+        },
+        "plexusui": {
+          "type": "string",
+          "default": "@/components/plexusui",
+          "description": "Path alias for Plexus UI components"
+        }
+      }
+    },
+    "resolvedPaths": {
+      "type": "object",
+      "description": "Resolved filesystem paths (computed during init)",
+      "properties": {
+        "components": {
+          "type": "string",
+          "description": "Absolute path to components directory"
+        },
+        "plexusui": {
+          "type": "string",
+          "description": "Absolute path to plexusui components"
+        }
+      }
+    }
+  },
+  "required": ["aliases"]
+}

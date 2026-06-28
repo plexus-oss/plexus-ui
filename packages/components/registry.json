@@ -1,0 +1,464 @@
+{
+  "$schema": "../schema.json",
+  "lib": {
+    "name": "lib",
+    "version": "1.0.0",
+    "displayName": "Lib",
+    "type": "infrastructure",
+    "description": "Shared utility functions, constants, and type definitions (automatically installed)",
+    "files": [
+      "lib/animations.ts",
+      "lib/color-scales.ts",
+      "lib/connectors.ts",
+      "lib/data-utils.ts",
+      "lib/index.ts",
+      "lib/timezone.ts",
+      "lib/utils.ts",
+      "lib/visibility.ts"
+    ],
+    "dependencies": [],
+    "registryDependencies": []
+  },
+  "components": {
+    "line-chart": {
+      "name": "line-chart",
+      "version": "0.2.0",
+      "displayName": "Line Chart",
+      "category": "charts",
+      "complexity": "simple",
+      "maturity": "stable",
+      "description": "Multi-series line chart with GPU-accelerated rendering. Handles 100k+ points smoothly. Use cases: Time-series trends, sensor data plotting, stock prices, temperature curves, signal analysis.",
+      "files": [
+        "charts/base-chart.tsx",
+        "charts/line-chart.tsx",
+        "lib/data-utils.ts",
+        "lib/visibility.ts"
+      ],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["real-time", "streaming", "telemetry", "time-series", "gpu-accelerated"],
+      "relatedComponents": ["area-chart", "scatter-chart"],
+      "performance": {
+        "dataPointsSupported": 100000,
+        "targetFPS": 60,
+        "typicalMemory": "50MB"
+      },
+      "aerospaceUseCases": [
+        "Flight test monitoring",
+        "Sensor data trending",
+        "Telemetry visualization",
+        "Ground station displays"
+      ]
+    },
+    "scatter-chart": {
+      "name": "scatter-chart",
+      "version": "0.1.0",
+      "displayName": "Scatter Chart",
+      "category": "charts",
+      "complexity": "simple",
+      "maturity": "beta",
+      "description": "Scatter plot with variable point sizes and colors. Use cases: Correlation analysis, cluster visualization, quality control plots, particle distribution, measurement scatter.",
+      "files": [
+        "charts/base-chart.tsx",
+        "charts/scatter-chart.tsx",
+        "lib/data-utils.ts",
+        "lib/visibility.ts"
+      ],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["correlation", "clustering", "statistical", "gpu-accelerated"],
+      "relatedComponents": ["line-chart", "histogram-chart"],
+      "performance": {
+        "dataPointsSupported": 50000,
+        "targetFPS": 60,
+        "typicalMemory": "40MB"
+      },
+      "aerospaceUseCases": [
+        "Correlation analysis",
+        "Quality control plots",
+        "Test result clustering"
+      ]
+    },
+    "bar-chart": {
+      "name": "bar-chart",
+      "version": "0.1.0",
+      "displayName": "Bar Chart",
+      "category": "charts",
+      "complexity": "simple",
+      "maturity": "beta",
+      "description": "Bar chart with vertical/horizontal orientation. Supports grouped and stacked layouts. Use cases: Categorical comparisons, test results, production counts, event frequencies.",
+      "files": [
+        "charts/bar-chart.tsx",
+        "charts/base-chart.tsx",
+        "lib/data-utils.ts",
+        "lib/visibility.ts"
+      ],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["categorical", "comparison", "grouped", "stacked"],
+      "relatedComponents": ["histogram-chart"],
+      "performance": {
+        "dataPointsSupported": 10000,
+        "targetFPS": 60,
+        "typicalMemory": "20MB"
+      },
+      "aerospaceUseCases": [
+        "Test result comparisons",
+        "Event frequency analysis",
+        "System status summaries"
+      ]
+    },
+    "area-chart": {
+      "name": "area-chart",
+      "version": "0.1.0",
+      "displayName": "Area Chart",
+      "category": "charts",
+      "complexity": "simple",
+      "maturity": "beta",
+      "description": "Area chart with filled regions and stacked support. Use cases: Cumulative data, bandwidth usage, memory consumption, power draw over time, filled envelopes.",
+      "files": [
+        "charts/area-chart.tsx",
+        "charts/base-chart.tsx",
+        "lib/data-utils.ts",
+        "lib/visibility.ts"
+      ],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["time-series", "cumulative", "stacked", "real-time"],
+      "relatedComponents": ["line-chart"],
+      "performance": {
+        "dataPointsSupported": 100000,
+        "targetFPS": 60,
+        "typicalMemory": "50MB"
+      },
+      "aerospaceUseCases": [
+        "Power consumption tracking",
+        "Bandwidth usage over time",
+        "Memory consumption monitoring"
+      ]
+    },
+    "heatmap-chart": {
+      "name": "heatmap-chart",
+      "version": "0.1.0",
+      "displayName": "Heatmap Chart",
+      "category": "charts",
+      "complexity": "moderate",
+      "maturity": "beta",
+      "description": "2D grid heatmap with custom color scales. Use cases: Thermal imaging (FLIR cameras), correlation matrices, pressure sensor arrays, PCB thermal maps, tactile sensor grids, seat occupancy.",
+      "files": [
+        "charts/base-chart.tsx",
+        "charts/heatmap-chart.tsx",
+        "lib/color-scales.ts",
+        "lib/data-utils.ts",
+        "lib/visibility.ts"
+      ],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["thermal", "grid", "2d-data", "color-mapping", "sensor-array"],
+      "relatedComponents": ["point-cloud-viewer"],
+      "performance": {
+        "dataPointsSupported": 100000,
+        "targetFPS": 60,
+        "typicalMemory": "60MB"
+      },
+      "aerospaceUseCases": [
+        "Thermal imaging visualization",
+        "Pressure sensor array displays",
+        "Structural heat distribution"
+      ]
+    },
+    "histogram-chart": {
+      "name": "histogram-chart",
+      "version": "0.1.0",
+      "displayName": "Histogram",
+      "category": "charts",
+      "complexity": "moderate",
+      "maturity": "stable",
+      "description": "Distribution visualization with automatic binning (Sturges, Scott, Freedman-Diaconis methods). Supports count, density, and frequency modes with optional normal curve overlay. Use cases: Data distribution analysis, quality control, experiment results, measurement statistics, tolerance analysis.",
+      "files": [
+        "charts/bar-chart.tsx",
+        "charts/base-chart.tsx",
+        "charts/histogram-chart.tsx",
+        "lib/data-utils.ts",
+        "lib/visibility.ts"
+      ],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["distribution", "statistical", "binning", "quality-control"],
+      "relatedComponents": ["bar-chart", "scatter-chart"],
+      "performance": {
+        "dataPointsSupported": 50000,
+        "targetFPS": 60,
+        "typicalMemory": "30MB"
+      },
+      "aerospaceUseCases": [
+        "Measurement distribution analysis",
+        "Quality control statistics",
+        "Test result distributions",
+        "Tolerance analysis"
+      ]
+    },
+    "radar-chart": {
+      "name": "radar-chart",
+      "version": "0.1.0",
+      "displayName": "Radar Chart",
+      "category": "instruments",
+      "complexity": "moderate",
+      "maturity": "beta",
+      "description": "Radar-style polar display with rotating sweep. Use cases: Air traffic control displays, weather radar visualization, sonar plots, 360° sensor sweeps, LIDAR scans.",
+      "files": ["charts/base-chart.tsx", "charts/radar-chart.tsx", "lib/visibility.ts"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["polar", "radar", "sweep", "360-degree"],
+      "relatedComponents": ["point-cloud-viewer"],
+      "performance": {
+        "dataPointsSupported": 10000,
+        "targetFPS": 60,
+        "typicalMemory": "30MB"
+      },
+      "aerospaceUseCases": [
+        "Air traffic control displays",
+        "Weather radar visualization",
+        "Ground-based radar tracking",
+        "360° LIDAR sweeps"
+      ]
+    },
+    "data-grid": {
+      "name": "data-grid",
+      "version": "1.0.0",
+      "displayName": "Data Grid",
+      "category": "data-display",
+      "complexity": "moderate",
+      "maturity": "stable",
+      "description": "High-performance data table with virtual scrolling (10k+ rows). Use cases: Telemetry logs, test results tables, event logs, CSV data viewers, database query results, flight data records.",
+      "files": ["charts/base-chart.tsx", "charts/data-grid.tsx", "lib/visibility.ts"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["table", "virtual-scrolling", "large-datasets", "logs"],
+      "relatedComponents": ["gantt"],
+      "performance": {
+        "dataPointsSupported": 10000,
+        "targetFPS": 60,
+        "typicalMemory": "100MB"
+      },
+      "aerospaceUseCases": [
+        "Flight data record tables",
+        "Telemetry log viewers",
+        "Test result tables",
+        "Event log displays"
+      ]
+    },
+    "attitude-indicator": {
+      "name": "attitude-indicator",
+      "version": "0.1.0",
+      "displayName": "Attitude Indicator",
+      "category": "instruments",
+      "complexity": "advanced",
+      "maturity": "stable",
+      "description": "Artificial horizon showing pitch and roll orientation. Use cases: Aircraft displays, drone ground stations, spacecraft attitude, surgical robot orientation, gimbal stabilization, ROV navigation.",
+      "files": ["charts/attitude-indicator.tsx", "charts/base-chart.tsx", "lib/visibility.ts"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["aviation", "orientation", "pitch", "roll", "artificial-horizon"],
+      "performance": {
+        "dataPointsSupported": 3,
+        "targetFPS": 60,
+        "typicalMemory": "10MB"
+      },
+      "aerospaceUseCases": [
+        "Aircraft attitude displays",
+        "Drone ground station HUD",
+        "Spacecraft orientation monitoring",
+        "Flight test instrumentation",
+        "Gimbal stabilization displays"
+      ]
+    },
+    "gantt": {
+      "name": "gantt",
+      "version": "0.1.0",
+      "displayName": "Gantt Chart",
+      "category": "timeline",
+      "complexity": "moderate",
+      "maturity": "stable",
+      "description": "Interactive timeline visualization with infinite scroll, zoom controls, and live time tracking. Use cases: Ground station contact schedules, mission planning, flight operations, maintenance windows, spacecraft subsystem timelines.",
+      "files": ["charts/gantt.tsx", "lib/timezone.ts", "lib/utils.ts"],
+      "dependencies": ["date-fns"],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["timeline", "scheduling", "planning", "temporal"],
+      "relatedComponents": ["data-grid"],
+      "performance": {
+        "dataPointsSupported": 1000,
+        "targetFPS": 60,
+        "typicalMemory": "40MB"
+      },
+      "aerospaceUseCases": [
+        "Ground station contact schedules",
+        "Mission planning timelines",
+        "Flight operations scheduling",
+        "Maintenance window planning",
+        "Spacecraft subsystem timelines"
+      ]
+    },
+    "chart-annotations": {
+      "name": "chart-annotations",
+      "version": "1.0.0",
+      "displayName": "Chart Annotations",
+      "category": "interactive",
+      "complexity": "simple",
+      "maturity": "stable",
+      "description": "Minimal text annotation system for labeling chart data. Click to add, inline editing, compact design that doesn't obscure your data. Perfect for data labeling workflows in robotics, medicine, and ML training.",
+      "files": ["charts/annotations.tsx", "charts/base-chart.tsx", "lib/visibility.ts"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["annotation", "labeling", "interactive", "data-markup"],
+      "relatedComponents": ["chart-region", "chart-ruler"],
+      "performance": {
+        "dataPointsSupported": 100,
+        "targetFPS": 60,
+        "typicalMemory": "5MB"
+      },
+      "aerospaceUseCases": [
+        "Flight phase labeling",
+        "Anomaly annotation",
+        "Event marking",
+        "Test point documentation"
+      ]
+    },
+    "chart-region": {
+      "name": "chart-region",
+      "version": "1.0.0",
+      "displayName": "Chart Region",
+      "category": "interactive",
+      "complexity": "simple",
+      "maturity": "stable",
+      "description": "Mark time ranges or segments with shaded vertical regions. Perfect for highlighting flight phases, operational modes, time windows, or any span of data on X-axis. Uses data coordinates so regions stay locked during streaming.",
+      "files": ["charts/annotations.tsx", "charts/base-chart.tsx", "lib/visibility.ts"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["region", "time-range", "phase-marking", "interactive"],
+      "relatedComponents": ["chart-annotations", "gantt"],
+      "performance": {
+        "dataPointsSupported": 50,
+        "targetFPS": 60,
+        "typicalMemory": "5MB"
+      },
+      "aerospaceUseCases": [
+        "Flight phase highlighting",
+        "Operational mode marking",
+        "Contact window visualization",
+        "Test segment marking"
+      ]
+    },
+    "chart-ruler": {
+      "name": "chart-ruler",
+      "version": "1.0.0",
+      "displayName": "Chart Ruler",
+      "category": "interactive",
+      "complexity": "simple",
+      "maturity": "stable",
+      "description": "Interactive measurement tool for calculating distances and deltas between points. Click and drag to measure ΔX, ΔY, and Euclidean distance. Perfect for analyzing rates of change, time differences, or amplitude changes in telemetry data.",
+      "files": ["charts/annotations.tsx", "charts/base-chart.tsx", "lib/visibility.ts"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["measurement", "delta", "interactive", "analysis"],
+      "relatedComponents": ["chart-annotations"],
+      "performance": {
+        "dataPointsSupported": 2,
+        "targetFPS": 60,
+        "typicalMemory": "5MB"
+      },
+      "aerospaceUseCases": [
+        "Rate of change analysis",
+        "Time difference measurement",
+        "Amplitude delta calculation",
+        "Trajectory slope measurement"
+      ]
+    },
+    "3d-model-viewer": {
+      "name": "3d-model-viewer",
+      "version": "0.1.0",
+      "displayName": "3D Model Viewer",
+      "category": "3d",
+      "complexity": "advanced",
+      "maturity": "stable",
+      "description": "Interactive 3D model viewer with vertex color overlay support for stress/thermal/fatigue visualization. Supports STL, OBJ, GLTF, and GLB formats. Use cases: FEA stress analysis, thermal imaging overlays, CAD model inspection, structural health monitoring, component fatigue visualization.",
+      "files": ["charts/3d-model-viewer.tsx", "lib/color-scales.ts"],
+      "dependencies": ["three", "@react-three/fiber", "@react-three/drei", "@types/three"],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["3d", "model", "visualization", "cad", "stress-analysis"],
+      "relatedComponents": ["point-cloud-viewer"],
+      "performance": {
+        "dataPointsSupported": 1000000,
+        "targetFPS": 60,
+        "typicalMemory": "200MB"
+      },
+      "aerospaceUseCases": [
+        "FEA stress analysis visualization",
+        "Thermal imaging overlay on CAD models",
+        "Structural health monitoring",
+        "Component fatigue visualization",
+        "CAD model inspection"
+      ]
+    },
+    "point-cloud-viewer": {
+      "name": "point-cloud-viewer",
+      "version": "0.1.0",
+      "displayName": "Point Cloud Viewer",
+      "category": "3d",
+      "complexity": "advanced",
+      "maturity": "stable",
+      "description": "High-performance 3D point cloud visualization with color mapping by height, intensity, or classification. Supports millions of points with interactive camera controls. Use cases: LIDAR scans (terrain/building mapping), photogrammetry output, 3D scanning (industrial inspection), satellite/aerial imaging, medical 3D reconstructions (CT/MRI), robotics perception (depth sensors, SLAM).",
+      "files": [
+        "charts/point-cloud-viewer.tsx",
+        "lib/color-scales.ts",
+        "lib/point-cloud-octree.ts"
+      ],
+      "dependencies": ["three", "@react-three/fiber", "@react-three/drei", "@types/three"],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "tier": "free",
+      "tags": ["3d", "point-cloud", "lidar", "photogrammetry", "visualization"],
+      "relatedComponents": ["3d-model-viewer", "heatmap-chart"],
+      "performance": {
+        "dataPointsSupported": 10000000,
+        "targetFPS": 60,
+        "typicalMemory": "500MB"
+      },
+      "aerospaceUseCases": [
+        "LIDAR terrain mapping",
+        "Building/structure scanning",
+        "Satellite imaging visualization",
+        "Aerial survey data display",
+        "Ground-based structure inspection"
+      ]
+    }
+  }
+}

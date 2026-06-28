@@ -1,0 +1,80 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import { Open_Sans, Space_Grotesk } from "next/font/google";
+import { Providers } from "@/app/providers";
+import { LayoutWrapper } from "@/components/layout-wrapper";
+import { TopNav } from "@/components/top-nav";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://ui.plexus.company"),
+  title: "Plexus UI",
+  description:
+    "GPU-accelerated React components for real-time visualization of physical systems. WebGPU/WebGL2 charts, 3D viewers, and flight instruments rendering 100k+ data points at 60fps.",
+  keywords: [
+    "react",
+    "components",
+    "webgpu",
+    "gpu-accelerated",
+    "charts",
+    "visualization",
+    "real-time",
+    "telemetry",
+    "aerospace",
+    "robotics",
+    "industrial-iot",
+  ],
+  authors: [{ name: "Plexus UI" }],
+  openGraph: {
+    title: "Plexus UI",
+    description:
+      "GPU-accelerated React components for real-time visualization of physical systems — WebGPU/WebGL2 charts, 3D viewers, and flight instruments at 60fps.",
+    type: "website",
+    images: [
+      {
+        url: "/black.png",
+        width: 677,
+        height: 720,
+        alt: "Plexus UI",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Plexus UI",
+    description:
+      "GPU-accelerated React components for real-time visualization of physical systems — charts, 3D viewers, and flight instruments at 60fps.",
+    images: ["/black.png"],
+  },
+};
+
+const geist = Open_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const geistMono = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-geist-mono",
+});
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geist.className} ${geistMono.variable} antialiased`}>
+        <Providers>
+          <div className="flex flex-col h-screen w-screen overflow-hidden">
+            <TopNav />
+            <div className="flex flex-1 overflow-hidden">
+              <LayoutWrapper>{children}</LayoutWrapper>
+            </div>
+          </div>
+        </Providers>
+      </body>
+    </html>
+  );
+}

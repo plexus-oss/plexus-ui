@@ -1,0 +1,60 @@
+{
+  "name": "plexus-ui",
+  "version": "0.1.0",
+  "description": "CLI for adding GPU-accelerated Plexus UI components to your project - built for robotics, medical devices, aerospace, and industrial IoT",
+  "type": "module",
+  "bin": {
+    "plexus-ui": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "scripts": {
+    "build": "cp ../components/registry.json src/registry/ && tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cli",
+    "aerospace",
+    "react",
+    "hardware",
+    "webGPU",
+    "robotics",
+    "automation",
+    "industrial",
+    "medical",
+    "defense",
+    "autonomous",
+    "vehicles",
+    "perception",
+    "sensor",
+    "ui",
+    "components",
+    "plexus"
+  ],
+  "author": "Ann Schulte",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plexus-oss/plexus-ui.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://ui.plexus.company",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "prompts": "^2.4.2",
+    "chalk": "^5.3.0",
+    "ora": "^8.0.1",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/prompts": "^2.4.9",
+    "@types/fs-extra": "^11.0.4",
+    "typescript": "^5.4.5"
+  }
+}

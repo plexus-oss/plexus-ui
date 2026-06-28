@@ -1,0 +1,29 @@
+{
+  "name": "@plexusui/components",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared component library for Plexus UI - not published, used by CLI",
+  "type": "module",
+  "exports": {
+    "./*": "./*.tsx"
+  },
+  "peerDependencies": {
+    "date-fns": ">=3.0.0",
+    "date-fns-tz": ">=3.0.0",
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@webgpu/types": "^0.1.65",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.6",
+    "@react-three/fiber": "^9.4.0",
+    "@types/three": "^0.181.0",
+    "react-error-boundary": "^6.0.0",
+    "three": "^0.180.0"
+  }
+}
