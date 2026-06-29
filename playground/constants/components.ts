@@ -22,19 +22,25 @@ export interface ComponentMetadata {
  * Get all components from registry regardless of category
  */
 export function getAllComponentsFromRegistry(registry: any): ComponentMetadata[] {
-  return Object.entries(registry.components).map(([id, component]: [string, any]) => ({
-    id,
-    name: component.name,
-    displayName: component.displayName || component.name,
-    category: component.category,
-    description: component.description,
-    files: component.files || [],
-    dependencies: component.dependencies,
-    devDependencies: component.devDependencies,
-    registryDependencies: component.registryDependencies,
-    tier: component.tier || "free",
-    textures: component.textures || [],
-  }));
+  return (
+    Object.entries(registry.components)
+      // Hide infrastructure (charts-base, charts-core) — pulled in automatically
+      // as dependencies, not picked from the gallery.
+      .filter(([, component]: [string, any]) => component.type !== "infrastructure")
+      .map(([id, component]: [string, any]) => ({
+        id,
+        name: component.name,
+        displayName: component.displayName || component.name,
+        category: component.category,
+        description: component.description,
+        files: component.files || [],
+        dependencies: component.dependencies,
+        devDependencies: component.devDependencies,
+        registryDependencies: component.registryDependencies,
+        tier: component.tier || "free",
+        textures: component.textures || [],
+      }))
+  );
 }
 
 export type ComponentTier = "free" | "pro";

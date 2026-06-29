@@ -9,7 +9,6 @@ import {
 import { AreaChart } from "@plexusui/components/charts/area-chart";
 import { BarChart } from "@plexusui/components/charts/bar-chart";
 import { GanttChart, type Task } from "@plexusui/components/charts/gantt";
-import { HistogramChart } from "@plexusui/components/charts/histogram-chart";
 import { LineChart } from "@plexusui/components/charts/line-chart";
 import { ScatterChart } from "@plexusui/components/charts/scatter-chart";
 import { downsampleLTTB } from "@plexusui/components/lib/data-utils";
@@ -527,26 +526,7 @@ export function TelemetryDemo() {
       </div>
 
       {/* Tertiary Charts */}
-      <div className="grid gap-3 md:grid-cols-2">
-        {/* G-Force Distribution */}
-        <ChartCard title="G-Force Distribution" description="Statistical histogram">
-          {accelHistory.length > 20 ? (
-            <HistogramChart
-              data={accelHistory.map((d) => d.y)}
-              binCount={12}
-              width="100%"
-              height={180}
-              xAxis={{ label: "G-Force", domain: [0.5, 1.5] }}
-              yAxis={{ label: "Count" }}
-              color={color}
-              showGrid
-              showAxes
-            />
-          ) : (
-            <LoadingState count={accelHistory.length} target={20} />
-          )}
-        </ChartCard>
-
+      <div className="grid gap-3 md:grid-cols-1">
         {/* System Health Bar Chart */}
         <ChartCard title="System Health" description="Real-time metrics (%)">
           <BarChart

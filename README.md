@@ -44,7 +44,6 @@ Copy-paste components into your project — no runtime dependency to manage.
 | **AreaChart** | Filled area chart with stacking |
 | **BarChart** | Vertical/horizontal bars, grouped & stacked layouts |
 | **ScatterChart** | Scatter plot with variable point sizes/colors, 50k+ points |
-| **HistogramChart** | Distribution with auto-binning (Sturges/Scott/Freedman-Diaconis) |
 | **HeatmapChart** | 2D grid heatmap for thermal/pressure arrays |
 
 ### 3D Visualization
@@ -96,9 +95,13 @@ Open http://localhost:3000 to see the playground and demos.
 
 ## Contributing
 
+Plexus UI is published as a **resource / reference library**, not a collaborative
+project. We welcome issues, but we don't accept external pull requests — see
+[CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+
 - Report bugs via [GitHub Issues](https://github.com/plexus-oss/plexus-ui/issues)
-- Request features via [Discussions](https://github.com/plexus-oss/plexus-ui/discussions)
-- Submit PRs for bug fixes or new components
+- Request features via [GitHub Issues](https://github.com/plexus-oss/plexus-ui/issues)
+- External PRs are closed automatically — please open an issue instead
 
 ## License
 

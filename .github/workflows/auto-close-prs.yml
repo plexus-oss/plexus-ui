@@ -1,0 +1,63 @@
+name: Auto-close external PRs
+
+# Plexus UI is published as a resource, not a collaborative project.
+# We welcome issues, but we do not accept pull requests from outside the
+# core team. This workflow politely closes PRs opened by non-collaborators.
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close PRs from non-collaborators
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const author = pr.user.login;
+
+            // Allow the core team (collaborators with push access) to open PRs.
+            let isCollaborator = false;
+            try {
+              const { status } = await github.rest.repos.checkCollaborator({
+                owner, repo, username: author,
+              });
+              isCollaborator = status === 204;
+            } catch (e) {
+              isCollaborator = false;
+            }
+
+            if (isCollaborator) {
+              core.info(`${author} is a collaborator — leaving PR open.`);
+              return;
+            }
+
+            const body = [
+              `Hi @${author}, thanks for your interest in Plexus UI! 👋`,
+              ``,
+              `Plexus UI is published as a **resource / reference library**, not a`,
+              `collaborative project, so we don't accept external pull requests.`,
+              `This PR will be closed automatically.`,
+              ``,
+              `We **do** value your input — please open a`,
+              `[GitHub Issue](https://github.com/${owner}/${repo}/issues) to report a bug`,
+              `or request a change, and we'll take it from there.`,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner, repo, issue_number: pr.number, body,
+            });
+            await github.rest.issues.addLabels({
+              owner, repo, issue_number: pr.number, labels: ['external-pr'],
+            }).catch(() => {});
+            await github.rest.pulls.update({
+              owner, repo, pull_number: pr.number, state: 'closed',
+            });

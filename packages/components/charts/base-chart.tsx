@@ -4,10 +4,8 @@
 import * as React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useChartVisibility } from "../lib/visibility";
+import { useGPUDevice } from "./gpu-device-provider";
 
-/**
- * Default GPU error fallback component
- */
 function GPUErrorFallback({
   error,
   resetErrorBoundary,
@@ -160,8 +158,26 @@ export interface BaseChartContext {
   devicePixelRatio: number;
   xAxis: Axis;
   yAxis: Axis;
+  /** Effective (currently-displayed) x domain — reflects pan/zoom, not just the prop. */
   xDomain: [number, number];
+  /** Effective (currently-displayed) y domain — reflects pan/zoom, not just the prop. */
   yDomain: [number, number];
+  /**
+   * Override the displayed x domain (pan/zoom). Pass `null` to reset to the
+   * prop-derived domain. This is the hook interaction components use to drive
+   * the viewport — without it, pan/zoom/scroll have nowhere to write to.
+   */
+  setXDomain: (domain: [number, number] | null) => void;
+  /** Override the displayed y domain (pan/zoom). Pass `null` to reset. */
+  setYDomain: (domain: [number, number] | null) => void;
+  /** Reset both axes to their prop-derived domains. */
+  resetDomains: () => void;
+  /** Whether the view has been panned/zoomed away from the prop-derived domain. */
+  isDomainOverridden: boolean;
+  /** Prop-derived ("full extent") x domain, ignoring any pan/zoom override. */
+  xBaseDomain: [number, number];
+  /** Prop-derived ("full extent") y domain, ignoring any pan/zoom override. */
+  yBaseDomain: [number, number];
   xTicks: number[];
   yTicks: number[];
   xScale: (x: number) => number;
@@ -232,6 +248,88 @@ export function getTicks(domain: [number, number], count: number): number[] {
     ticks.push(min + step * i);
   }
 
+  return ticks;
+}
+
+/**
+ * Nice time intervals in milliseconds for axis ticks.
+ * These are common intervals that produce clean time labels.
+ */
+const NICE_TIME_INTERVALS = [
+  1000, // 1 second
+  2000, // 2 seconds
+  5000, // 5 seconds
+  10000, // 10 seconds
+  15000, // 15 seconds
+  30000, // 30 seconds
+  60000, // 1 minute
+  120000, // 2 minutes
+  300000, // 5 minutes
+  600000, // 10 minutes
+  900000, // 15 minutes
+  1800000, // 30 minutes
+  3600000, // 1 hour
+  7200000, // 2 hours
+  14400000, // 4 hours
+  21600000, // 6 hours
+  43200000, // 12 hours
+  86400000, // 1 day
+];
+
+/**
+ * Get the nice time interval (ms) for a given data range that yields ~targetCount
+ * clean labels.
+ */
+export function getNiceTimeInterval(range: number, targetCount: number = 6): number {
+  if (range <= 0) return NICE_TIME_INTERVALS[0];
+
+  const idealInterval = range / (targetCount - 1);
+  for (const niceInterval of NICE_TIME_INTERVALS) {
+    if (niceInterval >= idealInterval) {
+      return niceInterval;
+    }
+  }
+  return NICE_TIME_INTERVALS[NICE_TIME_INTERVALS.length - 1];
+}
+
+/**
+ * Quantize a time domain to nice tick boundaries. The domain then only changes
+ * in discrete steps (when data crosses a boundary) instead of continuously —
+ * this keeps axis labels stable AND avoids re-uploading GPU buffers every frame
+ * during streaming, which is the key time-axis performance win.
+ */
+export function getQuantizedTimeDomain(
+  dataDomain: [number, number],
+  targetCount: number = 6
+): [number, number] {
+  const [dataMin, dataMax] = dataDomain;
+  const range = dataMax - dataMin;
+  if (range <= 0) return dataDomain;
+
+  const interval = getNiceTimeInterval(range, targetCount);
+  const quantizedMin = Math.floor(dataMin / interval) * interval;
+  const quantizedMax = Math.ceil(dataMax / interval) * interval;
+  return [quantizedMin, quantizedMax];
+}
+
+/**
+ * Generate time-based tick values anchored to absolute time boundaries (e.g.
+ * :00, :10, :20). Unlike linear ticks, these don't shift as new data arrives.
+ */
+export function getNiceTimeTicks(domain: [number, number], targetCount: number = 6): number[] {
+  const [min, max] = domain;
+  const range = max - min;
+  if (range <= 0) return [min];
+
+  const interval = getNiceTimeInterval(range, targetCount);
+  const ticks: number[] = [];
+  const firstTick = Math.ceil(min / interval) * interval;
+  for (let tick = firstTick; tick <= max; tick += interval) {
+    ticks.push(tick);
+  }
+  if (ticks.length < 2 && range > 0) {
+    return [min, max];
+  }
   return ticks;
 }
 
@@ -355,11 +453,10 @@ export function createWebGLRenderer<TProps extends RendererProps = RendererProps
 
   const clear = (width: number, height: number) => {
     gl.viewport(0, 0, width, height);
-    gl.clearColor(0, 0, 0, 0); // Transparent
+    gl.clearColor(0, 0, 0, 0); // transparent
     gl.clear(gl.COLOR_BUFFER_BIT);
   };
 
-  // Initialize program
   const { vertexSource, fragmentSource } = config.createShaders(gl);
   const program = createProgram(vertexSource, fragmentSource);
   setupBlending();
@@ -367,7 +464,17 @@ export function createWebGLRenderer<TProps extends RendererProps = RendererProps
   return {
     render: (props: TProps) => {
       clear(props.width, props.height);
+      // Clip rendering to the plot area (inside margins) so lines/fills
+      // don't bleed past the axes.
+      gl.enable(gl.SCISSOR_TEST);
+      gl.scissor(
+        Math.max(0, props.margin.left),
+        Math.max(0, props.margin.bottom),
+        Math.max(0, props.width - props.margin.left - props.margin.right),
+        Math.max(0, props.height - props.margin.top - props.margin.bottom)
+      );
       config.onRender(gl, program, props);
+      gl.disable(gl.SCISSOR_TEST);
     },
     destroy: () => {
       if (config.onDestroy) {
@@ -425,7 +532,6 @@ export function createWebGPURenderer<TProps extends RendererProps = RendererProp
     alphaMode: "premultiplied",
   });
 
-  // Initialize pipeline
   const pipeline = config.createPipeline(device, format);
 
   return {
@@ -456,6 +562,19 @@ export interface BaseChartRootProps {
   yAxis?: Axis;
   xDomain?: [number, number] | "auto";
   yDomain?: [number, number] | "auto";
+  /**
+   * Whether the supplied domain is data-derived ("auto") rather than an explicit
+   * controlled range. Callers that always pass a computed array (e.g. the unified
+   * `Chart`) should set this so a controlled domain change still resets the
+   * pan/zoom override while streaming/auto growth does not. Defaults to inferring
+   * from the domain prop.
+   */
+  xDomainAuto?: boolean;
+  yDomainAuto?: boolean;
+  /** Notified whenever the displayed x domain changes via pan/zoom (or reset to null). */
+  onXDomainChange?: (domain: [number, number] | null) => void;
+  /** Notified whenever the displayed y domain changes via pan/zoom (or reset to null). */
+  onYDomainChange?: (domain: [number, number] | null) => void;
   xTicks?: number[];
   yTicks?: number[];
   preferWebGPU?: boolean;
@@ -490,6 +609,10 @@ export function ChartRoot({
   yAxis = {},
   xDomain: xDomainProp,
   yDomain: yDomainProp,
+  xDomainAuto: xDomainAutoProp,
+  yDomainAuto: yDomainAutoProp,
+  onXDomainChange,
+  onYDomainChange,
   xTicks: xTicksProp,
   yTicks: yTicksProp,
   preferWebGPU = true,
@@ -506,7 +629,6 @@ export function ChartRoot({
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const overlayRef = React.useRef<HTMLCanvasElement>(null);
 
-  // Visibility detection for auto-pausing when off-screen
   const { isVisible: visibilityState } = useChartVisibility(containerRef);
   const isVisible = autoHide ? visibilityState : true;
 
@@ -523,11 +645,31 @@ export function ChartRoot({
   const [tooltipData, setTooltipData] = React.useState<TooltipData | null>(null);
   const [renderMode, setRenderMode] = React.useState<"webgpu" | "webgl" | null>(null);
 
+  const { device: sharedDevice, isLoading: sharedDeviceLoading } = useGPUDevice();
   const [gpuDevice, setGpuDevice] = React.useState<GPUDevice | null>(null);
+  // A device WE acquired (no provider present) — must be destroyed on
+  // unmount/re-init. A provider-shared device is never owned here.
+  const ownedDeviceRef = React.useRef<GPUDevice | null>(null);
 
   React.useEffect(() => {
     if (!preferWebGPU) {
       setRenderMode("webgl");
+      return;
+    }
+
+    // Prefer a device shared via GPUDeviceProvider so every chart in the tree
+    // reuses one GPUDevice instead of each acquiring (and leaking) its own.
+    if (sharedDevice) {
+      setGpuDevice(sharedDevice);
+      setRenderMode("webgpu");
+      return;
+    }
+
+    // A provider is present and still resolving its device asynchronously
+    // (isLoading). Wait for it — self-acquiring now would mean destroying that
+    // device the instant the shared one lands, mid-render, throwing
+    // "Destroyed device" validation errors and blanking the first frame.
+    if (sharedDeviceLoading) {
       return;
     }
 
@@ -552,8 +694,12 @@ export function ChartRoot({
 
         const device = await adapter.requestDevice();
         if (!cancelled) {
+          ownedDeviceRef.current = device;
           setGpuDevice(device);
           setRenderMode("webgpu");
+        } else {
+          // Effect was torn down mid-acquire; don't leak the fresh device.
+          device.destroy();
         }
       } catch (error) {
         if (!cancelled) {
@@ -565,8 +711,12 @@ export function ChartRoot({
 
     return () => {
       cancelled = true;
+      if (ownedDeviceRef.current) {
+        ownedDeviceRef.current.destroy();
+        ownedDeviceRef.current = null;
+      }
     };
-  }, [preferWebGPU]);
+  }, [preferWebGPU, sharedDevice, sharedDeviceLoading]);
 
   const [timeSeriesState, setTimeSeriesState] = React.useState<TimeSeriesState | null>(() => {
     if (!enableTimeSeries || !timeRange) return null;
@@ -633,10 +783,81 @@ export function ChartRoot({
 
   const { width, height } = dimensions;
 
-  const xDomain: [number, number] = xDomainProp === "auto" || !xDomainProp ? [0, 100] : xDomainProp;
-  const yDomain: [number, number] = yDomainProp === "auto" || !yDomainProp ? [0, 100] : yDomainProp;
+  // Prop-derived ("base") domains. Memoized so the "auto" case returns a stable
+  // array identity across renders — otherwise every render hands GPU render
+  // effects a new [0, 100] and forces a redraw.
+  const xBaseDomain = React.useMemo<[number, number]>(() => {
+    const base: [number, number] = xDomainProp === "auto" || !xDomainProp ? [0, 100] : xDomainProp;
+    // Time axes quantize to nice boundaries so the domain only changes in
+    // discrete steps — stable labels + no per-frame GPU re-upload while streaming.
+    return xAxis.type === "time" ? getQuantizedTimeDomain(base) : base;
+  }, [xDomainProp, xAxis.type]);
+  const yBaseDomain = React.useMemo<[number, number]>(
+    () => (yDomainProp === "auto" || !yDomainProp ? [0, 100] : yDomainProp),
+    [yDomainProp]
+  );
 
-  const xTicks = React.useMemo(() => xTicksProp || getTicks(xDomain, 6), [xTicksProp, xDomain]);
+  // View overrides driven by pan/zoom interactions. `null` means "follow the
+  // prop-derived domain". This is the missing feedback path that lets children
+  // (ChartPanZoom, minimap, useChartPanZoom) actually move the viewport.
+  const [xViewDomain, setXViewDomainState] = React.useState<[number, number] | null>(null);
+  const [yViewDomain, setYViewDomainState] = React.useState<[number, number] | null>(null);
+
+  const xIsAuto = xDomainAutoProp ?? (xDomainProp === "auto" || !xDomainProp);
+  const yIsAuto = yDomainAutoProp ?? (yDomainProp === "auto" || !yDomainProp);
+
+  // Reset the pan/zoom override only when a CONTROLLED domain's VALUES actually
+  // change — i.e. a deliberate prop change (date-picker, linked panels) should
+  // win over an in-progress zoom. We compare values, not array identity, so the
+  // identity churn from streaming recomputation (same numbers, new array each
+  // tick) does NOT wipe the user's zoom. Auto/data-derived domains are skipped
+  // entirely since their values legitimately grow while streaming.
+  const prevXBase = React.useRef(xBaseDomain);
+  const prevYBase = React.useRef(yBaseDomain);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: compares against a ref by design
+  React.useEffect(() => {
+    const [a, b] = prevXBase.current;
+    if (!xIsAuto && (a !== xBaseDomain[0] || b !== xBaseDomain[1])) {
+      setXViewDomainState(null);
+    }
+    prevXBase.current = xBaseDomain;
+  }, [xBaseDomain, xIsAuto]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: compares against a ref by design
+  React.useEffect(() => {
+    const [a, b] = prevYBase.current;
+    if (!yIsAuto && (a !== yBaseDomain[0] || b !== yBaseDomain[1])) {
+      setYViewDomainState(null);
+    }
+    prevYBase.current = yBaseDomain;
+  }, [yBaseDomain, yIsAuto]);
+
+  const setXDomain = React.useCallback(
+    (domain: [number, number] | null) => {
+      setXViewDomainState(domain);
+      onXDomainChange?.(domain);
+    },
+    [onXDomainChange]
+  );
+  const setYDomain = React.useCallback(
+    (domain: [number, number] | null) => {
+      setYViewDomainState(domain);
+      onYDomainChange?.(domain);
+    },
+    [onYDomainChange]
+  );
+  const resetDomains = React.useCallback(() => {
+    setXDomain(null);
+    setYDomain(null);
+  }, [setXDomain, setYDomain]);
+
+  const xDomain = xViewDomain ?? xBaseDomain;
+  const yDomain = yViewDomain ?? yBaseDomain;
+  const isDomainOverridden = xViewDomain !== null || yViewDomain !== null;
+
+  const xTicks = React.useMemo(
+    () => xTicksProp || (xAxis.type === "time" ? getNiceTimeTicks(xDomain) : getTicks(xDomain, 6)),
+    [xTicksProp, xDomain, xAxis.type]
+  );
   const yTicks = React.useMemo(() => yTicksProp || getTicks(yDomain, 6), [yTicksProp, yDomain]);
 
   const innerWidth = width - margin.left - margin.right;
@@ -659,37 +880,76 @@ export function ChartRoot({
     setDevicePixelRatio(window.devicePixelRatio || 1);
   }, []);
 
-  const contextValue: BaseChartContext = {
-    width,
-    height,
-    margin,
-    devicePixelRatio,
-    xAxis,
-    yAxis,
-    xDomain,
-    yDomain,
-    xTicks,
-    yTicks,
-    xScale,
-    yScale,
-    canvasRef,
-    overlayRef,
-    containerRef,
-    preferWebGPU,
-    renderMode,
-    setRenderMode,
-    gpuDevice,
-    hoveredPoint,
-    setHoveredPoint,
-    tooltipData,
-    setTooltipData,
-    timeSeriesState,
-    setTimeSeriesState,
-    isVisible,
-  };
+  // Memoize the context object so consumers (especially GPU render effects)
+  // don't re-run on every render purely from a new object identity.
+  const contextValue: BaseChartContext = React.useMemo(
+    () => ({
+      width,
+      height,
+      margin,
+      devicePixelRatio,
+      xAxis,
+      yAxis,
+      xDomain,
+      yDomain,
+      setXDomain,
+      setYDomain,
+      resetDomains,
+      isDomainOverridden,
+      xBaseDomain,
+      yBaseDomain,
+      xTicks,
+      yTicks,
+      xScale,
+      yScale,
+      canvasRef,
+      overlayRef,
+      containerRef,
+      preferWebGPU,
+      renderMode,
+      setRenderMode,
+      gpuDevice,
+      hoveredPoint,
+      setHoveredPoint,
+      tooltipData,
+      setTooltipData,
+      timeSeriesState,
+      setTimeSeriesState,
+      isVisible,
+    }),
+    [
+      width,
+      height,
+      margin,
+      devicePixelRatio,
+      xAxis,
+      yAxis,
+      xDomain,
+      yDomain,
+      setXDomain,
+      setYDomain,
+      resetDomains,
+      isDomainOverridden,
+      xBaseDomain,
+      yBaseDomain,
+      xTicks,
+      yTicks,
+      xScale,
+      yScale,
+      preferWebGPU,
+      renderMode,
+      setRenderMode,
+      gpuDevice,
+      hoveredPoint,
+      setHoveredPoint,
+      tooltipData,
+      setTooltipData,
+      timeSeriesState,
+      setTimeSeriesState,
+      isVisible,
+    ]
+  );
 
-  // Container style with responsive support
-  // For responsive behavior: always use 100% width/height and let constraints control size
   const containerStyle: React.CSSProperties = {
     position: "relative",
     width:
@@ -715,7 +975,7 @@ export function ChartRoot({
     <BaseChartContext.Provider value={contextValue}>
       <div
         ref={containerRef}
-        className={`bg-white dark:bg-zinc-950 rounded-lg ${className || ""}`}
+        className={`bg-white dark:bg-zinc-950 rounded-none ${className || ""}`}
         style={containerStyle}
       >
         {children}
@@ -748,7 +1008,14 @@ export function ChartRoot({
 // Axes Component
 // ============================================================================
 
-export function ChartAxes() {
+export interface ChartAxesProps {
+  /** Draw the x-axis line, ticks and label. Default true. */
+  showXAxis?: boolean;
+  /** Draw the y-axis line, ticks and label. Default true. */
+  showYAxis?: boolean;
+}
+
+export function ChartAxes({ showXAxis = true, showYAxis = true }: ChartAxesProps = {}) {
   const ctx = useBaseChart();
 
   React.useEffect(() => {
@@ -772,83 +1039,89 @@ export function ChartAxes() {
     context.fillStyle = textColor;
     context.font = "12px -apple-system, BlinkMacSystemFont, sans-serif";
 
-    context.beginPath();
-    context.moveTo(ctx.margin.left, ctx.height - ctx.margin.bottom);
-    context.lineTo(ctx.width - ctx.margin.right, ctx.height - ctx.margin.bottom);
-    context.stroke();
+    // X-axis
+    if (showXAxis) {
+      context.beginPath();
+      context.moveTo(ctx.margin.left, ctx.height - ctx.margin.bottom);
+      context.lineTo(ctx.width - ctx.margin.right, ctx.height - ctx.margin.bottom);
+      context.stroke();
 
-    const getFilteredXTicks = () => {
-      if (ctx.xTicks.length === 0) return [];
+      const getFilteredXTicks = () => {
+        if (ctx.xTicks.length === 0) return [];
 
-      const sampleLabel = ctx.xAxis.formatter
-        ? ctx.xAxis.formatter(ctx.xTicks[0])
-        : formatValue(ctx.xTicks[0]);
-      const labelWidth = context.measureText(sampleLabel).width;
-      const minSpacing = labelWidth + 20;
+        const sampleLabel = ctx.xAxis.formatter
+          ? ctx.xAxis.formatter(ctx.xTicks[0])
+          : formatValue(ctx.xTicks[0]);
+        const labelWidth = context.measureText(sampleLabel).width;
+        const minSpacing = labelWidth + 20;
 
-      const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
-      const availableSpace = innerWidth / ctx.xTicks.length;
+        const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
+        const availableSpace = innerWidth / ctx.xTicks.length;
 
-      if (availableSpace >= minSpacing) {
-        return ctx.xTicks;
+        if (availableSpace >= minSpacing) {
+          return ctx.xTicks;
+        }
+
+        const skipFactor = Math.ceil(minSpacing / availableSpace);
+        return ctx.xTicks.filter((_, i) => i % skipFactor === 0);
+      };
+
+      const visibleXTicks = getFilteredXTicks();
+
+      ctx.xTicks.forEach((tick) => {
+        const x = ctx.xScale(tick);
+        context.beginPath();
+        context.moveTo(x, ctx.height - ctx.margin.bottom);
+        context.lineTo(x, ctx.height - ctx.margin.bottom + 6);
+        context.stroke();
+      });
+
+      visibleXTicks.forEach((tick) => {
+        const x = ctx.xScale(tick);
+        context.textAlign = "center";
+        const label = ctx.xAxis.formatter ? ctx.xAxis.formatter(tick) : formatValue(tick);
+        context.fillText(label, x, ctx.height - ctx.margin.bottom + 20);
+      });
+
+      if (ctx.xAxis.label) {
+        context.font = "14px -apple-system, BlinkMacSystemFont, sans-serif";
+        context.textAlign = "center";
+        context.fillText(ctx.xAxis.label, ctx.width / 2, ctx.height - 5);
       }
-
-      const skipFactor = Math.ceil(minSpacing / availableSpace);
-      return ctx.xTicks.filter((_, i) => i % skipFactor === 0);
-    };
-
-    const visibleXTicks = getFilteredXTicks();
-
-    ctx.xTicks.forEach((tick) => {
-      const x = ctx.xScale(tick);
-      context.beginPath();
-      context.moveTo(x, ctx.height - ctx.margin.bottom);
-      context.lineTo(x, ctx.height - ctx.margin.bottom + 6);
-      context.stroke();
-    });
-
-    visibleXTicks.forEach((tick) => {
-      const x = ctx.xScale(tick);
-      context.textAlign = "center";
-      const label = ctx.xAxis.formatter ? ctx.xAxis.formatter(tick) : formatValue(tick);
-      context.fillText(label, x, ctx.height - ctx.margin.bottom + 20);
-    });
-
-    if (ctx.xAxis.label) {
-      context.font = "14px -apple-system, BlinkMacSystemFont, sans-serif";
-      context.textAlign = "center";
-      context.fillText(ctx.xAxis.label, ctx.width / 2, ctx.height - 5);
     }
 
-    context.font = "12px -apple-system, BlinkMacSystemFont, sans-serif";
-    context.beginPath();
-    context.moveTo(ctx.margin.left, ctx.margin.top);
-    context.lineTo(ctx.margin.left, ctx.height - ctx.margin.bottom);
-    context.stroke();
-
-    ctx.yTicks.forEach((tick) => {
-      const y = ctx.yScale(tick);
+    // Y-axis
+    if (showYAxis) {
+      context.font = "12px -apple-system, BlinkMacSystemFont, sans-serif";
       context.beginPath();
-      context.moveTo(ctx.margin.left - 6, y);
-      context.lineTo(ctx.margin.left, y);
+      context.moveTo(ctx.margin.left, ctx.margin.top);
+      context.lineTo(ctx.margin.left, ctx.height - ctx.margin.bottom);
       context.stroke();
 
-      context.textAlign = "right";
-      context.textBaseline = "middle";
-      const label = ctx.yAxis.formatter ? ctx.yAxis.formatter(tick) : formatValue(tick);
-      context.fillText(label, ctx.margin.left - 10, y);
-    });
+      ctx.yTicks.forEach((tick) => {
+        const y = ctx.yScale(tick);
+        context.beginPath();
+        context.moveTo(ctx.margin.left - 6, y);
+        context.lineTo(ctx.margin.left, y);
+        context.stroke();
 
-    if (ctx.yAxis.label) {
-      context.save();
-      context.translate(15, ctx.height / 2);
-      context.rotate(-Math.PI / 2);
-      context.font = "14px -apple-system, BlinkMacSystemFont, sans-serif";
-      context.textAlign = "center";
-      context.fillText(ctx.yAxis.label, 0, 0);
-      context.restore();
+        context.textAlign = "right";
+        context.textBaseline = "middle";
+        const label = ctx.yAxis.formatter ? ctx.yAxis.formatter(tick) : formatValue(tick);
+        context.fillText(label, ctx.margin.left - 10, y);
+      });
+
+      if (ctx.yAxis.label) {
+        context.save();
+        context.translate(15, ctx.height / 2);
+        context.rotate(-Math.PI / 2);
+        context.font = "14px -apple-system, BlinkMacSystemFont, sans-serif";
+        context.textAlign = "center";
+        context.fillText(ctx.yAxis.label, 0, 0);
+        context.restore();
+      }
     }
-  }, [ctx]);
+  }, [ctx, showXAxis, showYAxis]);
 
   return (
     <canvas
@@ -892,7 +1165,6 @@ export function ChartTooltip({
     );
   }
 
-  // Calculate tooltip position
   const tooltipWidth = 160;
   const tooltipHeight = 20 + ctx.tooltipData.items.length * 20 + 10;
   let tooltipX = ctx.hoveredPoint.screenX + 12;

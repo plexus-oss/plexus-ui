@@ -1,5 +1,5 @@
+import * as path from "node:path";
 import fs from "fs-extra";
-import * as path from "path";
 import { loadConfig } from "./config.js";
 
 export interface ProjectStructure {

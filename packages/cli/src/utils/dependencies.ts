@@ -1,9 +1,10 @@
 /** biome-ignore-all lint/suspicious/useIterableCallbackReturn: <explanation> */
 
+import { execSync } from "node:child_process";
+import * as path from "node:path";
 import chalk from "chalk";
-import { execSync } from "child_process";
 import fs from "fs-extra";
-import * as path from "path";
+import { detectPackageManager, installCommand } from "./package-manager.js";
 
 /**
  * Check which dependencies are already installed in the current project
@@ -39,19 +40,20 @@ export async function getInstalledDependencies(): Promise<Set<string>> {
  */
 export async function installDependencies(deps: string[], devDeps: string[]): Promise<void> {
   const cwd = process.cwd();
+  const pm = detectPackageManager(cwd);
 
   try {
     if (deps.length > 0) {
-      console.log(chalk.dim("\n📦 Installing dependencies..."));
-      execSync(`npm install ${deps.join(" ")}`, {
+      console.log(chalk.dim(`\n📦 Installing dependencies with ${pm}...`));
+      execSync(installCommand(pm, deps, false), {
         cwd,
         stdio: "inherit",
       });
     }
 
     if (devDeps.length > 0) {
-      console.log(chalk.dim("\n📦 Installing dev dependencies..."));
-      execSync(`npm install -D ${devDeps.join(" ")}`, {
+      console.log(chalk.dim(`\n📦 Installing dev dependencies with ${pm}...`));
+      execSync(installCommand(pm, devDeps, true), {
         cwd,
         stdio: "inherit",
       });
@@ -59,8 +61,8 @@ export async function installDependencies(deps: string[], devDeps: string[]): Pr
   } catch (_error) {
     throw new Error(
       `Failed to install dependencies. Please run manually:\n` +
-        (deps.length > 0 ? `  npm install ${deps.join(" ")}\n` : "") +
-        (devDeps.length > 0 ? `  npm install -D ${devDeps.join(" ")}` : "")
+        (deps.length > 0 ? `  ${installCommand(pm, deps, false)}\n` : "") +
+        (devDeps.length > 0 ? `  ${installCommand(pm, devDeps, true)}` : "")
     );
   }
 }

@@ -26,6 +26,38 @@
  * ```
  */
 
+// Globe (3D Earth + satellite visualisation)
+export type { GlobeProps, GroundMarker, SatelliteInput } from "./globe";
+export { EarthGlobe, Globe } from "./globe";
+export type {
+  PropagationWorkerHandle,
+  PropagationWorkerSat,
+} from "./use-propagation-worker";
+export { usePropagationWorker } from "./use-propagation-worker";
+// Orbital mechanics core (re-exported for convenience)
+export type {
+  KeplerianElements,
+  LatLng,
+  OrbitalElements,
+  PropagationResult,
+  Tle,
+  Vec3,
+} from "../lib/orbital";
+export {
+  calculateKeplerianPosition,
+  EARTH_RADIUS_KM,
+  eciToScenePosition,
+  generateGroundTrack,
+  generateKeplerianPath,
+  generateOrbitalPath,
+  getOrbitalElements,
+  gmstAngle,
+  isTleStale,
+  latLngAltToPosition,
+  orbitKey,
+  propagateSGP4,
+  SCENE_SCALE,
+} from "../lib/orbital";
 // Point cloud utilities
 export {
   detectFormat,

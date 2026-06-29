@@ -18,7 +18,7 @@
  *
  * 2. **Component Layer** (Chart Primitives)
  *    - LineChart, BarChart, ScatterChart, AreaChart
- *    - HeatmapChart, Histogram
+ *    - HeatmapChart
  *    - RadarChart, AttitudeIndicator
  *    - DataGrid, GanttChart, ModelViewer
  *
@@ -98,6 +98,8 @@ export type {
   DataGridProps,
 } from "./data-grid";
 export { DataGrid } from "./data-grid";
+export type { EphemerisCardProps } from "./ephemeris-card";
+export { EphemerisCard } from "./ephemeris-card";
 export type {
   GanttChartContainerProps,
   GanttChartControlsProps,
@@ -113,13 +115,17 @@ export type {
 } from "./gantt";
 export { GanttChart } from "./gantt";
 export type {
+  GroundStation2D,
+  GroundTrack2DProps,
+  GroundTrack2DSatellite,
+} from "./ground-track-2d";
+export { GroundTrack2D } from "./ground-track-2d";
+export type {
   DataPoint as HeatmapDataPoint,
   HeatmapChartProps,
   HeatmapChartRootProps,
 } from "./heatmap-chart";
 export { HeatmapChart } from "./heatmap-chart";
-export type { HistogramChartProps } from "./histogram-chart";
-export { HistogramChart } from "./histogram-chart";
 export type {
   DataPoint as LineDataPoint,
   LineChartCanvasProps,
@@ -127,8 +133,13 @@ export type {
   LineChartRootProps,
   Series as LineSeries,
 } from "./line-chart";
-// Chart components
 export { LineChart } from "./line-chart";
+export type {
+  PolarSkyPlotProps,
+  SkyPlotObserver,
+  SkyPlotSatellite,
+} from "./polar-sky-plot";
+export { PolarSkyPlot } from "./polar-sky-plot";
 export type {
   RadarChartProps,
   RadarDataPoint,
@@ -159,13 +170,9 @@ export { ScatterChart } from "./scatter-chart";
 
 // Data utilities
 export {
-  type BinMethod,
   type Complex,
-  calculateBinCount,
   calculateBounds,
   calculateNiceBounds,
-  calculateNormalCurve,
-  createHistogramBins,
   createOrResizeVertexBuffer,
   data3DToVertexArray,
   dataToVertexArray,
@@ -174,10 +181,12 @@ export {
   generateCategoricalData,
   generateSineWave,
   generateTelemetryData,
-  type HistogramBin,
   normalizeData,
   type SpectrogramPoint as DataSpectrogramPoint,
 } from "../lib/data-utils";
+export type { AlertBand, AlertBandsProps } from "./alert-bands";
+// Alert bands overlay
+export { AlertBands } from "./alert-bands";
 export type {
   Annotation,
   ChartAnnotationsProps,
@@ -185,6 +194,9 @@ export type {
   ChartRegionProps,
   ChartRulerProps,
   Measurement,
+  // Annotations' array wrapper is renamed to avoid colliding with the
+  // severity-based `ReferenceLines` (which pairs with the `ReferenceLine` type).
+  ReferenceLinesProps as ChartReferenceLinesProps,
 } from "./annotations";
 // Chart annotations and helpers
 export {
@@ -192,6 +204,7 @@ export {
   ChartReferenceLine,
   ChartRegion,
   ChartRuler,
+  ReferenceLines as ChartReferenceLines,
 } from "./annotations";
 export type {
   Axis,
@@ -217,29 +230,50 @@ export {
   hexToRgb,
   useBaseChart,
 } from "./base-chart";
+// ============================================================================
+// Config-driven Chart (matches the Plexus frontend's UnifiedChart)
+// ============================================================================
 export type {
-  ChartMinimapProps,
-  MinimapContainerProps,
-  MinimapSeries,
-} from "./chart-minimap";
-
-// Chart minimap
-export { ChartMinimap, MinimapContainer } from "./chart-minimap";
+  ChartProps,
+  ChartType,
+  UnifiedChartProps,
+  UnifiedSeries,
+} from "./chart";
+export { Chart, UnifiedChart } from "./chart";
+// Shared GPU device — wrap a chart subtree in <GPUDeviceProvider> so every
+// chart reuses one GPUDevice instead of each acquiring its own.
+export { GPUDeviceProvider, useGPUDevice } from "./gpu-device-provider";
 export type {
   BrushSelection,
   ChartBrushProps,
-  ChartBrushSelectorProps,
   ChartClickProps,
   ChartCrosshairProps,
   ChartInteractionsProps,
+  ChartPanZoomProps,
   ClickEvent,
   CrosshairPosition,
 } from "./interactions";
-// Chart interactions
+// Chart interactions (pan/zoom is always on inside <Chart>)
 export {
   ChartBrush,
-  ChartBrushSelector,
   ChartClick,
   ChartCrosshair,
   ChartInteractions,
+  ChartPanZoom,
 } from "./interactions";
+export type { ReferenceLine } from "./reference-lines";
+// The canonical `ReferenceLines` is the severity-based overlay that pairs with
+// the exported `ReferenceLine` type. (Annotations' axis-based array wrapper is
+// exported as `ChartReferenceLines`.)
+export { limitsToReferenceLines, ReferenceLines } from "./reference-lines";
+export type { UnifiedRendererProps } from "./unified-renderer";
+export {
+  createUnifiedWebGLRenderer,
+  createUnifiedWebGPURenderer,
+} from "./unified-renderer";
+export type {
+  UseChartPanZoomOptions,
+  UseChartPanZoomResult,
+} from "./use-chart-pan-zoom";
+// Pan/zoom interaction primitive
+export { useChartPanZoom } from "./use-chart-pan-zoom";

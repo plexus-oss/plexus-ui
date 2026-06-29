@@ -1,6 +1,6 @@
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import fs from "fs-extra";
-import * as path from "path";
-import { fileURLToPath } from "url";
 import registryData from "./registry.json" with { type: "json" };
 import type { ComponentConfig, Registry } from "./schema.js";
 

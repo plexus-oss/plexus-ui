@@ -32,7 +32,7 @@ function BasicAreaChart() {
     <ComponentPreview
       title="Basic Area Chart"
       description="Simple area chart showing stock price trends"
-      code={`import { AreaChart } from "@/components/plexusui/charts/area-chart";
+      code={`import { AreaChart } from "@plexusui/components/charts/area-chart";
 
 const data = Array.from({ length: 60 }, (_, i) => ({
   x: i,
@@ -40,18 +40,15 @@ const data = Array.from({ length: 60 }, (_, i) => ({
 }));
 
 <AreaChart
-  series={[{
-    name: "Stock Price",
-    data,
-    color: "#3b82f6",
-    fillOpacity: 0.3,
-  }]}
+  series={[{ name: "Stock Price", data, color: "#3b82f6", fillOpacity: 0.3 }]}
   width={800}
   height={400}
   showTooltip
+  showLegend
+  referenceLines={[{ value: 120, severity: "info", label: "Resistance" }]}
 />`}
       preview={
-        <div className="w-full">
+        <div className="w-full h-[460px]">
           <AreaChart
             series={[
               {
@@ -63,11 +60,13 @@ const data = Array.from({ length: 60 }, (_, i) => ({
               },
             ]}
             yAxis={{ label: "Price ($)" }}
-            xAxis={{ label: "Time (days)", domain: [0, 59] }}
+            xAxis={{ label: "Time (days)" }}
             width="100%"
-            height={400}
+            height={460}
             showGrid
             showTooltip
+            showLegend
+            referenceLines={[{ value: 120, severity: "info", label: "Resistance" }]}
           />
         </div>
       }

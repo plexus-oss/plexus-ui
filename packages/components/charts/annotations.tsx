@@ -11,10 +11,6 @@
 import * as React from "react";
 import { useBaseChart } from "./base-chart";
 
-// ============================================================================
-// Types
-// ============================================================================
-
 export interface Annotation {
   id: string;
   dataX: number;
@@ -29,17 +25,9 @@ export interface ChartAnnotationsProps {
   color?: string;
 }
 
-// ============================================================================
-// Utilities
-// ============================================================================
-
 function generateId(): string {
   return `ann-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 }
-
-// ============================================================================
-// Annotation Item Component
-// ============================================================================
 
 interface AnnotationItemProps {
   annotation: Annotation;
@@ -178,10 +166,6 @@ function AnnotationItem({
   );
 }
 
-// ============================================================================
-// Main Annotations Component
-// ============================================================================
-
 export function ChartAnnotations({
   annotations,
   onChange,
@@ -278,7 +262,6 @@ export function ChartAnnotations({
         />
       )}
 
-      {/* Render annotations */}
       {annotations.map((annotation) => (
         <AnnotationItem
           key={annotation.id}
@@ -325,11 +308,14 @@ export function ChartReferenceLine({
   const getScreenPosition = () => {
     if (axis === "x") {
       const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
-      const normalizedX = (value - ctx.xDomain[0]) / (ctx.xDomain[1] - ctx.xDomain[0]);
+      const range = ctx.xDomain[1] - ctx.xDomain[0];
+      // Guard a degenerate (flat) domain so we don't divide by zero → NaN.
+      const normalizedX = range === 0 ? 0.5 : (value - ctx.xDomain[0]) / range;
       return ctx.margin.left + normalizedX * innerWidth;
     } else {
       const innerHeight = ctx.height - ctx.margin.top - ctx.margin.bottom;
-      const normalizedY = (value - ctx.yDomain[0]) / (ctx.yDomain[1] - ctx.yDomain[0]);
+      const range = ctx.yDomain[1] - ctx.yDomain[0];
+      const normalizedY = range === 0 ? 0.5 : (value - ctx.yDomain[0]) / range;
       return ctx.height - ctx.margin.bottom - normalizedY * innerHeight;
     }
   };
@@ -420,6 +406,25 @@ export function ChartReferenceLine({
           {label}
         </div>
       )}
+    </>
+  );
+}
+
+export interface ReferenceLinesProps {
+  /** One entry per reference line. */
+  lines: ChartReferenceLineProps[];
+}
+
+/**
+ * Render multiple `ChartReferenceLine`s from an array — handy for plotting a
+ * set of thresholds/limits without mapping by hand.
+ */
+export function ReferenceLines({ lines }: ReferenceLinesProps) {
+  return (
+    <>
+      {lines.map((line, idx) => (
+        <ChartReferenceLine key={idx} {...line} />
+      ))}
     </>
   );
 }

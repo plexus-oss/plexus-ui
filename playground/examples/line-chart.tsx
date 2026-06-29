@@ -62,74 +62,35 @@ function RevenueChart() {
       description="A clean, minimal chart showing monthly revenue trends with year-over-year comparison"
       code={`import { LineChart } from "@plexusui/components/charts/line-chart";
 
-const revenueData = [
-  { x: 0, y: 2890 }, { x: 1, y: 3420 }, { x: 2, y: 3180 },
-  // ... more data
-];
-
-<LineChart.Root
+// Everything is config. Pan/zoom is always on (cmd/ctrl + scroll to zoom,
+// cmd/ctrl + drag to pan).
+<LineChart
   series={[
     { name: "2024", data: revenueData, color: "#3b82f6", strokeWidth: 3 },
     { name: "2023", data: previousYearData, color: "#94a3b8", strokeWidth: 2 },
   ]}
-  xAxis={{
-    label: "Month",
-    formatter: (v) => months[Math.round(v)],
-  }}
-  yAxis={{
-    label: "Revenue ($)",
-    formatter: (v) => \`$\${(v / 1000).toFixed(1)}k\`,
-  }}
-  width={800}
+  xAxis={{ formatter: (v) => months[Math.round(v)] }}
+  yAxis={{ formatter: (v) => \`$\${(v / 1000).toFixed(1)}k\` }}
+  width="100%"
   height={350}
-  preferWebGPU={true}
->
-  <LineChart.Canvas showGrid={true} />
-  <LineChart.Axes />
-  <LineChart.Tooltip />
-</LineChart.Root>`}
+  showTooltip
+  showLegend
+  referenceLines={[{ value: 6000, severity: "warning", label: "Target" }]}
+/>`}
       preview={
-        <div className="w-full">
-          <div className="mb-4 flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[0] }} />
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">2024</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[1] }} />
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">2023</span>
-            </div>
-          </div>
-          <LineChart.Root
-            series={[
-              {
-                name: "2024",
-                data: revenueData,
-                color: colors[0],
-                strokeWidth: 3,
-              },
-              {
-                name: "2023",
-                data: previousYearData,
-                color: colors[1],
-                strokeWidth: 2,
-              },
-            ]}
-            xAxis={{
-              formatter: (v: number) => months[Math.round(v)] || "",
-            }}
-            yAxis={{
-              formatter: (v: number) => `$${(v / 1000).toFixed(1)}k`,
-            }}
-            width="100%"
-            height={350}
-            preferWebGPU={true}
-          >
-            <LineChart.Canvas showGrid={true} />
-            <LineChart.Axes />
-            <LineChart.Tooltip />
-          </LineChart.Root>
-        </div>
+        <LineChart
+          series={[
+            { name: "2024", data: revenueData, color: colors[0], strokeWidth: 3 },
+            { name: "2023", data: previousYearData, color: colors[1], strokeWidth: 2 },
+          ]}
+          xAxis={{ formatter: (v: number) => months[Math.round(v)] || "" }}
+          yAxis={{ formatter: (v: number) => `$${(v / 1000).toFixed(1)}k` }}
+          width="100%"
+          height={350}
+          showTooltip
+          showLegend
+          referenceLines={[{ value: 6000, severity: "warning", label: "Target" }]}
+        />
       }
     />
   );
@@ -272,7 +233,7 @@ function StreamingChart() {
     return () => {
       cancelAnimationFrame(animationFrame);
     };
-  }, [isPaused, WINDOW_SIZE, UPDATE_RATE]);
+  }, [isPaused, WINDOW_SIZE]);
 
   const xMin = primaryData[0]?.x || 0;
   const xMax = primaryData[primaryData.length - 1]?.x || WINDOW_DURATION;

@@ -3,8 +3,7 @@
 
 import type { DataPoint } from "@plexusui/components/charts/bar-chart";
 import { BarChart } from "@plexusui/components/charts/bar-chart";
-import { MinimapContainer } from "@plexusui/components/charts/chart-minimap";
-import React, { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { useColorScheme, useMultiColors } from "@/components/color-scheme-provider";
 import { ComponentPreview } from "@/components/component-preview";
@@ -98,31 +97,32 @@ function BasicBarChart() {
     <ComponentPreview
       title="Basic Bar Chart"
       description="Simple vertical bar chart showing monthly metrics"
-      code={`import { BarChart } from "@/components/plexusui/charts/bar-chart";
+      code={`import { BarChart } from "@plexusui/components/charts/bar-chart";
 
 const data = [
-  { x: "Jan", y: 45 },
-  { x: "Feb", y: 52 },
-  { x: "Mar", y: 48 },
-  { x: "Apr", y: 61 },
-  { x: "May", y: 55 },
-  { x: "Jun", y: 67 },
+  { x: "Jan", y: 45 }, { x: "Feb", y: 52 }, { x: "Mar", y: 48 },
+  { x: "Apr", y: 61 }, { x: "May", y: 55 }, { x: "Jun", y: 67 },
 ];
 
+// Same config props as every other chart.
 <BarChart
   series={[{ name: "Revenue", data, color: "#3b82f6" }]}
   width={800}
   height={400}
   showTooltip
+  showLegend
+  referenceLines={[{ value: 60, severity: "warning", label: "Goal" }]}
 />`}
       preview={
-        <div className="w-full h-[400px]">
+        <div className="w-full h-[420px]">
           <BarChart
             series={[{ name: "Revenue ($K)", data: monthlyData, color: color }]}
             yAxis={{ label: "Revenue ($K)" }}
             width="100%"
-            height={400}
+            height={420}
             showTooltip
+            showLegend
+            referenceLines={[{ value: 60, severity: "warning", label: "Goal" }]}
             barWidth={60}
           />
         </div>
@@ -397,348 +397,6 @@ function HighDensityTimeSeriesBarChart() {
   );
 }
 
-// Simple minimap component
-function SimpleMinimap({
-  series,
-  fullRange,
-  visibleRange,
-  onRangeChange,
-}: {
-  series: any[];
-  fullRange: { min: number; max: number };
-  visibleRange: { start: number; end: number };
-  onRangeChange: (start: number, end: number) => void;
-}) {
-  const [dragMode, setDragMode] = React.useState<"pan" | "resize-left" | "resize-right" | null>(
-    null
-  );
-  const [dragStart, setDragStart] = React.useState({
-    x: 0,
-    startVal: 0,
-    endVal: 0,
-  });
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  const rangeWidth = fullRange.max - fullRange.min;
-  const leftPercent = ((visibleRange.start - fullRange.min) / rangeWidth) * 100;
-  const widthPercent = ((visibleRange.end - visibleRange.start) / rangeWidth) * 100;
-
-  const handlePanStart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDragMode("pan");
-    setDragStart({
-      x: e.clientX,
-      startVal: visibleRange.start,
-      endVal: visibleRange.end,
-    });
-  };
-
-  const handleResizeLeftStart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDragMode("resize-left");
-    setDragStart({
-      x: e.clientX,
-      startVal: visibleRange.start,
-      endVal: visibleRange.end,
-    });
-  };
-
-  const handleResizeRightStart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDragMode("resize-right");
-    setDragStart({
-      x: e.clientX,
-      startVal: visibleRange.start,
-      endVal: visibleRange.end,
-    });
-  };
-
-  React.useEffect(() => {
-    if (!dragMode) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const rect = container.getBoundingClientRect();
-      const deltaX = e.clientX - dragStart.x;
-      const deltaValue = (deltaX / rect.width) * rangeWidth;
-
-      let newStart = visibleRange.start;
-      let newEnd = visibleRange.end;
-
-      if (dragMode === "pan") {
-        const duration = dragStart.endVal - dragStart.startVal;
-        newStart = dragStart.startVal + deltaValue;
-        newEnd = dragStart.endVal + deltaValue;
-
-        // Clamp to bounds
-        if (newStart < fullRange.min) {
-          newStart = fullRange.min;
-          newEnd = fullRange.min + duration;
-        }
-        if (newEnd > fullRange.max) {
-          newEnd = fullRange.max;
-          newStart = fullRange.max - duration;
-        }
-      } else if (dragMode === "resize-left") {
-        newStart = Math.max(
-          fullRange.min,
-          Math.min(dragStart.startVal + deltaValue, dragStart.endVal - 86400000)
-        ); // Min 1 day
-        newEnd = dragStart.endVal;
-      } else if (dragMode === "resize-right") {
-        newStart = dragStart.startVal;
-        newEnd = Math.min(
-          fullRange.max,
-          Math.max(dragStart.endVal + deltaValue, dragStart.startVal + 86400000)
-        ); // Min 1 day
-      }
-
-      onRangeChange(newStart, newEnd);
-    };
-
-    const handleMouseUp = () => setDragMode(null);
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [dragMode, dragStart, rangeWidth, fullRange, onRangeChange, visibleRange]);
-
-  return (
-    <div
-      ref={containerRef}
-      className="relative"
-      style={{ height: 60, width: "100%", overflow: "hidden" }}
-    >
-      {/* Bar chart with negative margins to eliminate padding */}
-      <div
-        style={{
-          marginLeft: -60,
-          marginRight: -20,
-          marginTop: -20,
-          marginBottom: -50,
-        }}
-      >
-        <BarChart.Root
-          series={series}
-          xAxis={{ domain: [fullRange.min, fullRange.max] as [number, number] }}
-          yAxis={{ domain: "auto" }}
-          width="calc(100% + 80px)"
-          height={130}
-          grouped={true}
-          barWidth={1}
-        >
-          <BarChart.Canvas showGrid={false} />
-        </BarChart.Root>
-      </div>
-
-      {/* Overlay */}
-      <div className="absolute inset-0" style={{ pointerEvents: "none", zIndex: 10 }}>
-        {/* Left dimmed area */}
-        <div
-          className="absolute inset-y-0 bg-black/60"
-          style={{ left: 0, width: `${leftPercent}%` }}
-        />
-        {/* Right dimmed area */}
-        <div
-          className="absolute inset-y-0 bg-black/60"
-          style={{ left: `${leftPercent + widthPercent}%`, right: 0 }}
-        />
-        {/* Selection box */}
-        <div
-          className="absolute inset-y-0 border-2 border-blue-500 cursor-move bg-transparent"
-          style={{
-            left: `${leftPercent}%`,
-            width: `${widthPercent}%`,
-            pointerEvents: "auto",
-          }}
-          onMouseDown={handlePanStart}
-        >
-          {/* Left handle */}
-          <div
-            className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-10 bg-white border-2 border-blue-500 rounded cursor-ew-resize hover:bg-blue-50"
-            style={{ pointerEvents: "auto" }}
-            onMouseDown={handleResizeLeftStart}
-          />
-
-          <div
-            className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-3 h-10 bg-white border-2 border-blue-500 rounded cursor-ew-resize hover:bg-blue-50"
-            style={{ pointerEvents: "auto" }}
-            onMouseDown={handleResizeRightStart}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TimeSeriesWithMinimap() {
-  const colors = useMultiColors(3);
-  const { series: rawSeries, categories } = useMemo(() => generateTimeSeriesData(), []);
-
-  // Use only first 3 series to keep it clean
-  const limitedSeries = useMemo(() => rawSeries.slice(0, 3), [rawSeries]);
-  const limitedCategories = useMemo(() => categories.slice(0, 3), [categories]);
-
-  // Calculate full time range
-  const fullTimeRange = useMemo(() => {
-    const allTimestamps = limitedSeries.flatMap((s) => s.map((d) => d.x as number));
-    return {
-      min: Math.min(...allTimestamps),
-      max: Math.max(...allTimestamps),
-    };
-  }, [limitedSeries]);
-
-  // State for visible range (initialize to show ~50% of data in the middle)
-  const [visibleRange, setVisibleRange] = useState({
-    start: new Date(2023, 11, 1).getTime(),
-    end: new Date(2024, 11, 27).getTime(),
-  });
-
-  // Sync visible range with actual data range on mount - show middle 50%
-  React.useEffect(() => {
-    if (fullTimeRange.min && fullTimeRange.max) {
-      const totalRange = fullTimeRange.max - fullTimeRange.min;
-      const quarterRange = totalRange * 0.25;
-
-      setVisibleRange({
-        start: fullTimeRange.min + quarterRange,
-        end: fullTimeRange.max - quarterRange,
-      });
-    }
-  }, [fullTimeRange.min, fullTimeRange.max]);
-
-  // Filter data based on visible range
-  const displayedSeries = useMemo(() => {
-    const filtered = limitedSeries.map((data, idx) => ({
-      name: limitedCategories[idx],
-      data: data.filter(
-        (d) => (d.x as number) >= visibleRange.start && (d.x as number) <= visibleRange.end
-      ),
-      color: colors[idx],
-    }));
-
-    console.log(
-      "Filtered data:",
-      filtered.map((s) => ({
-        name: s.name,
-        points: s.data.length,
-        firstPoint: s.data[0],
-        lastPoint: s.data[s.data.length - 1],
-      }))
-    );
-
-    return filtered;
-  }, [limitedSeries, limitedCategories, colors, visibleRange]);
-
-  // Prepare minimap series (same format as main chart)
-  const minimapSeries = useMemo(() => {
-    return limitedSeries.map((data, idx) => ({
-      name: limitedCategories[idx],
-      data: data,
-      color: colors[idx],
-    }));
-  }, [limitedSeries, limitedCategories, colors]);
-
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  return (
-    <ComponentPreview
-      title="Time Series with Minimap"
-      description="Navigate large datasets with an interactive minimap and range selector"
-      code={`import { BarChart, ChartBrushSelector, MinimapContainer } from "@plexusui/components/charts";
-
-const [visibleRange, setVisibleRange] = useState({
-  start: oneYearAgo,
-  end: now
-});
-
-<MinimapContainer
-  gap={20}
-  minimap={
-    <div className="relative chart-minimap-container" style={{ height: 100, width: '100%' }}>
-      <BarChart.Root
-        series={minimapSeries}
-        xAxis={{ domain: [fullTimeRange.min, fullTimeRange.max] }}
-        yAxis={{ domain: "auto" }}
-        width="100%"
-        height={100}
-        grouped={true}
-        barWidth={2}
-      >
-        <BarChart.Canvas showGrid={false} />
-        <ChartBrushSelector
-          start={visibleRange.start}
-          end={visibleRange.end}
-          fullMin={fullTimeRange.min}
-          fullMax={fullTimeRange.max}
-          onSelectionChange={(start, end) => setVisibleRange({ start, end })}
-          color="#3b82f6"
-          containerClass="chart-minimap-container"
-        />
-      </BarChart.Root>
-    </div>
-  }
->
-  <BarChart
-    series={displayedSeries}
-    grouped={true}
-    showTooltip
-    width="100%"
-    height={400}
-    barWidth={8}
-    xAxis={{
-      label: "Date",
-      formatter: (val) => formatDate(val)
-    }}
-  />
-</MinimapContainer>`}
-      preview={
-        <div className="w-full">
-          <MinimapContainer
-            gap={20}
-            minimap={
-              <SimpleMinimap
-                series={minimapSeries}
-                fullRange={fullTimeRange}
-                visibleRange={visibleRange}
-                onRangeChange={(start, end) => setVisibleRange({ start, end })}
-              />
-            }
-          >
-            <BarChart
-              series={displayedSeries}
-              grouped={true}
-              showTooltip
-              width="100%"
-              height={400}
-              barWidth={8}
-              xAxis={{
-                label: "Date",
-                domain: [visibleRange.start, visibleRange.end] as [number, number],
-                formatter: (val: number) => formatDate(val),
-              }}
-              yAxis={{ label: "Messages" }}
-            />
-          </MinimapContainer>
-        </div>
-      }
-    />
-  );
-}
-
 // ============================================================================
 // API Reference
 // ============================================================================
@@ -942,7 +600,6 @@ export function BarChartExamples() {
         <HorizontalBarChart />
         <StackedBarChart />
         <HighDensityTimeSeriesBarChart />
-        <TimeSeriesWithMinimap />
         <PrimitiveBarChart />
       </div>
 

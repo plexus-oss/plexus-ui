@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Command } from "commander";
-import { readFileSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
 import { add } from "./commands/add.js";
 import { diff } from "./commands/diff.js";
 import { init } from "./commands/init.js";
@@ -30,6 +30,7 @@ program
   .command("add")
   .description("Add components to your project")
   .argument("[components...]", "components to add")
+  .option("--overwrite", "overwrite existing files without prompting")
   .action(add);
 
 program

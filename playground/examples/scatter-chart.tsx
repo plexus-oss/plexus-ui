@@ -63,6 +63,7 @@ function MultiSeriesScatterChart() {
   yAxis={{ label: "Y Axis" }}
   showGrid
   showTooltip
+  showLegend
 />`}
       preview={
         <div className="w-full h-[400px]">
@@ -96,6 +97,7 @@ function MultiSeriesScatterChart() {
             height={400}
             showGrid={true}
             showTooltip
+            showLegend
           />
         </div>
       }

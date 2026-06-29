@@ -1,6 +1,6 @@
 {
   "name": "@plexus/ui-aerospace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "GPU-accelerated component library for real-time visualization of physical systems - robotics, medical devices, aerospace, and industrial IoT",
   "workspaces": [

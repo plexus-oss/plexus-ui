@@ -3,6 +3,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { formatDateTimeInZone, getBrowserTimezone } from "../lib/timezone";
 import {
   ChartRoot,
   createWebGLRenderer,
@@ -176,6 +177,8 @@ interface DataGridContextType {
   sortable: boolean;
   scrollTop: number;
   setScrollTop: (value: number) => void;
+  scrollbarWidth: number;
+  setScrollbarWidth: (value: number) => void;
   hoveredRow: number | null;
   setHoveredRow: (index: number | null) => void;
   sortState: SortState;
@@ -282,6 +285,69 @@ interface DataGridRendererProps extends RendererProps {
   alternateRows: boolean;
   scrollTop: number;
   hoveredRow: number | null;
+  /** Vertical scrollbar width (device px) — kept out of the column layout so GPU lines align with DOM */
+  scrollbarWidth: number;
+}
+
+/** Minimum width an auto-sized column may shrink to before the grid scrolls horizontally */
+const MIN_COLUMN_WIDTH = 48;
+
+/**
+ * Number of extra rows rendered above and below the visible window.
+ *
+ * Virtual scrolling only mounts rows in view, but mounting them exactly at the
+ * viewport edge makes them pop in one frame late — most visibly when scrolling
+ * up, where a row appears at the very top with a perceptible flash. Rendering a
+ * few rows beyond each edge means the next row is already painted before it
+ * scrolls into view, so motion looks continuous. Applied identically to the DOM
+ * body and the GPU geometry so backgrounds and cells stay in lockstep.
+ */
+const ROW_OVERSCAN = 4;
+
+/**
+ * Resolve a pixel width for every column so the grid fills `availableWidth` responsively.
+ *
+ * - Columns with an explicit `width` are honored.
+ * - Remaining space is shared equally among auto (width-less) columns.
+ * - If every column is fixed and they under-fill the container, they are scaled
+ *   proportionally to fill it (flex-grow behavior) so `width="100%"` has no dead gap.
+ * - If fixed columns overflow the container, widths are honored as-is (horizontal scroll).
+ *
+ * Scale-invariant: callers pass CSS px (DOM) or device px (GPU) and get matching units back,
+ * so header, body, and GPU grid lines stay pixel-aligned.
+ */
+function computeColumnWidths(columns: Column[], availableWidth: number): number[] {
+  if (columns.length === 0) return [];
+
+  // A column gets an even share of the space unless it has an explicit POSITIVE
+  // width — width 0 / negative isn't a usable fixed width (treating it as one
+  // collapses the column to a zero-width sliver).
+  const isFixed = (col: Column) => col.width != null && col.width > 0;
+  const autoCols = columns.filter((col) => !isFixed(col));
+  const fixedTotal = columns.reduce(
+    (sum, col) => sum + (isFixed(col) ? (col.width as number) : 0),
+    0
+  );
+
+  if (autoCols.length > 0) {
+    const remaining = availableWidth - fixedTotal;
+    const autoWidth = Math.max(MIN_COLUMN_WIDTH, remaining / autoCols.length);
+    return columns.map((col) => (isFixed(col) ? (col.width as number) : autoWidth));
+  }
+
+  // Every column is fixed: scale them proportionally so the grid exactly fills its
+  // container (grow when there's slack, shrink when it's tight) and stays responsive.
+  // Bail out to the authored widths — letting the grid scroll horizontally — only when
+  // shrinking would push a column below a readable minimum.
+  if (fixedTotal > 0) {
+    const scale = availableWidth / fixedTotal;
+    const scaled = columns.map((col) => (col.width as number) * scale);
+    if (scaled.every((w) => w >= MIN_COLUMN_WIDTH)) {
+      return scaled;
+    }
+  }
+
+  return columns.map((col) => col.width as number);
 }
 
 /**
@@ -300,6 +366,7 @@ function createGridGeometry(props: DataGridRendererProps) {
     width,
     height,
     margin,
+    scrollbarWidth,
   } = props;
 
   const positions: number[] = [];
@@ -317,9 +384,9 @@ function createGridGeometry(props: DataGridRendererProps) {
   const hoverBg = hexToRgb(isDark ? "#27272a" : "#f4f4f5");
   const borderColor = hexToRgb(isDark ? "#27272a" : "#e4e4e7");
 
-  // Calculate column widths
-  const totalWidth = innerWidth;
-  const colWidths = columns.map((col) => col.width || totalWidth / columns.length);
+  // Calculate column widths against the area visible beside the scrollbar so GPU
+  // separators line up with the DOM cells (which use the same available width).
+  const colWidths = computeColumnWidths(columns, innerWidth - scrollbarWidth);
 
   let yOffset = 0;
 
@@ -348,14 +415,15 @@ function createGridGeometry(props: DataGridRendererProps) {
     yOffset += headerHeight;
   }
 
-  // Calculate visible rows for virtual scrolling
-  const startRow = Math.floor(scrollTop / rowHeight);
-  const visibleRowCount = Math.ceil((innerHeight - yOffset) / rowHeight) + 1;
+  // Calculate visible rows for virtual scrolling (with overscan so rows are
+  // already drawn before they scroll into view — see ROW_OVERSCAN).
+  const startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - ROW_OVERSCAN);
+  const visibleRowCount = Math.ceil((innerHeight - yOffset) / rowHeight) + 1 + ROW_OVERSCAN * 2;
   const endRow = Math.min(data.length, startRow + visibleRowCount);
 
   // Draw visible row backgrounds
   for (let i = startRow; i < endRow; i++) {
-    const y1 = yOffset + i * rowHeight - scrollTop + (showHeader ? headerHeight : 0);
+    const y1 = yOffset + i * rowHeight - scrollTop;
     const y2 = y1 + rowHeight;
 
     // Skip if row is not visible
@@ -638,6 +706,7 @@ function Root({
   onSort,
 }: RootProps) {
   const [scrollTop, setScrollTop] = useState(0);
+  const [scrollbarWidth, setScrollbarWidth] = useState(0);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
   const [sortState, setSortState] = useState<SortState>({
     columnId: null,
@@ -693,6 +762,8 @@ function Root({
     sortable,
     scrollTop,
     setScrollTop,
+    scrollbarWidth,
+    setScrollbarWidth,
     hoveredRow,
     setHoveredRow,
     sortState,
@@ -827,6 +898,7 @@ function Canvas() {
         alternateRows: ctx.alternateRows,
         scrollTop: ctx.scrollTop * dpr,
         hoveredRow: ctx.hoveredRow,
+        scrollbarWidth: ctx.scrollbarWidth * dpr,
         width: ctx.width * dpr,
         height: ctx.height * dpr,
         margin: {
@@ -863,6 +935,7 @@ function Canvas() {
     ctx.headerHeight,
     ctx.showHeader,
     ctx.alternateRows,
+    ctx.scrollbarWidth,
     ctx.width,
     ctx.height,
     ctx.margin,
@@ -893,8 +966,7 @@ function Header() {
 
   if (!ctx.showHeader) return null;
 
-  const totalWidth = ctx.width;
-  const colWidths = ctx.columns.map((col) => col.width || totalWidth / ctx.columns.length);
+  const colWidths = computeColumnWidths(ctx.columns, ctx.width - ctx.scrollbarWidth);
 
   const handleSort = (columnId: string) => {
     if (!ctx.sortable) return;
@@ -922,7 +994,7 @@ function Header() {
 
   return (
     <div
-      className="absolute top-0 left-0 right-0 flex items-center z-10"
+      className="absolute top-0 left-0 right-0 flex items-center z-10 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800"
       style={{ height: ctx.headerHeight }}
     >
       {ctx.columns.map((col, i) => {
@@ -970,18 +1042,33 @@ function Body() {
   const ctx = useDataGrid();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const totalWidth = ctx.width;
-  const colWidths = ctx.columns.map((col) => col.width || totalWidth / ctx.columns.length);
+  const colWidths = computeColumnWidths(ctx.columns, ctx.width - ctx.scrollbarWidth);
 
   const yOffset = ctx.showHeader ? ctx.headerHeight : 0;
   const visibleHeight = ctx.height - yOffset;
 
-  // Calculate visible rows for virtual scrolling
-  const startRow = Math.floor(ctx.scrollTop / ctx.rowHeight);
+  // Calculate visible rows for virtual scrolling (with overscan above and below
+  // so rows don't pop in at the viewport edge on scroll — see ROW_OVERSCAN).
+  const startRow = Math.max(0, Math.floor(ctx.scrollTop / ctx.rowHeight) - ROW_OVERSCAN);
   const endRow = Math.min(
     ctx.sortedData.length,
-    Math.ceil((ctx.scrollTop + visibleHeight) / ctx.rowHeight) + 1
+    Math.ceil((ctx.scrollTop + visibleHeight) / ctx.rowHeight) + 1 + ROW_OVERSCAN
   );
+
+  // Measure scrollbar width and report to context so Header stays aligned
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const measure = () => {
+      const sw = el.offsetWidth - el.clientWidth;
+      ctx.setScrollbarWidth(sw);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+    // biome-ignore lint/correctness/useExhaustiveDependencies: re-measure only when row count changes
+  }, [ctx.sortedData.length]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     ctx.setScrollTop(e.currentTarget.scrollTop);
@@ -996,7 +1083,7 @@ function Body() {
       return value.toLocaleString();
     }
     if (col.type === "timestamp" && typeof value === "number") {
-      return new Date(value).toLocaleString();
+      return formatDateTimeInZone(new Date(value), getBrowserTimezone());
     }
 
     return String(value);

@@ -3,7 +3,6 @@
 import chalk from "chalk";
 import fs from "fs-extra";
 import ora from "ora";
-import * as path from "path";
 import prompts from "prompts";
 import {
   getComponent,
@@ -14,11 +13,13 @@ import {
   registry,
 } from "../registry/index.js";
 import {
+  detectPackageManager,
   detectProjectStructure,
   downloadFile,
   getComponentDestinationPath,
   getComponentSubdirectory,
   getInstalledDependencies,
+  installCommand,
   installDependencies,
   loadConfig,
   transformImports,
@@ -37,7 +38,7 @@ async function getFileContent(filePath: string): Promise<string> {
   }
 }
 
-export async function add(components: string[]) {
+export async function add(components: string[], options: { overwrite?: boolean } = {}) {
   const availableComponents = Object.keys(registry);
 
   // If no components specified, prompt
@@ -109,10 +110,46 @@ export async function add(components: string[]) {
 
     components.forEach(collectDependencies);
 
+    // Detect files that already exist so we don't silently clobber local edits
+    let overwrite = options.overwrite ?? false;
+    if (!overwrite) {
+      const existing: string[] = [];
+      for (const component of allComponentsToInstall) {
+        const config = component === "lib" ? getLib() : getComponent(component);
+        if (!config) continue;
+        for (const filePath of config.files) {
+          const destPath = getComponentDestinationPath(filePath, componentsDir);
+          if (await fs.pathExists(destPath)) existing.push(destPath);
+        }
+      }
+
+      if (existing.length > 0) {
+        spinner.stop();
+        console.log(
+          chalk.yellow(`\n⚠️  ${existing.length} file(s) already exist and may contain your edits:`)
+        );
+        existing.slice(0, 10).forEach((f) => console.log(chalk.dim(`   ${f}`)));
+        if (existing.length > 10) {
+          console.log(chalk.dim(`   …and ${existing.length - 10} more`));
+        }
+
+        const res = await prompts({
+          type: "confirm",
+          name: "value",
+          message: "Overwrite existing files?",
+          initial: false,
+        });
+        overwrite = res.value === true;
+        spinner.start("Downloading components...");
+      }
+    }
+
     spinner.text = "Downloading components...";
 
     // Download and save each component
     const installedComponents: string[] = [];
+    const skippedComponents: string[] = [];
+    const skippedFiles: string[] = [];
     const failedComponents: Array<{ name: string; error: string }> = [];
 
     for (const component of allComponentsToInstall) {
@@ -124,14 +161,21 @@ export async function add(components: string[]) {
 
       try {
         // Download or copy all files for this component
+        let wroteAny = false;
         for (const filePath of config.files) {
+          // Determine destination path; skip files that already exist unless
+          // the user opted in to overwriting (protects local edits).
+          const destPath = getComponentDestinationPath(filePath, componentsDir);
+          if (!overwrite && (await fs.pathExists(destPath))) {
+            skippedFiles.push(destPath);
+            continue;
+          }
+
           let content = await getFileContent(filePath);
 
           // Transform imports to use configured aliases for better tree-shaking
           content = transformImports(content, plexusConfig);
 
-          // Determine destination path and ensure subdirectory exists
-          const destPath = getComponentDestinationPath(filePath, componentsDir);
           const subdir = getComponentSubdirectory(filePath, componentsDir);
 
           if (subdir) {
@@ -139,8 +183,13 @@ export async function add(components: string[]) {
           }
 
           await fs.outputFile(destPath, content);
+          wroteAny = true;
         }
-        installedComponents.push(component);
+        // Only report as "added" if we actually wrote a file. A component whose
+        // files all already exist (no --overwrite) is left untouched, so don't
+        // claim it was installed/updated — that would mask a stale component.
+        if (wroteAny) installedComponents.push(component);
+        else skippedComponents.push(component);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Unknown error";
         failedComponents.push({ name: component, error: errorMessage });
@@ -149,7 +198,16 @@ export async function add(components: string[]) {
 
     // Show completion status
     if (failedComponents.length === 0) {
-      spinner.succeed(chalk.green("Components added!"));
+      if (installedComponents.length > 0) {
+        spinner.succeed(chalk.green("Components added!"));
+      } else {
+        // Nothing was written — every requested file already existed.
+        spinner.info(
+          chalk.yellow(
+            "Nothing to do — all files already exist. Re-run with --overwrite to update."
+          )
+        );
+      }
     } else if (installedComponents.length > 0) {
       spinner.warn(chalk.yellow("Some components failed to install"));
     } else {
@@ -169,14 +227,18 @@ export async function add(components: string[]) {
     });
 
     // Show results
-    console.log(chalk.dim("\n✨ Components copied to:"));
-    console.log(chalk.cyan(`   ${componentsDir}\n`));
+    if (installedComponents.length > 0) {
+      console.log(chalk.dim("\n✨ Components copied to:"));
+      console.log(chalk.cyan(`   ${componentsDir}\n`));
 
-    console.log(chalk.dim("📦 Installed components:"));
-    installedComponents.forEach((c) => {
-      const config = getComponent(c);
-      console.log(chalk.cyan(`   • ${c}${config?.description ? ` - ${config.description}` : ""}`));
-    });
+      console.log(chalk.dim("📦 Installed components:"));
+      installedComponents.forEach((c) => {
+        const config = getComponent(c);
+        console.log(
+          chalk.cyan(`   • ${c}${config?.description ? ` - ${config.description}` : ""}`)
+        );
+      });
+    }
 
     if (failedComponents.length > 0) {
       console.log(chalk.red("\n❌ Failed components:"));
@@ -188,6 +250,18 @@ export async function add(components: string[]) {
       if (installedComponents.length === 0) {
         process.exit(1);
       }
+    }
+
+    if (skippedFiles.length > 0) {
+      console.log(
+        chalk.yellow(`\n⏭️  Skipped ${skippedFiles.length} existing file(s) to preserve your edits.`)
+      );
+      if (skippedComponents.length > 0) {
+        console.log(
+          chalk.dim(`   Left unchanged (already present): ${skippedComponents.join(", ")}`)
+        );
+      }
+      console.log(chalk.dim("   Re-run with --overwrite to replace them with upstream."));
     }
 
     // Check what's already installed
@@ -219,16 +293,17 @@ export async function add(components: string[]) {
           console.log(chalk.green("\n✅ Dependencies installed successfully!"));
         } catch (error) {
           console.log(
-            chalk.yellow("\n⚠️  " + (error instanceof Error ? error.message : "Unknown error"))
+            chalk.yellow(`\n⚠️  ${error instanceof Error ? error.message : "Unknown error"}`)
           );
         }
       } else {
+        const pm = detectPackageManager();
         console.log(chalk.dim("\n📦 To install dependencies manually, run:"));
         if (missingDeps.length > 0) {
-          console.log(chalk.cyan(`   npm install ${missingDeps.join(" ")}`));
+          console.log(chalk.cyan(`   ${installCommand(pm, missingDeps, false)}`));
         }
         if (missingDevDeps.length > 0) {
-          console.log(chalk.cyan(`   npm install -D ${missingDevDeps.join(" ")}`));
+          console.log(chalk.cyan(`   ${installCommand(pm, missingDevDeps, true)}`));
         }
       }
     } else {

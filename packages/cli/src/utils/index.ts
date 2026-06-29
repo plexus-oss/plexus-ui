@@ -12,6 +12,11 @@ export {
 export { downloadFile } from "./http.js";
 export { transformImports } from "./import-transformer.js";
 export {
+  detectPackageManager,
+  installCommand,
+  type PackageManager,
+} from "./package-manager.js";
+export {
   detectProjectStructure,
   type ProjectStructure,
 } from "./project-structure.js";

@@ -1,10 +1,59 @@
+import { execSync } from "node:child_process";
+import * as path from "node:path";
 import chalk from "chalk";
-import { execSync } from "child_process";
 import fs from "fs-extra";
 import ora from "ora";
-import * as path from "path";
 import prompts from "prompts";
-import { detectProjectStructure, type PlexusConfig } from "../utils/index.js";
+import {
+  detectPackageManager,
+  detectProjectStructure,
+  installCommand,
+  type PlexusConfig,
+} from "../utils/index.js";
+
+/**
+ * Ensure the project's tsconfig.json maps the `@/*` alias the generated
+ * config (and the component imports) rely on. No-op for JS projects.
+ */
+async function ensureTsconfigPaths(cwd: string, hasSrc: boolean) {
+  const tsconfigPath = path.join(cwd, "tsconfig.json");
+  if (!(await fs.pathExists(tsconfigPath))) return;
+
+  const target = hasSrc ? "./src/*" : "./*";
+
+  // biome-ignore lint/suspicious/noExplicitAny: tsconfig is free-form JSON
+  let tsconfig: any;
+  try {
+    tsconfig = await fs.readJson(tsconfigPath);
+  } catch {
+    console.log(chalk.yellow("\n⚠️  Could not parse tsconfig.json automatically."));
+    console.log(chalk.dim(`   Map "@/*" → "${target}" so component imports resolve.`));
+    return;
+  }
+
+  if (!tsconfig.compilerOptions) tsconfig.compilerOptions = {};
+  const compilerOptions = tsconfig.compilerOptions;
+  if (!compilerOptions.paths) compilerOptions.paths = {};
+  const paths = compilerOptions.paths;
+  if (paths["@/*"]) return; // already wired
+
+  const { addPath } = await prompts({
+    type: "confirm",
+    name: "addPath",
+    message: `Add "@/*" → "${target}" path alias to tsconfig.json?`,
+    initial: true,
+  });
+
+  if (!addPath) {
+    console.log(chalk.dim(`   Skipped. Add it manually so "@/..." imports resolve.`));
+    return;
+  }
+
+  if (compilerOptions.baseUrl === undefined) compilerOptions.baseUrl = ".";
+  paths["@/*"] = [target];
+  await fs.writeJson(tsconfigPath, tsconfig, { spaces: 2 });
+  console.log(chalk.green('\n✅ Added "@/*" path alias to tsconfig.json'));
+}
 
 export async function init() {
   const cwd = process.cwd();
@@ -64,13 +113,17 @@ export async function init() {
   const spinner = ora("Creating configuration...").start();
 
   try {
-    // Compute aliases based on user input
+    // Compute aliases based on user input.
+    // The `@/*` alias already maps into `src/` on src-based projects, so a
+    // leading `src/` must be stripped — otherwise we'd emit `@/src/components`
+    // which resolves to `src/src/components`.
     const componentsPath = config.componentsPath;
     const plexusuiPath = path.join(componentsPath, "plexusui");
     const hasAtSymbol = componentsPath.startsWith("@/");
 
-    const componentsAlias = hasAtSymbol ? componentsPath : `@/${componentsPath}`;
-    const utilsAlias = structure.hasSrc ? "@/lib/utils" : "@/lib/utils";
+    const aliasBase = componentsPath.replace(/^src\//, "");
+    const componentsAlias = hasAtSymbol ? componentsPath : `@/${aliasBase}`;
+    const utilsAlias = "@/lib/utils";
     const plexusuiAlias = `${componentsAlias}/plexusui`;
 
     // Create config object
@@ -102,6 +155,15 @@ export async function init() {
     console.log(chalk.dim("\n📝 Config saved to:"));
     console.log(chalk.cyan(`   ${configPath}\n`));
 
+    // Wire the `@/*` path alias the generated config depends on
+    if (config.typescript) {
+      await ensureTsconfigPaths(cwd, structure.hasSrc);
+    }
+
+    const pm = detectPackageManager(cwd);
+    const runtimeDeps = ["react", "react-dom", "three", "@react-three/fiber", "@react-three/drei"];
+    const devDeps = ["@types/react", "@types/react-dom", "@types/three"];
+
     // Ask about installing dependencies
     const { installDeps } = await prompts({
       type: "confirm",
@@ -113,24 +175,24 @@ export async function init() {
     if (!installDeps) {
       console.log(chalk.yellow("\nSkipped dependency installation."));
       console.log(chalk.dim("You'll need to install these manually:\n"));
-      console.log("  npm install react react-dom three @react-three/fiber @react-three/drei");
-      console.log("  npm install -D @types/react @types/react-dom @types/three\n");
+      console.log(`  ${installCommand(pm, runtimeDeps, false)}`);
+      console.log(`  ${installCommand(pm, devDeps, true)}\n`);
       console.log(chalk.green("✅ Configuration complete!"));
       console.log(chalk.dim("\nAdd components with:"));
       console.log(chalk.cyan("  npx plexus-ui add line-chart"));
       return;
     }
 
-    const depSpinner = ora("Installing peer dependencies...").start();
+    const depSpinner = ora(`Installing peer dependencies with ${pm}...`).start();
 
     // Install runtime dependencies (React + Three.js ecosystem)
-    execSync("npm install react react-dom three @react-three/fiber @react-three/drei", {
+    execSync(installCommand(pm, runtimeDeps, false), {
       stdio: "pipe",
       cwd,
     });
 
     // Install dev dependencies
-    execSync("npm install -D @types/react @types/react-dom @types/three", {
+    execSync(installCommand(pm, devDeps, true), {
       stdio: "pipe",
       cwd,
     });

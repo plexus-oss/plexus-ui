@@ -1,4 +1,4 @@
-import * as path from "path";
+import * as path from "node:path";
 
 /**
  * Determine the destination path for a component file based on its source path.
@@ -6,7 +6,7 @@ import * as path from "path";
  */
 export function getComponentDestinationPath(
   sourceFilePath: string,
-  baseComponentsDir: string
+  baseComponentsDir: string,
 ): string {
   const filename = path.basename(sourceFilePath);
   const dirname = path.dirname(sourceFilePath);
@@ -27,6 +27,10 @@ export function getComponentDestinationPath(
 
   // Chart components - preserve charts/ structure
   if (dirname.includes("charts")) {
+    // Handle geometry subdirectory (shared GPU geometry generators)
+    if (dirname.includes("geometry")) {
+      return path.join(baseComponentsDir, "charts", "geometry", filename);
+    }
     return path.join(baseComponentsDir, "charts", filename);
   }
 
@@ -40,7 +44,7 @@ export function getComponentDestinationPath(
  */
 export function getComponentSubdirectory(
   sourceFilePath: string,
-  baseComponentsDir: string
+  baseComponentsDir: string,
 ): string | null {
   const dirname = path.dirname(sourceFilePath);
 
@@ -56,6 +60,9 @@ export function getComponentSubdirectory(
   }
 
   if (dirname.includes("charts")) {
+    if (dirname.includes("geometry")) {
+      return path.join(baseComponentsDir, "charts", "geometry");
+    }
     return path.join(baseComponentsDir, "charts");
   }
 

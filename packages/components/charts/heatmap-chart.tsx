@@ -15,10 +15,6 @@ import {
   type WebGPURenderer,
 } from "./base-chart";
 
-// ============================================================================
-// Heatmap Chart Types
-// ============================================================================
-
 export interface DataPoint {
   x: number | string;
   y: number | string;
@@ -51,13 +47,12 @@ export interface HeatmapChartProps {
   showTooltip?: boolean;
   className?: string;
   preferWebGPU?: boolean;
-  colorScale?: (value: number) => string; // Function to map value to color
+  colorScale?: (value: number) => string;
   minValue?: number;
   maxValue?: number;
   cellGap?: number;
 }
 
-// Extended context for heatmap chart
 interface HeatmapChartContextType {
   data: DataPoint[];
   xCategories: (string | number)[];
@@ -169,7 +164,6 @@ interface HeatmapRendererProps extends RendererProps {
   cellGap: number;
 }
 
-// Helper function to create heatmap geometry
 function createHeatmapGeometry(
   data: DataPoint[],
   xScale: (x: number) => number,
@@ -192,8 +186,7 @@ function createHeatmapGeometry(
 
     if (xIdx === undefined || yIdx === undefined) continue;
 
-    // xScale/yScale return the center position, so offset by half cell size
-    // to position the cell correctly
+    // xScale/yScale return cell centers, so offset by half a cell to place the corner.
     const centerX = xScale(xIdx);
     const centerY = yScale(yIdx);
     const x = centerX - cellWidth / 2;
@@ -201,15 +194,14 @@ function createHeatmapGeometry(
     const w = cellWidth - cellGap;
     const h = cellHeight - cellGap;
 
-    // Normalize value to [0, 1]
     const normalizedValue = (point.value - minValue) / (maxValue - minValue);
     const colorStr = colorScale(normalizedValue);
     const rgb = hexToRgb(colorStr);
 
-    // Two triangles for rectangle
+    // Two triangles per rectangle.
     positions.push(x, y, x + w, y, x, y + h, x + w, y, x + w, y + h, x, y + h);
 
-    // Same color for all 6 vertices
+    // Same color for all 6 vertices.
     for (let i = 0; i < 6; i++) {
       colors.push(...rgb, 1.0);
     }
@@ -218,7 +210,6 @@ function createHeatmapGeometry(
   return { positions, colors };
 }
 
-// Factory function to create WebGL heatmap renderer
 function createWebGLHeatmapRenderer(
   canvas: HTMLCanvasElement
 ): WebGLRenderer<HeatmapRendererProps> {
@@ -309,7 +300,6 @@ function createWebGLHeatmapRenderer(
   return renderer;
 }
 
-// Factory function to create WebGPU heatmap renderer
 function createWebGPUHeatmapRenderer(
   canvas: HTMLCanvasElement,
   device: GPUDevice
@@ -470,7 +460,7 @@ function createWebGPUHeatmapRenderer(
       const positionData = new Float32Array(geometry.positions);
       const colorData = new Float32Array(geometry.colors);
 
-      // Create or resize position buffer with 1.5x growth factor
+      // Grow buffers by 1.5x when they overflow to amortize reallocations.
       if (
         !heatmapBuffers.position ||
         heatmapBuffers.position.size < positionData.byteLength * 1.5
@@ -482,7 +472,6 @@ function createWebGPUHeatmapRenderer(
         });
       }
 
-      // Create or resize color buffer with 1.5x growth factor
       if (!heatmapBuffers.color || heatmapBuffers.color.size < colorData.byteLength * 1.5) {
         heatmapBuffers.color?.destroy();
         heatmapBuffers.color = device.createBuffer({
@@ -491,7 +480,6 @@ function createWebGPUHeatmapRenderer(
         });
       }
 
-      // Write data to buffers
       device.queue.writeBuffer(heatmapBuffers.position, 0, positionData);
       device.queue.writeBuffer(heatmapBuffers.color, 0, colorData);
 
@@ -505,7 +493,6 @@ function createWebGPUHeatmapRenderer(
     },
     onDestroy: () => {
       uniformBuffer.destroy();
-      // Clean up heatmap buffers
       heatmapBuffers.position?.destroy();
       heatmapBuffers.color?.destroy();
     },
@@ -513,10 +500,6 @@ function createWebGPUHeatmapRenderer(
 
   return renderer;
 }
-
-// ============================================================================
-// Heatmap Chart Components
-// ============================================================================
 
 function Root({
   data,
@@ -565,7 +548,7 @@ function Root({
   className?: string;
   children?: React.ReactNode;
 }) {
-  // Extract categories - preserve insertion order for strings, sort numbers
+  // Sort numeric categories; preserve insertion order for strings or mixed types.
   const xCategories = useMemo(() => {
     if (xAxis.categories) return xAxis.categories;
     const cats = new Set<string | number>();
@@ -573,11 +556,9 @@ function Root({
       cats.add(d.x);
     });
     const arr = Array.from(cats);
-    // Only sort if all categories are numbers
     if (arr.length > 0 && arr.every((c) => typeof c === "number")) {
       return arr.sort((a, b) => (a as number) - (b as number));
     }
-    // For strings or mixed types, preserve insertion order
     return arr;
   }, [data, xAxis.categories]);
 
@@ -588,15 +569,12 @@ function Root({
       cats.add(d.y);
     });
     const arr = Array.from(cats);
-    // Only sort if all categories are numbers
     if (arr.length > 0 && arr.every((c) => typeof c === "number")) {
       return arr.sort((a, b) => (a as number) - (b as number));
     }
-    // For strings or mixed types, preserve insertion order
     return arr;
   }, [data, yAxis.categories]);
 
-  // Create category mappings
   const xCategoryMap = useMemo(() => {
     const map = new Map<string | number, number>();
     xCategories.forEach((cat, idx) => {
@@ -613,7 +591,6 @@ function Root({
     return map;
   }, [yCategories]);
 
-  // Calculate value range
   const calculatedMinValue = useMemo(() => {
     if (minValue !== undefined) return minValue;
     return Math.min(...data.map((d) => d.value));
@@ -624,18 +601,15 @@ function Root({
     return Math.max(...data.map((d) => d.value));
   }, [data, maxValue]);
 
-  // Domains for rendering
   const xDomain: [number, number] = [-0.5, xCategories.length - 0.5];
   const yDomain: [number, number] = [-0.5, yCategories.length - 0.5];
 
-  // Generate ticks at integer positions for categorical data
   const xTicksArray = useMemo(() => {
-    // Show all X category ticks (usually not too many)
     return Array.from({ length: xCategories.length }, (_, i) => i);
   }, [xCategories.length]);
 
   const yTicksArray = useMemo(() => {
-    // For Y axis, if there are many categories (>10), show a subset for readability
+    // Thin out Y ticks past 10 categories so labels stay readable.
     if (yCategories.length > 10) {
       const step = Math.ceil(yCategories.length / 8);
       return Array.from(
@@ -646,7 +620,6 @@ function Root({
     return Array.from({ length: yCategories.length }, (_, i) => i);
   }, [yCategories.length]);
 
-  // Formatters to map indices to category labels
   const xFormatter = useMemo(() => {
     return (
       xAxis.formatter ||
@@ -712,7 +685,6 @@ function Canvas() {
   >(null);
   const mountedRef = useRef(true);
 
-  // Initialize renderer once
   useEffect(() => {
     const canvas = ctx.canvasRef.current;
     if (!canvas) return;
@@ -723,42 +695,38 @@ function Canvas() {
     canvas.style.width = `${ctx.width}px`;
     canvas.style.height = `${ctx.height}px`;
 
+    // Wait until ChartRoot has chosen a render mode (and, for WebGPU, resolved
+    // its device). We consume ctx.gpuDevice — the single device owned and torn
+    // down by ChartRoot — instead of acquiring a second one that would leak.
+    if (!ctx.renderMode) return;
+
     mountedRef.current = true;
 
-    async function initRenderer() {
+    function initRenderer() {
       if (!canvas) return;
 
-      try {
-        if (ctx.preferWebGPU && "gpu" in navigator) {
-          const adapter = await navigator.gpu?.requestAdapter();
-          if (adapter) {
-            const device = await adapter.requestDevice();
-            const renderer = createWebGPUHeatmapRenderer(canvas, device);
-
-            if (!mountedRef.current) {
-              renderer.destroy();
-              return;
-            }
-
-            rendererRef.current = renderer;
-            ctx.setRenderMode("webgpu");
+      if (ctx.renderMode === "webgpu") {
+        if (!ctx.gpuDevice) return; // re-runs once the device resolves
+        try {
+          const renderer = createWebGPUHeatmapRenderer(canvas, ctx.gpuDevice);
+          if (!mountedRef.current) {
+            renderer.destroy();
             return;
           }
+          rendererRef.current = renderer;
+          return;
+        } catch (error) {
+          console.warn("WebGPU failed, falling back to WebGL:", error);
         }
-      } catch (error) {
-        console.warn("WebGPU failed, falling back to WebGL:", error);
       }
 
       try {
         const renderer = createWebGLHeatmapRenderer(canvas);
-
         if (!mountedRef.current) {
           renderer.destroy();
           return;
         }
-
         rendererRef.current = renderer;
-        ctx.setRenderMode("webgl");
       } catch (error) {
         console.error("WebGL failed:", error);
       }
@@ -773,16 +741,25 @@ function Canvas() {
         rendererRef.current = null;
       }
     };
+    // Resize is handled by the render effect below; recreate the renderer only
+    // on mode/device change, not on every dimension change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only initialize once
+  }, [ctx.canvasRef, ctx.renderMode, ctx.gpuDevice]);
 
-  // Update render when data changes
   useEffect(() => {
     const canvas = ctx.canvasRef.current;
     const renderer = rendererRef.current;
     if (!canvas || !renderer) return;
 
     const dpr = ctx.devicePixelRatio;
+
+    // Keep the canvas backing store in sync with the current size — the init
+    // effect only sizes it once, so without this the heatmap would not respond
+    // to container resizes.
+    canvas.width = ctx.width * dpr;
+    canvas.height = ctx.height * dpr;
+    canvas.style.width = `${ctx.width}px`;
+    canvas.style.height = `${ctx.height}px`;
 
     const renderProps = {
       canvas,
@@ -810,6 +787,10 @@ function Canvas() {
 
     renderer.render(renderProps);
   }, [
+    // renderMode/gpuDevice: re-run once the init effect has created the renderer
+    // (it reads a ref, so it needs an explicit signal that the renderer exists).
+    ctx.renderMode,
+    ctx.gpuDevice,
     ctx.canvasRef,
     ctx.data,
     ctx.xDomain,
@@ -855,7 +836,6 @@ function Grid() {
 
     const dpr = ctx.devicePixelRatio;
 
-    // Get theme-aware colors
     const isDark = document.documentElement.classList.contains("dark");
     const gridColor = isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)";
 
@@ -867,7 +847,6 @@ function Grid() {
     const innerWidth = ctx.width - ctx.margin.left - ctx.margin.right;
     const innerHeight = ctx.height - ctx.margin.top - ctx.margin.bottom;
 
-    // Draw vertical grid lines (one for each x category)
     for (let i = 0; i <= ctx.xCategories.length; i++) {
       const x = ctx.margin.left + (i / ctx.xCategories.length) * innerWidth;
       context.beginPath();
@@ -876,7 +855,6 @@ function Grid() {
       context.stroke();
     }
 
-    // Draw horizontal grid lines (one for each y category)
     for (let i = 0; i <= ctx.yCategories.length; i++) {
       const y = ctx.margin.top + (i / ctx.yCategories.length) * innerHeight;
       context.beginPath();
@@ -938,11 +916,9 @@ function Tooltip() {
     const xCat = ctx.xCategories[xIdx];
     const yCat = ctx.yCategories[yIdx];
 
-    // Find the data point
     const dataPoint = ctx.data.find((d) => d.x === xCat && d.y === yCat);
 
     if (dataPoint) {
-      // Only update if the hovered cell has changed
       const cellChanged =
         !ctx.hoveredPoint ||
         !ctx.tooltipData ||
@@ -980,10 +956,6 @@ function Tooltip() {
 
   return <ChartTooltip onHover={handleHover} />;
 }
-
-// ============================================================================
-// Composed Component (Simple API)
-// ============================================================================
 
 export function HeatmapChart({
   data,
@@ -1034,10 +1006,6 @@ export function HeatmapChart({
     </Root>
   );
 }
-
-// ============================================================================
-// Primitive API (Composable)
-// ============================================================================
 
 /**
  * HeatmapChart Primitives - Composable chart components for custom layouts

@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { useBaseChart } from "./base-chart";
+import { useChartPanZoom } from "./use-chart-pan-zoom";
 
 // ============================================================================
 // Interaction Types
@@ -579,266 +580,121 @@ export function ChartCrosshair({
 }
 
 // ============================================================================
-// Brush Selector Component (Draggable Timeline Selection)
+// Pan / Zoom Component (drives the chart viewport)
 // ============================================================================
 
-export interface ChartBrushSelectorProps {
-  /**
-   * Start of selection range (in data coordinates)
-   */
-  start: number;
+type PanZoomModifier = "ctrl" | "meta" | "ctrlOrMeta" | "none";
 
+export interface ChartPanZoomProps {
+  /** Master enable switch. Default true. */
+  enabled?: boolean;
+  /** Modifier required for wheel-zoom. Default "ctrlOrMeta" (cmd/ctrl + scroll). */
+  zoomKey?: PanZoomModifier;
+  /** Modifier required for drag-pan. Default "ctrlOrMeta" (cmd/ctrl + drag). */
+  panKey?: PanZoomModifier;
+  /** Allow shift+drag to rubber-band a sub-range to zoom into. Default true. */
+  enableBrush?: boolean;
+  /** Smallest zoom-in span, in x data units. */
+  minSpan?: number;
+  /** Largest span, in x data units. */
+  maxSpan?: number;
   /**
-   * End of selection range (in data coordinates)
+   * Hard clamp — the view can never travel outside these x bounds. Omit (the
+   * default) to allow zooming/panning past the rendered data.
    */
-  end: number;
-
-  /**
-   * Minimum value of full data range
-   */
-  fullMin: number;
-
-  /**
-   * Maximum value of full data range
-   */
-  fullMax: number;
-
-  /**
-   * Callback when selection changes
-   */
-  onSelectionChange: (newStart: number, newEnd: number) => void;
-
-  /**
-   * Format function for displaying dates
-   */
-  formatLabel?: (value: number) => string;
-
-  /**
-   * Selection color
-   */
-  color?: string;
-
-  /**
-   * Container class name (used for calculating positions)
-   */
-  containerClass?: string;
+  bounds?: [number, number];
+  /** Show a "Reset" button while the view is panned/zoomed. Default true. */
+  showReset?: boolean;
+  /** Color of the brush rectangle. Default matches the brush selection blue. */
+  brushColor?: string;
 }
 
 /**
- * Draggable brush selector for timeline navigation
- * Similar to video editing crop tools
+ * Pan & zoom the x-axis viewport. Drop it inside any `*.Root` and it works —
+ * it reads the chart's domain from context and writes the new viewport back via
+ * `setXDomain`, which is the feedback path the base chart exposes for this.
+ *
+ * Gestures (matching the frontend): cmd/ctrl + wheel = zoom (cursor-centered),
+ * cmd/ctrl + drag = pan, shift+drag = brush-zoom. The view is NOT clamped to the
+ * data extent by default, so you can zoom/pan past the rendered data.
  *
  * @example
  * ```tsx
- * <BarChart.Root series={minimapSeries}>
- *   <BarChart.Canvas />
- *   <ChartBrushSelector
- *     start={visibleRange.start}
- *     end={visibleRange.end}
- *     fullMin={fullTimeRange.min}
- *     fullMax={fullTimeRange.max}
- *     onSelectionChange={(start, end) =>
- *       setBrushSelection({ xStart: start, xEnd: end })
- *     }
- *   />
- * </BarChart.Root>
+ * <LineChart.Root series={data} xDomain={[0, 100]}>
+ *   <LineChart.Canvas />
+ *   <LineChart.Axes />
+ *   <ChartPanZoom />
+ * </LineChart.Root>
  * ```
  */
-export function ChartBrushSelector({
-  start,
-  end,
-  fullMin,
-  fullMax,
-  onSelectionChange,
-  formatLabel,
-  color = "#3b82f6",
-  containerClass = "minimap-container",
-}: ChartBrushSelectorProps) {
-  const [isDragging, setIsDragging] = React.useState(false);
-  const [isResizingLeft, setIsResizingLeft] = React.useState(false);
-  const [isResizingRight, setIsResizingRight] = React.useState(false);
-  const [dragStart, setDragStart] = React.useState({
-    x: 0,
-    startVal: 0,
-    endVal: 0,
+export function ChartPanZoom({
+  enabled = true,
+  zoomKey = "ctrlOrMeta",
+  panKey = "ctrlOrMeta",
+  enableBrush = true,
+  minSpan,
+  maxSpan,
+  bounds,
+  showReset = true,
+  brushColor = "#3b82f6",
+}: ChartPanZoomProps) {
+  const ctx = useBaseChart();
+
+  const { brushRect, reset } = useChartPanZoom({
+    containerRef: ctx.containerRef,
+    margin: { left: ctx.margin.left, right: ctx.margin.right },
+    // Controlled by the chart context — pan/zoom writes straight back to it.
+    domain: ctx.xDomain,
+    // No default clamp — allow zooming/panning outside the rendered data.
+    bounds,
+    minSpan,
+    maxSpan,
+    enabled,
+    zoomKey,
+    panKey,
+    enableBrush,
+    onPreview: (d) => ctx.setXDomain(d),
+    onCommit: (d) => ctx.setXDomain(d),
+    onInteractionStart: () => {
+      // Pan/zoom and the tooltip fight over the same pixels — drop any hover.
+      ctx.setHoveredPoint(null);
+      ctx.setTooltipData(null);
+    },
   });
 
-  const rangeWidth = fullMax - fullMin;
-  const leftPercent = ((start - fullMin) / rangeWidth) * 100;
-  const widthPercent = ((end - start) / rangeWidth) * 100;
-
-  // Debug logging
-  React.useEffect(() => {
-    console.log("ChartBrushSelector render:", {
-      start,
-      end,
-      fullMin,
-      fullMax,
-      leftPercent: leftPercent.toFixed(2) + "%",
-      widthPercent: widthPercent.toFixed(2) + "%",
-      containerClass,
-      selectionBox: {
-        leftPosition: leftPercent + "%",
-        width: widthPercent + "%",
-      },
-    });
-  }, [start, end, fullMin, fullMax, leftPercent, widthPercent, containerClass]);
-
-  const handleMouseDown = (e: React.MouseEvent, type: "left" | "right" | "body") => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (type === "left") {
-      setIsResizingLeft(true);
-    } else if (type === "right") {
-      setIsResizingRight(true);
-    } else {
-      setIsDragging(true);
-    }
-
-    setDragStart({ x: e.clientX, startVal: start, endVal: end });
-  };
-
-  React.useEffect(() => {
-    if (!isDragging && !isResizingLeft && !isResizingRight) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const container = document.querySelector(`.${containerClass}`) as HTMLElement;
-      if (!container) return;
-
-      const rect = container.getBoundingClientRect();
-      const containerWidth = rect.width;
-      const deltaX = e.clientX - dragStart.x;
-      const deltaValue = (deltaX / containerWidth) * rangeWidth;
-
-      if (isDragging) {
-        // Move entire selection
-        const duration = dragStart.endVal - dragStart.startVal;
-        let newStart = dragStart.startVal + deltaValue;
-        let newEnd = dragStart.endVal + deltaValue;
-
-        // Clamp to bounds
-        if (newStart < fullMin) {
-          newStart = fullMin;
-          newEnd = fullMin + duration;
-        }
-        if (newEnd > fullMax) {
-          newEnd = fullMax;
-          newStart = fullMax - duration;
-        }
-
-        onSelectionChange(newStart, newEnd);
-      } else if (isResizingLeft) {
-        // Resize from left
-        let newStart = dragStart.startVal + deltaValue;
-        newStart = Math.max(fullMin, Math.min(newStart, dragStart.endVal - rangeWidth * 0.01)); // Min 1% width
-        onSelectionChange(newStart, dragStart.endVal);
-      } else if (isResizingRight) {
-        // Resize from right
-        let newEnd = dragStart.endVal + deltaValue;
-        newEnd = Math.min(fullMax, Math.max(newEnd, dragStart.startVal + rangeWidth * 0.01)); // Min 1% width
-        onSelectionChange(dragStart.startVal, newEnd);
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      setIsResizingLeft(false);
-      setIsResizingRight(false);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [
-    isDragging,
-    isResizingLeft,
-    isResizingRight,
-    dragStart,
-    rangeWidth,
-    fullMin,
-    fullMax,
-    onSelectionChange,
-    containerClass,
-  ]);
+  const handleReset = React.useCallback(() => {
+    reset();
+    ctx.resetDomains();
+  }, [reset, ctx]);
 
   return (
-    <div className="absolute inset-0" style={{ zIndex: 100 }}>
-      {/* Dimmed overlay on left */}
-      <div
-        className="absolute inset-y-0 bg-black/50"
-        style={{ left: 0, width: `${leftPercent}%`, pointerEvents: "none" }}
-      />
-
-      {/* Dimmed overlay on right */}
-      <div
-        className="absolute inset-y-0 bg-black/50"
-        style={{
-          left: `${leftPercent + widthPercent}%`,
-          right: 0,
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* Selection box */}
-      <div
-        className={`absolute inset-y-0 group ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-        style={{
-          left: `${leftPercent}%`,
-          width: `${widthPercent}%`,
-          zIndex: 101,
-          pointerEvents: "auto",
-        }}
-        onMouseDown={(e) => handleMouseDown(e, "body")}
-      >
-        {/* Border with rounded corners */}
+    <>
+      {/* Active brush-zoom rectangle */}
+      {brushRect && (
         <div
-          className="absolute inset-0 border-4 rounded-lg pointer-events-none"
-          style={{ borderColor: color }}
+          className="absolute pointer-events-none"
+          style={{
+            left: brushRect.left,
+            width: brushRect.width,
+            top: ctx.margin.top,
+            height: ctx.height - ctx.margin.top - ctx.margin.bottom,
+            backgroundColor: brushColor,
+            opacity: 0.15,
+            border: `1px solid ${brushColor}`,
+          }}
         />
+      )}
 
-        {/* Left handle */}
-        <div
-          className="absolute left-0 inset-y-0 w-8 cursor-ew-resize flex items-center justify-center"
-          onMouseDown={(e) => handleMouseDown(e, "left")}
-          style={{
-            zIndex: 103,
-            pointerEvents: "auto",
-            marginLeft: "-16px", // Half of w-8 to center on edge
-          }}
+      {showReset && ctx.isDomainOverridden && (
+        <button
+          type="button"
+          onClick={handleReset}
+          className="absolute top-2 right-2 z-50 px-2 py-1 text-xs font-medium rounded-md bg-white/90 dark:bg-zinc-900/90 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 shadow-sm hover:bg-white dark:hover:bg-zinc-800 transition-colors"
         >
-          {/* White circular handle */}
-          <div
-            className="w-6 h-12 bg-white rounded-full border-2 border-gray-400 hover:scale-110 transition-transform shadow-lg"
-            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}
-          />
-        </div>
-
-        {/* Right handle */}
-        <div
-          className="absolute right-0 inset-y-0 w-8 cursor-ew-resize flex items-center justify-center"
-          onMouseDown={(e) => handleMouseDown(e, "right")}
-          style={{
-            zIndex: 103,
-            pointerEvents: "auto",
-            marginRight: "-16px", // Half of w-8 to center on edge
-          }}
-        >
-          {/* White circular handle */}
-          <div
-            className="w-6 h-12 bg-white rounded-full border-2 border-gray-400 hover:scale-110 transition-transform shadow-lg"
-            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}
-          />
-        </div>
-
-        {/* Center position indicator (vertical dashed line) */}
-        <div className="absolute left-1/2 inset-y-0 w-px border-l-2 border-dashed border-white/40 pointer-events-none" />
-      </div>
-    </div>
+          Reset zoom
+        </button>
+      )}
+    </>
   );
 }
 
@@ -864,6 +720,16 @@ export interface ChartInteractionsProps
    * Enable crosshair
    */
   enableCrosshair?: boolean;
+
+  /**
+   * Enable pan/zoom of the x-axis viewport (wheel = zoom, drag = pan).
+   */
+  enablePanZoom?: boolean;
+
+  /**
+   * Pan/zoom options (forwarded to ChartPanZoom).
+   */
+  panZoom?: ChartPanZoomProps;
 }
 
 /**
@@ -890,6 +756,8 @@ export function ChartInteractions({
   enableClick = false,
   enableBrush = false,
   enableCrosshair = false,
+  enablePanZoom = false,
+  panZoom,
   onClick,
   onDoubleClick,
   showClickMarker,
@@ -914,6 +782,7 @@ export function ChartInteractions({
 }: ChartInteractionsProps) {
   return (
     <>
+      {enablePanZoom && <ChartPanZoom {...panZoom} />}
       {enableClick && (
         <ChartClick
           onClick={onClick}

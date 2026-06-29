@@ -1,6 +1,6 @@
 {
   "name": "plexus-ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "CLI for adding GPU-accelerated Plexus UI components to your project - built for robotics, medical devices, aerospace, and industrial IoT",
   "type": "module",
   "bin": {
@@ -13,7 +13,7 @@
     "node": ">=20.10.0"
   },
   "scripts": {
-    "build": "cp ../components/registry.json src/registry/ && tsc",
+    "build": "cp ../components/registry.json src/registry/ && tsc && cp ../components/registry.json dist/registry/registry.json",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
