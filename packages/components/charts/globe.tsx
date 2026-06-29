@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: <group>/<points> are react-three-fiber primitives (3D scene objects), not DOM elements, so DOM a11y rules don't apply. */
 /**
  * Globe — a premium, framework-generic 3D Earth + satellite visualisation.
  *

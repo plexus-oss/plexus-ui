@@ -1,10 +1,7 @@
 "use client";
 
 import { GroundTrack2D } from "@plexusui/components/charts/ground-track-2d";
-import {
-  type ApiProp,
-  ApiReferenceTable,
-} from "@/components/api-reference-table";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { ComponentPreview } from "@/components/component-preview";
 
 // ============================================================================
@@ -17,10 +14,8 @@ const SATELLITES = [
     label: "ISS",
     color: "#e0457b",
     tle: {
-      line1:
-        "1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9000",
-      line2:
-        "2 25544  51.6400 208.9163 0006317  69.9862 290.1962 15.49380999000009",
+      line1: "1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9000",
+      line2: "2 25544  51.6400 208.9163 0006317  69.9862 290.1962 15.49380999000009",
     },
   },
   {
@@ -28,10 +23,8 @@ const SATELLITES = [
     label: "NOAA-19",
     color: "#5b9bd5",
     tle: {
-      line1:
-        "1 33591U 09005A   24001.50000000  .00000098  00000-0  790-4 0  9991",
-      line2:
-        "2 33591  99.1890  45.2000 0014000 100.0000 260.2000 14.12500000  9990",
+      line1: "1 33591U 09005A   24001.50000000  .00000098  00000-0  790-4 0  9991",
+      line2: "2 33591  99.1890  45.2000 0014000 100.0000 260.2000 14.12500000  9990",
     },
   },
   {
@@ -39,10 +32,8 @@ const SATELLITES = [
     label: "MetOp-B",
     color: "#cbd5e1",
     tle: {
-      line1:
-        "1 38771U 12049A   24001.50000000  .00000020  00000-0  18000-4 0  9990",
-      line2:
-        "2 38771  98.7000  10.0000 0001500  90.0000 270.0000 14.21500000  9991",
+      line1: "1 38771U 12049A   24001.50000000  .00000020  00000-0  18000-4 0  9990",
+      line2: "2 38771  98.7000  10.0000 0001500  90.0000 270.0000 14.21500000  9991",
     },
   },
 ];
@@ -121,8 +112,7 @@ const props: ApiProp[] = [
     name: "satellites",
     type: "GroundTrack2DSatellite[]",
     default: "[]",
-    description:
-      "Satellites to track (TLE per object). Each may toggle its track/footprint.",
+    description: "Satellites to track (TLE per object). Each may toggle its track/footprint.",
   },
   {
     name: "groundStations",
@@ -134,8 +124,7 @@ const props: ApiProp[] = [
     name: "mapImageUrl",
     type: "string",
     default: "undefined",
-    description:
-      "Equirectangular (2:1) basemap image. Omit for a plain dark map.",
+    description: "Equirectangular (2:1) basemap image. Omit for a plain dark map.",
   },
   {
     name: "showGraticule",
@@ -187,8 +176,8 @@ export function GroundTrack2DExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            Equirectangular satellite tracking map with SGP4 ground tracks,
-            coverage footprints, and a live day/night terminator.
+            Equirectangular satellite tracking map with SGP4 ground tracks, coverage footprints, and
+            a live day/night terminator.
           </p>
         </div>
         <div className="space-y-4">

@@ -26,17 +26,9 @@
       "displayName": "Charts Base",
       "type": "infrastructure",
       "description": "Shared base chart runtime: responsive root, axes, tooltip, and a shared WebGPU device provider. Required by every chart.",
-      "files": [
-        "charts/base-chart.tsx",
-        "charts/gpu-device-provider.tsx",
-        "lib/visibility.ts"
-      ],
-      "dependencies": [
-        "react-error-boundary"
-      ],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
+      "files": ["charts/base-chart.tsx", "charts/gpu-device-provider.tsx", "lib/visibility.ts"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
       "registryDependencies": [],
       "category": "charts",
       "tier": "free"
@@ -63,12 +55,8 @@
         "charts/annotations.tsx"
       ],
       "dependencies": [],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
-      "registryDependencies": [
-        "charts-base"
-      ],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": ["charts-base"],
       "category": "charts",
       "tier": "free"
     },
@@ -80,30 +68,13 @@
       "complexity": "simple",
       "maturity": "stable",
       "description": "Multi-series line chart with GPU-accelerated rendering. Handles 100k+ points smoothly. Use cases: Time-series trends, sensor data plotting, stock prices, temperature curves, signal analysis.",
-      "files": [
-        "charts/line-chart.tsx"
-      ],
-      "dependencies": [
-        "react-error-boundary"
-      ],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
-      "registryDependencies": [
-        "charts-core"
-      ],
+      "files": ["charts/line-chart.tsx"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": ["charts-core"],
       "tier": "free",
-      "tags": [
-        "real-time",
-        "streaming",
-        "telemetry",
-        "time-series",
-        "gpu-accelerated"
-      ],
-      "relatedComponents": [
-        "area-chart",
-        "scatter-chart"
-      ],
+      "tags": ["real-time", "streaming", "telemetry", "time-series", "gpu-accelerated"],
+      "relatedComponents": ["area-chart", "scatter-chart"],
       "performance": {
         "dataPointsSupported": 100000,
         "targetFPS": 60,
@@ -124,28 +95,13 @@
       "complexity": "simple",
       "maturity": "beta",
       "description": "Scatter plot with variable point sizes and colors. Use cases: Correlation analysis, cluster visualization, quality control plots, particle distribution, measurement scatter.",
-      "files": [
-        "charts/scatter-chart.tsx"
-      ],
-      "dependencies": [
-        "react-error-boundary"
-      ],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
-      "registryDependencies": [
-        "charts-core"
-      ],
+      "files": ["charts/scatter-chart.tsx"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": ["charts-core"],
       "tier": "free",
-      "tags": [
-        "correlation",
-        "clustering",
-        "statistical",
-        "gpu-accelerated"
-      ],
-      "relatedComponents": [
-        "line-chart"
-      ],
+      "tags": ["correlation", "clustering", "statistical", "gpu-accelerated"],
+      "relatedComponents": ["line-chart"],
       "performance": {
         "dataPointsSupported": 50000,
         "targetFPS": 60,
@@ -165,25 +121,12 @@
       "complexity": "simple",
       "maturity": "beta",
       "description": "Bar chart with vertical/horizontal orientation. Supports grouped and stacked layouts. Use cases: Categorical comparisons, test results, production counts, event frequencies.",
-      "files": [
-        "charts/bar-chart.tsx"
-      ],
-      "dependencies": [
-        "react-error-boundary"
-      ],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
-      "registryDependencies": [
-        "charts-core"
-      ],
+      "files": ["charts/bar-chart.tsx"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": ["charts-core"],
       "tier": "free",
-      "tags": [
-        "categorical",
-        "comparison",
-        "grouped",
-        "stacked"
-      ],
+      "tags": ["categorical", "comparison", "grouped", "stacked"],
       "relatedComponents": [],
       "performance": {
         "dataPointsSupported": 10000,
@@ -204,28 +147,13 @@
       "complexity": "simple",
       "maturity": "beta",
       "description": "Area chart with filled regions and stacked support. Use cases: Cumulative data, bandwidth usage, memory consumption, power draw over time, filled envelopes.",
-      "files": [
-        "charts/area-chart.tsx"
-      ],
-      "dependencies": [
-        "react-error-boundary"
-      ],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
-      "registryDependencies": [
-        "charts-core"
-      ],
+      "files": ["charts/area-chart.tsx"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": ["charts-core"],
       "tier": "free",
-      "tags": [
-        "time-series",
-        "cumulative",
-        "stacked",
-        "real-time"
-      ],
-      "relatedComponents": [
-        "line-chart"
-      ],
+      "tags": ["time-series", "cumulative", "stacked", "real-time"],
+      "relatedComponents": ["line-chart"],
       "performance": {
         "dataPointsSupported": 100000,
         "targetFPS": 60,
@@ -245,30 +173,13 @@
       "complexity": "moderate",
       "maturity": "beta",
       "description": "2D grid heatmap with custom color scales. Use cases: Thermal imaging (FLIR cameras), correlation matrices, pressure sensor arrays, PCB thermal maps, tactile sensor grids, seat occupancy.",
-      "files": [
-        "charts/heatmap-chart.tsx",
-        "lib/color-scales.ts"
-      ],
-      "dependencies": [
-        "react-error-boundary"
-      ],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
-      "registryDependencies": [
-        "charts-base"
-      ],
+      "files": ["charts/heatmap-chart.tsx", "lib/color-scales.ts"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": ["charts-base"],
       "tier": "free",
-      "tags": [
-        "thermal",
-        "grid",
-        "2d-data",
-        "color-mapping",
-        "sensor-array"
-      ],
-      "relatedComponents": [
-        "point-cloud-viewer"
-      ],
+      "tags": ["thermal", "grid", "2d-data", "color-mapping", "sensor-array"],
+      "relatedComponents": ["point-cloud-viewer"],
       "performance": {
         "dataPointsSupported": 100000,
         "targetFPS": 60,
@@ -288,28 +199,13 @@
       "complexity": "moderate",
       "maturity": "beta",
       "description": "Radar-style polar display with rotating sweep. Use cases: Air traffic control displays, weather radar visualization, sonar plots, 360° sensor sweeps, LIDAR scans.",
-      "files": [
-        "charts/radar-chart.tsx"
-      ],
-      "dependencies": [
-        "react-error-boundary"
-      ],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
-      "registryDependencies": [
-        "charts-base"
-      ],
+      "files": ["charts/radar-chart.tsx"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": ["charts-base"],
       "tier": "free",
-      "tags": [
-        "polar",
-        "radar",
-        "sweep",
-        "360-degree"
-      ],
-      "relatedComponents": [
-        "point-cloud-viewer"
-      ],
+      "tags": ["polar", "radar", "sweep", "360-degree"],
+      "relatedComponents": ["point-cloud-viewer"],
       "performance": {
         "dataPointsSupported": 10000,
         "targetFPS": 60,
@@ -330,29 +226,13 @@
       "complexity": "moderate",
       "maturity": "stable",
       "description": "High-performance data table with virtual scrolling (10k+ rows). Use cases: Telemetry logs, test results tables, event logs, CSV data viewers, database query results, flight data records.",
-      "files": [
-        "charts/data-grid.tsx",
-        "lib/timezone.ts"
-      ],
-      "dependencies": [
-        "react-error-boundary"
-      ],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
-      "registryDependencies": [
-        "charts-base"
-      ],
+      "files": ["charts/data-grid.tsx", "lib/timezone.ts"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": ["charts-base"],
       "tier": "free",
-      "tags": [
-        "table",
-        "virtual-scrolling",
-        "large-datasets",
-        "logs"
-      ],
-      "relatedComponents": [
-        "gantt"
-      ],
+      "tags": ["table", "virtual-scrolling", "large-datasets", "logs"],
+      "relatedComponents": ["gantt"],
       "performance": {
         "dataPointsSupported": 10000,
         "targetFPS": 60,
@@ -373,26 +253,12 @@
       "complexity": "advanced",
       "maturity": "stable",
       "description": "Artificial horizon showing pitch and roll orientation. Use cases: Aircraft displays, drone ground stations, spacecraft attitude, surgical robot orientation, gimbal stabilization, ROV navigation.",
-      "files": [
-        "charts/attitude-indicator.tsx"
-      ],
-      "dependencies": [
-        "react-error-boundary"
-      ],
-      "devDependencies": [
-        "@webgpu/types"
-      ],
-      "registryDependencies": [
-        "charts-base"
-      ],
+      "files": ["charts/attitude-indicator.tsx"],
+      "dependencies": ["react-error-boundary"],
+      "devDependencies": ["@webgpu/types"],
+      "registryDependencies": ["charts-base"],
       "tier": "free",
-      "tags": [
-        "aviation",
-        "orientation",
-        "pitch",
-        "roll",
-        "artificial-horizon"
-      ],
+      "tags": ["aviation", "orientation", "pitch", "roll", "artificial-horizon"],
       "performance": {
         "dataPointsSupported": 3,
         "targetFPS": 60,
@@ -414,26 +280,13 @@
       "complexity": "moderate",
       "maturity": "stable",
       "description": "Interactive timeline visualization with infinite scroll, zoom controls, and live time tracking. Use cases: Ground station contact schedules, mission planning, flight operations, maintenance windows, spacecraft subsystem timelines.",
-      "files": [
-        "charts/gantt.tsx",
-        "lib/timezone.ts",
-        "lib/utils.ts"
-      ],
-      "dependencies": [
-        "date-fns"
-      ],
+      "files": ["charts/gantt.tsx", "lib/timezone.ts", "lib/utils.ts"],
+      "dependencies": ["date-fns"],
       "devDependencies": [],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "timeline",
-        "scheduling",
-        "planning",
-        "temporal"
-      ],
-      "relatedComponents": [
-        "data-grid"
-      ],
+      "tags": ["timeline", "scheduling", "planning", "temporal"],
+      "relatedComponents": ["data-grid"],
       "performance": {
         "dataPointsSupported": 1000,
         "targetFPS": 60,
@@ -455,29 +308,13 @@
       "complexity": "advanced",
       "maturity": "stable",
       "description": "Interactive 3D model viewer with vertex color overlay support for stress/thermal/fatigue visualization. Supports STL, OBJ, GLTF, and GLB formats. Use cases: FEA stress analysis, thermal imaging overlays, CAD model inspection, structural health monitoring, component fatigue visualization.",
-      "files": [
-        "charts/3d-model-viewer.tsx",
-        "lib/color-scales.ts"
-      ],
-      "dependencies": [
-        "three",
-        "@react-three/fiber",
-        "@react-three/drei",
-        "@types/three"
-      ],
+      "files": ["charts/3d-model-viewer.tsx", "lib/color-scales.ts"],
+      "dependencies": ["three", "@react-three/fiber", "@react-three/drei", "@types/three"],
       "devDependencies": [],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "3d",
-        "model",
-        "visualization",
-        "cad",
-        "stress-analysis"
-      ],
-      "relatedComponents": [
-        "point-cloud-viewer"
-      ],
+      "tags": ["3d", "model", "visualization", "cad", "stress-analysis"],
+      "relatedComponents": ["point-cloud-viewer"],
       "performance": {
         "dataPointsSupported": 1000000,
         "targetFPS": 60,
@@ -504,26 +341,12 @@
         "lib/color-scales.ts",
         "lib/point-cloud-octree.ts"
       ],
-      "dependencies": [
-        "three",
-        "@react-three/fiber",
-        "@react-three/drei",
-        "@types/three"
-      ],
+      "dependencies": ["three", "@react-three/fiber", "@react-three/drei", "@types/three"],
       "devDependencies": [],
       "registryDependencies": [],
       "tier": "free",
-      "tags": [
-        "3d",
-        "point-cloud",
-        "lidar",
-        "photogrammetry",
-        "visualization"
-      ],
-      "relatedComponents": [
-        "3d-model-viewer",
-        "heatmap-chart"
-      ],
+      "tags": ["3d", "point-cloud", "lidar", "photogrammetry", "visualization"],
+      "relatedComponents": ["3d-model-viewer", "heatmap-chart"],
       "performance": {
         "dataPointsSupported": 10000000,
         "targetFPS": 60,
@@ -543,33 +366,15 @@
       "displayName": "Ground Track (2D)",
       "type": "component",
       "description": "Equirectangular world map for satellite tracking: SGP4 ground tracks, coverage footprints, a live day/night terminator, pass time-ticks, ground stations, and a lat/lng graticule over a satellite basemap. Pure SVG.",
-      "files": [
-        "charts/ground-track-2d.tsx",
-        "lib/orbital.ts",
-        "lib/utils.ts"
-      ],
-      "dependencies": [
-        "satellite.js"
-      ],
+      "files": ["charts/ground-track-2d.tsx", "lib/orbital.ts", "lib/utils.ts"],
+      "dependencies": ["satellite.js"],
       "devDependencies": [],
       "registryDependencies": [],
       "category": "instruments",
       "tier": "free",
-      "textures": [
-        "/textures/earth/day.webp"
-      ],
-      "tags": [
-        "map",
-        "ground-track",
-        "satellite",
-        "sgp4",
-        "tracking",
-        "equirectangular"
-      ],
-      "relatedComponents": [
-        "globe",
-        "ephemeris-card"
-      ],
+      "textures": ["/textures/earth/day.webp"],
+      "tags": ["map", "ground-track", "satellite", "sgp4", "tracking", "equirectangular"],
+      "relatedComponents": ["globe", "ephemeris-card"],
       "aerospaceUseCases": [
         "Ground-track display",
         "Coverage/footprint analysis",
@@ -583,31 +388,14 @@
       "displayName": "Polar Sky Plot",
       "type": "component",
       "description": "Azimuth/elevation sky chart for satellite passes: a radar-style polar plot with the current or next pass arc, UTC time-ticks, a live position marker, and an Az/El/LOS readout. SGP4 look-angles. Pure SVG.",
-      "files": [
-        "charts/polar-sky-plot.tsx",
-        "lib/orbital.ts",
-        "lib/utils.ts"
-      ],
-      "dependencies": [
-        "satellite.js"
-      ],
+      "files": ["charts/polar-sky-plot.tsx", "lib/orbital.ts", "lib/utils.ts"],
+      "dependencies": ["satellite.js"],
       "devDependencies": [],
       "registryDependencies": [],
       "category": "instruments",
       "tier": "free",
-      "tags": [
-        "satellite",
-        "sky-plot",
-        "azimuth",
-        "elevation",
-        "pass",
-        "tracking"
-      ],
-      "relatedComponents": [
-        "ground-track-2d",
-        "globe",
-        "ephemeris-card"
-      ],
+      "tags": ["satellite", "sky-plot", "azimuth", "elevation", "pass", "tracking"],
+      "relatedComponents": ["ground-track-2d", "globe", "ephemeris-card"],
       "aerospaceUseCases": [
         "Pass visualisation",
         "Antenna pointing",
@@ -627,15 +415,8 @@
         "lib/orbital.ts",
         "lib/orbital-worker.ts"
       ],
-      "dependencies": [
-        "three",
-        "@react-three/fiber",
-        "@react-three/drei",
-        "satellite.js"
-      ],
-      "devDependencies": [
-        "@types/three"
-      ],
+      "dependencies": ["three", "@react-three/fiber", "@react-three/drei", "satellite.js"],
+      "devDependencies": ["@types/three"],
       "registryDependencies": [],
       "category": "3d",
       "tier": "free",
@@ -645,18 +426,8 @@
         "/textures/earth/clouds.webp",
         "/textures/earth/bump.webp"
       ],
-      "tags": [
-        "3d",
-        "globe",
-        "satellite",
-        "sgp4",
-        "orbital",
-        "constellation"
-      ],
-      "relatedComponents": [
-        "ephemeris-card",
-        "point-cloud-viewer"
-      ],
+      "tags": ["3d", "globe", "satellite", "sgp4", "orbital", "constellation"],
+      "relatedComponents": ["ephemeris-card", "point-cloud-viewer"],
       "performance": {
         "dataPointsSupported": 10000,
         "targetFPS": 60,
@@ -675,28 +446,14 @@
       "displayName": "Ephemeris Card",
       "type": "component",
       "description": "SatCat-style readout of classical orbital elements derived from a TLE.",
-      "files": [
-        "charts/ephemeris-card.tsx",
-        "lib/orbital.ts",
-        "lib/utils.ts"
-      ],
-      "dependencies": [
-        "satellite.js"
-      ],
+      "files": ["charts/ephemeris-card.tsx", "lib/orbital.ts", "lib/utils.ts"],
+      "dependencies": ["satellite.js"],
       "devDependencies": [],
       "registryDependencies": [],
       "category": "instruments",
       "tier": "free",
-      "tags": [
-        "orbital",
-        "ephemeris",
-        "tle",
-        "satellite",
-        "readout"
-      ],
-      "relatedComponents": [
-        "globe"
-      ],
+      "tags": ["orbital", "ephemeris", "tle", "satellite", "readout"],
+      "relatedComponents": ["globe"],
       "performance": {
         "dataPointsSupported": 1,
         "targetFPS": 60,

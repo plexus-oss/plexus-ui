@@ -30,9 +30,7 @@ export type WorkerInMessage =
   | { type: "init"; satellites: WorkerSat[] }
   | { type: "propagate"; time: number };
 
-export type WorkerOutMessage =
-  | { type: "ready" }
-  | { type: "positions"; buffer: Float32Array };
+export type WorkerOutMessage = { type: "ready" } | { type: "positions"; buffer: Float32Array };
 
 let satrecs: (SatRec | null)[] = [];
 let count = 0;
@@ -81,7 +79,7 @@ self.onmessage = (e: MessageEvent<WorkerInMessage>) => {
     const copy = new Float32Array(buffer);
     (self as unknown as Worker).postMessage(
       { type: "positions", buffer: copy } satisfies WorkerOutMessage,
-      [copy.buffer] as Transferable[],
+      [copy.buffer] as Transferable[]
     );
   }
 };

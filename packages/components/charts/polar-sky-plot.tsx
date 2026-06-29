@@ -104,9 +104,7 @@ function fmtDur(ms: number): string {
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
   const sec = s % 60;
-  return h > 0
-    ? `${h}:${String(m).padStart(2, "0")}`
-    : `${m}:${String(sec).padStart(2, "0")}`;
+  return h > 0 ? `${h}:${String(m).padStart(2, "0")}` : `${m}:${String(sec).padStart(2, "0")}`;
 }
 
 interface PassSample {
@@ -126,7 +124,7 @@ function findPass(
   backMin: number,
   forwardMin: number,
   minEl: number,
-  stepSec = 20,
+  stepSec = 20
 ): PassSample[] | null {
   const start = centerMs - backMin * 60_000;
   const end = centerMs + forwardMin * 60_000;
@@ -147,9 +145,7 @@ function findPass(
   if (cur) runs.push(cur);
   if (runs.length === 0) return null;
 
-  const containing = runs.find(
-    (r) => r[0].t <= centerMs && r[r.length - 1].t >= centerMs,
-  );
+  const containing = runs.find((r) => r[0].t <= centerMs && r[r.length - 1].t >= centerMs);
   if (containing) return containing;
   return runs.find((r) => r[0].t >= centerMs) ?? null;
 }
@@ -196,27 +192,13 @@ export function PolarSkyPlot({
       const color = sat.color ?? DEFAULT_SAT_COLOR;
       let run: PassSample[] | null = null;
       try {
-        run = findPass(
-          sat.tle,
-          observer,
-          center,
-          searchBackMin,
-          searchForwardMin,
-          minElevation,
-        );
+        run = findPass(sat.tle, observer, center, searchBackMin, searchForwardMin, minElevation);
       } catch {
         run = null;
       }
       return { sat, color, run };
     });
-  }, [
-    satellites,
-    observer,
-    coarse,
-    searchBackMin,
-    searchForwardMin,
-    minElevation,
-  ]);
+  }, [satellites, observer, coarse, searchBackMin, searchForwardMin, minElevation]);
 
   // Live marker / readout: current look-angle per satellite at `now`.
   const live = useMemo(() => {
@@ -253,10 +235,7 @@ export function PolarSkyPlot({
   return (
     <div
       ref={containerRef}
-      className={cn(
-        "relative rounded-xl border border-white/10 p-4 shadow-sm",
-        className,
-      )}
+      className={cn("relative rounded-xl border border-white/10 p-4 shadow-sm", className)}
       style={style}
     >
       <div className="relative w-full" style={{ aspectRatio: "1 / 1" }}>
@@ -266,58 +245,17 @@ export function PolarSkyPlot({
           role="img"
           aria-label="Azimuth/elevation sky plot"
         >
-          <circle
-            cx={CX}
-            cy={CY}
-            r={R}
-            fill="#000000"
-            stroke="#8aa0c0"
-            strokeOpacity={0.22}
-          />
-          <g
-            stroke="#8aa0c0"
-            strokeOpacity={0.15}
-            fill="none"
-            vectorEffect="non-scaling-stroke"
-          >
+          <circle cx={CX} cy={CY} r={R} fill="#000000" stroke="#8aa0c0" strokeOpacity={0.22} />
+          <g stroke="#8aa0c0" strokeOpacity={0.15} fill="none" vectorEffect="non-scaling-stroke">
             {rings.map((el) => (
-              <circle
-                key={el}
-                cx={CX}
-                cy={CY}
-                r={((90 - el) / 90) * R}
-                strokeWidth={0.6}
-              />
+              <circle key={el} cx={CX} cy={CY} r={((90 - el) / 90) * R} strokeWidth={0.6} />
             ))}
             {Array.from({ length: 12 }, (_, i) => i * 30).map((az) => {
               const [x, y] = project(az, 0);
-              return (
-                <line
-                  key={az}
-                  x1={CX}
-                  y1={CY}
-                  x2={x}
-                  y2={y}
-                  strokeWidth={0.4}
-                />
-              );
+              return <line key={az} x1={CX} y1={CY} x2={x} y2={y} strokeWidth={0.4} />;
             })}
-            <line
-              x1={CX - R}
-              y1={CY}
-              x2={CX + R}
-              y2={CY}
-              strokeWidth={0.6}
-              strokeOpacity={0.26}
-            />
-            <line
-              x1={CX}
-              y1={CY - R}
-              x2={CX}
-              y2={CY + R}
-              strokeWidth={0.6}
-              strokeOpacity={0.26}
-            />
+            <line x1={CX - R} y1={CY} x2={CX + R} y2={CY} strokeWidth={0.6} strokeOpacity={0.26} />
+            <line x1={CX} y1={CY - R} x2={CX} y2={CY + R} strokeWidth={0.6} strokeOpacity={0.26} />
           </g>
           {passes.map(({ sat, color, run }) => {
             if (!run || run.length < 2) return null;
@@ -328,10 +266,7 @@ export function PolarSkyPlot({
               })
               .join(" ");
             const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => {
-              const idx = Math.min(
-                run.length - 1,
-                Math.round(f * (run.length - 1)),
-              );
+              const idx = Math.min(run.length - 1, Math.round(f * (run.length - 1)));
               return run[idx];
             });
             return (
@@ -359,13 +294,7 @@ export function PolarSkyPlot({
                   const [x, y] = project(s.az, s.el);
                   return (
                     <g key={i}>
-                      <circle
-                        cx={x}
-                        cy={y}
-                        r={0.9}
-                        fill={color}
-                        opacity={0.85}
-                      />
+                      <circle cx={x} cy={y} r={0.9} fill={color} opacity={0.85} />
                       {showLabels && (
                         <text
                           x={x + 1.8}
@@ -476,18 +405,12 @@ export function PolarSkyPlot({
           const P = passes.find((p) => p.sat.id === hover.id);
           const lines: string[] = [];
           if (L.up && L.la) {
-            lines.push(
-              `Az ${L.la.azimuth.toFixed(1)}°`,
-              `El ${L.la.elevation.toFixed(1)}°`,
-            );
+            lines.push(`Az ${L.la.azimuth.toFixed(1)}°`, `El ${L.la.elevation.toFixed(1)}°`);
             if (L.losMs != null) lines.push(`LOS in ${fmtDur(L.losMs)}`);
           } else if (P?.run && P.run.length > 0) {
             let maxEl = 0;
             for (const s of P.run) maxEl = Math.max(maxEl, s.el);
-            lines.push(
-              `AOS ${fmtUTC(P.run[0].t)} UTC`,
-              `Max El ${maxEl.toFixed(0)}°`,
-            );
+            lines.push(`AOS ${fmtUTC(P.run[0].t)} UTC`, `Max El ${maxEl.toFixed(0)}°`);
             if (now) lines.push(`in ${fmtDur(P.run[0].t - now)}`);
           } else {
             lines.push("No pass in window");

@@ -11,11 +11,7 @@ export async function downloadFile(url: string): Promise<string> {
           // Follow redirect
           https.get(res.headers.location!, (res2) => {
             if (res2.statusCode !== 200) {
-              reject(
-                new Error(
-                  `Failed to download: ${res2.statusCode} ${res2.statusMessage}`,
-                ),
-              );
+              reject(new Error(`Failed to download: ${res2.statusCode} ${res2.statusMessage}`));
               return;
             }
             let data = "";
@@ -25,11 +21,7 @@ export async function downloadFile(url: string): Promise<string> {
             res2.on("error", reject);
           });
         } else if (res.statusCode !== 200) {
-          reject(
-            new Error(
-              `Failed to download: ${res.statusCode} ${res.statusMessage}`,
-            ),
-          );
+          reject(new Error(`Failed to download: ${res.statusCode} ${res.statusMessage}`));
           return;
         } else {
           let data = "";

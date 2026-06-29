@@ -1,10 +1,7 @@
 "use client";
 
 import { PolarSkyPlot } from "@plexusui/components/charts/polar-sky-plot";
-import {
-  type ApiProp,
-  ApiReferenceTable,
-} from "@/components/api-reference-table";
+import { type ApiProp, ApiReferenceTable } from "@/components/api-reference-table";
 import { ComponentPreview } from "@/components/component-preview";
 
 // ============================================================================
@@ -21,10 +18,8 @@ const SATELLITES = [
     label: "ISS",
     color: "#e0457b",
     tle: {
-      line1:
-        "1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9000",
-      line2:
-        "2 25544  51.6400 208.9163 0006317  69.9862 290.1962 15.49380999000009",
+      line1: "1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9000",
+      line2: "2 25544  51.6400 208.9163 0006317  69.9862 290.1962 15.49380999000009",
     },
   },
   {
@@ -32,10 +27,8 @@ const SATELLITES = [
     label: "NOAA-19",
     color: "#5b9bd5",
     tle: {
-      line1:
-        "1 33591U 09005A   24001.50000000  .00000098  00000-0  790-4 0  9991",
-      line2:
-        "2 33591  99.1890  45.2000 0014000 100.0000 260.2000 14.12500000  9990",
+      line1: "1 33591U 09005A   24001.50000000  .00000098  00000-0  790-4 0  9991",
+      line2: "2 33591  99.1890  45.2000 0014000 100.0000 260.2000 14.12500000  9990",
     },
   },
 ];
@@ -61,11 +54,7 @@ function NextPassExample() {
       preview={
         <div className="flex justify-center">
           <div className="w-full max-w-md">
-            <PolarSkyPlot
-              observer={CPH}
-              satellites={SATELLITES}
-              epochOverride={PASS_EPOCH}
-            />
+            <PolarSkyPlot observer={CPH} satellites={SATELLITES} epochOverride={PASS_EPOCH} />
           </div>
         </div>
       }
@@ -114,8 +103,7 @@ const props: ApiProp[] = [
     name: "satellites",
     type: "SkyPlotSatellite[]",
     default: "[]",
-    description:
-      "Satellites to plot (TLE per object), each with an optional colour/label.",
+    description: "Satellites to plot (TLE per object), each with an optional colour/label.",
   },
   {
     name: "minElevation",
@@ -161,8 +149,8 @@ export function PolarSkyPlotExamples() {
         <div>
           <h2 className="text-2xl font-bold mb-2">API Reference</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            Azimuth/elevation sky plot of satellite passes from a ground
-            station, driven by SGP4 look-angles.
+            Azimuth/elevation sky plot of satellite passes from a ground station, driven by SGP4
+            look-angles.
           </p>
         </div>
         <div className="space-y-4">

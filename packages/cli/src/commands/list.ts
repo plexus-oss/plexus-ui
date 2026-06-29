@@ -1,18 +1,12 @@
 import chalk from "chalk";
 import fs from "fs-extra";
-import {
-  getAllComponents,
-  getComponentsByCategory,
-} from "../registry/index.js";
-import {
-  detectProjectStructure,
-  getComponentDestinationPath,
-} from "../utils/index.js";
+import { getAllComponents, getComponentsByCategory } from "../registry/index.js";
+import { detectProjectStructure, getComponentDestinationPath } from "../utils/index.js";
 
 async function isComponentInstalled(
   _componentName: string,
   componentsDir: string,
-  files: string[],
+  files: string[]
 ): Promise<boolean> {
   if (files.length === 0) return false;
 
@@ -32,19 +26,13 @@ export async function list(options: { category?: string } = {}) {
     const components = getComponentsByCategory(options.category);
 
     if (components.length === 0) {
-      console.log(
-        chalk.yellow(`No components found in category: ${options.category}`),
-      );
+      console.log(chalk.yellow(`No components found in category: ${options.category}`));
       return;
     }
 
     console.log(chalk.bold(`Category: ${options.category}\n`));
     for (const component of components) {
-      const installed = await isComponentInstalled(
-        component.name,
-        componentsDir,
-        component.files,
-      );
+      const installed = await isComponentInstalled(component.name, componentsDir, component.files);
       const status = installed ? chalk.green("✓") : chalk.dim("○");
       console.log(`${status} ${chalk.cyan(component.name)}`);
       if (component.description) {
@@ -56,9 +44,7 @@ export async function list(options: { category?: string } = {}) {
     // Group by category - dynamically derived from registry
     const allComponents = getAllComponents();
     const categories = [
-      ...new Set(
-        allComponents.map((c) => c.category).filter((cat) => cat !== undefined),
-      ),
+      ...new Set(allComponents.map((c) => c.category).filter((cat) => cat !== undefined)),
     ].sort() as string[];
 
     for (const cat of categories) {
@@ -70,7 +56,7 @@ export async function list(options: { category?: string } = {}) {
         const installed = await isComponentInstalled(
           component.name,
           componentsDir,
-          component.files,
+          component.files
         );
         const status = installed ? chalk.green("✓") : chalk.dim("○");
         console.log(`  ${status} ${chalk.cyan(component.name)}`);
@@ -86,7 +72,7 @@ export async function list(options: { category?: string } = {}) {
     chalk.dim("Legend: ") +
       chalk.green("✓") +
       chalk.dim(" installed  ") +
-      chalk.dim("○ not installed"),
+      chalk.dim("○ not installed")
   );
   console.log(chalk.dim("\nTo add a component, run:"));
   console.log(chalk.cyan("  npx plexus-ui add <component-name>\n"));

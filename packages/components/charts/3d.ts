@@ -26,14 +26,6 @@
  * ```
  */
 
-// Globe (3D Earth + satellite visualisation)
-export type { GlobeProps, GroundMarker, SatelliteInput } from "./globe";
-export { EarthGlobe, Globe } from "./globe";
-export type {
-  PropagationWorkerHandle,
-  PropagationWorkerSat,
-} from "./use-propagation-worker";
-export { usePropagationWorker } from "./use-propagation-worker";
 // Orbital mechanics core (re-exported for convenience)
 export type {
   KeplerianElements,
@@ -81,6 +73,9 @@ export {
 export type { ModelViewerProps } from "./3d-model-viewer";
 // 3D Model Viewer
 export { ModelViewer } from "./3d-model-viewer";
+// Globe (3D Earth + satellite visualisation)
+export type { GlobeProps, GroundMarker, SatelliteInput } from "./globe";
+export { EarthGlobe, Globe } from "./globe";
 export type {
   BoundingBox3D as BoundingBox3DType,
   BoundingBox3DProps,
@@ -110,3 +105,8 @@ export type {
 } from "./point-cloud-viewer";
 // Point Cloud Viewer
 export { PointCloudViewer } from "./point-cloud-viewer";
+export type {
+  PropagationWorkerHandle,
+  PropagationWorkerSat,
+} from "./use-propagation-worker";
+export { usePropagationWorker } from "./use-propagation-worker";

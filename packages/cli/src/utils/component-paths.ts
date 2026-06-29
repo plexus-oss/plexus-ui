@@ -6,7 +6,7 @@ import * as path from "node:path";
  */
 export function getComponentDestinationPath(
   sourceFilePath: string,
-  baseComponentsDir: string,
+  baseComponentsDir: string
 ): string {
   const filename = path.basename(sourceFilePath);
   const dirname = path.dirname(sourceFilePath);
@@ -44,7 +44,7 @@ export function getComponentDestinationPath(
  */
 export function getComponentSubdirectory(
   sourceFilePath: string,
-  baseComponentsDir: string,
+  baseComponentsDir: string
 ): string | null {
   const dirname = path.dirname(sourceFilePath);
 
