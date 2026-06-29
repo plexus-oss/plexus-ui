@@ -46,5 +46,8 @@
     "@biomejs/biome": "^2.3.4",
     "typescript": "^5.4.5"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "overrides": {
+    "postcss": "^8.5.10"
+  }
 }
